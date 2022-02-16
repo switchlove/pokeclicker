@@ -1,4 +1,4 @@
-var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, curDungeon, curRoute, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
+var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
 
 var bossA = 0;
 var bossB = 0;
@@ -9,6 +9,7 @@ var lastEPoke = 0;
 var lastPoke = 0;
 var mystSCount = 0;
 var stage = 0;
+var boost = 1;
 
 
 Element.prototype.appendBefore = function (element) {
@@ -27,11 +28,16 @@ window.addEventListener("load", function() {
 	setTimeout(function(){
 		main();
 
+
 		setInterval(function(){
 			main();
 		}, 500);
 
-		Settings.add(new Setting('menuPlace', 'Place A6 window after this:',
+    Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
+    Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
+    Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
+    Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
+		Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this:',
 			[
 				new SettingOption('Achievement Tracker', 'achivementTrackerContainer'),
 				new SettingOption('Battle Items', 'battleItemContainer'),
@@ -43,12 +49,13 @@ window.addEventListener("load", function() {
 				new SettingOption('Pokéballs', 'pokeballSelector'),
 			],
 			'pokeballSelector'));
-		Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
-		Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
-		Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
 		Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
+		Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
+    Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
+
 		Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
 		Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
+		Settings.add(new BooleanSetting('chestCollect', 'Open chests in dungeons', false));
 		Settings.add(new Setting('dungeOpts', 'Dungeon bot stop options:',
 			[
 				new SettingOption('None', 'dungOptN'),
@@ -79,64 +86,104 @@ window.addEventListener("load", function() {
 				new SettingOption('Level', 'bfOptL'),
 			],
 			'bfOptN'));
+		Settings.add(new Setting('maxChests', 'maxChests', [], '1'));
 		Settings.add(new Setting('maxClears', 'maxClears', [], '1000'));
 		Settings.add(new Setting('minDT', 'minDT', [], '10000'));
 		Settings.add(new Setting('maxLvl', 'maxLvl', [], '100'));
 		Settings.add(new Setting('maxTime', 'maxTime', [], '30'));
 		Settings.add(new Setting('srOpts', 'Soft Reset Type:',
-		[
-			new SettingOption('Mystery Eggs', 'mys'),
-			new SettingOption('Evo Items', 'evo'),
-			new SettingOption('Shop Mon', 'poke'),
-		],
-		'mys'));
+  		[
+  			new SettingOption('Mystery Eggs', 'mys'),
+  			new SettingOption('Evo Items', 'evo'),
+  			new SettingOption('Fossils', 'fos'),
+  			new SettingOption('Shop Mon', 'poke'),
+  			//new SettingOption('Regular Eggs', 'egg'),
+  		],
+  		'mys'));
 		Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item:',
-		[
-			new SettingOption('Dawn Stone', 'Dawn_stone'),
-			new SettingOption('Deepsea Scale', 'Deepsea_scale'),
-			new SettingOption('Deepsea Tooth', 'Deepsea_tooth'),
-			new SettingOption('Dragon Scale', 'Dragon_scale'),
-			new SettingOption('Dubious Disc', 'Dubious_disc'),
-			new SettingOption('Dusk Stone', 'Dusk_stone'),
-			new SettingOption('Electirizer', 'Electirizer'),
-			new SettingOption('Fire Stone', 'Fire_stone'),
-			new SettingOption('Kings Rock', 'Kings_rock'),
-			new SettingOption('Leaf Stone', 'Leaf_stone'),
-			new SettingOption('Magmarizer', 'Magmarizer'),
-			new SettingOption('Metal Coat', 'Metal_coat'),
-			new SettingOption('Moon Stone', 'Moon_stone'),
-			new SettingOption('Prism Scale', 'Prism_scale'),
-			new SettingOption('Protector', 'Protector'),
-			new SettingOption('Razor Claw', 'Razor_claw'),
-			new SettingOption('Razor Fang', 'Razor_fang'),
-			new SettingOption('Reaper Cloth', 'Reaper_cloth'),
-			new SettingOption('Sachet', 'Sachet'),
-			new SettingOption('Shiny Stone', 'Shiny_stone'),
-			new SettingOption('Soothe Bell', 'Soothe_bell'),
-			new SettingOption('Sun Stone', 'Sun_stone'),
-			new SettingOption('Thunder Stone', 'Thunder_stone'),
-			new SettingOption('Trade Stone', 'Trade_stone'),
-			new SettingOption('Upgrade', 'Upgrade'),
-			new SettingOption('Water Stone', 'Water_stone'),
-			new SettingOption('Whipped Dream', 'Whipped_dream'),
-		],
-		'Water_stone'));
+  		[
+  			new SettingOption('Dawn Stone', 'Dawn_stone'),
+  			new SettingOption('Deepsea Scale', 'Deepsea_scale'),
+  			new SettingOption('Deepsea Tooth', 'Deepsea_tooth'),
+  			new SettingOption('Dragon Scale', 'Dragon_scale'),
+  			new SettingOption('Dubious Disc', 'Dubious_disc'),
+  			new SettingOption('Dusk Stone', 'Dusk_stone'),
+  			new SettingOption('Electirizer', 'Electirizer'),
+  			new SettingOption('Fire Stone', 'Fire_stone'),
+  			new SettingOption('Kings Rock', 'Kings_rock'),
+  			new SettingOption('Leaf Stone', 'Leaf_stone'),
+  			new SettingOption('Magmarizer', 'Magmarizer'),
+  			new SettingOption('Metal Coat', 'Metal_coat'),
+  			new SettingOption('Moon Stone', 'Moon_stone'),
+  			new SettingOption('Prism Scale', 'Prism_scale'),
+  			new SettingOption('Protector', 'Protector'),
+  			new SettingOption('Razor Claw', 'Razor_claw'),
+  			new SettingOption('Razor Fang', 'Razor_fang'),
+  			new SettingOption('Reaper Cloth', 'Reaper_cloth'),
+  			new SettingOption('Sachet', 'Sachet'),
+  			new SettingOption('Shiny Stone', 'Shiny_stone'),
+  			new SettingOption('Soothe Bell', 'Soothe_bell'),
+  			new SettingOption('Sun Stone', 'Sun_stone'),
+  			new SettingOption('Thunder Stone', 'Thunder_stone'),
+  			new SettingOption('Trade Stone', 'Trade_stone'),
+  			new SettingOption('Upgrade', 'Upgrade'),
+  			new SettingOption('Water Stone', 'Water_stone'),
+  			new SettingOption('Whipped Dream', 'Whipped_dream'),
+  		],
+  		'Water_stone'));
+		Settings.add(new Setting('breedingOpts', 'Breeding options:',
+  		[
+  			new SettingOption('None', 'none'),
+  			new SettingOption('Mystery Eggs', 'mystery'),
+  			new SettingOption('Typed Eggs', 'typed'),
+  			new SettingOption('Fossils', 'fossil'),
+  		],
+  		'none'));
+		Settings.add(new Setting('typedEggOpts', 'Typed egg to use:',
+  		[
+  			new SettingOption('Fire', 'fire'),
+  			new SettingOption('Water', 'water'),
+  			new SettingOption('Grass', 'grass'),
+  			new SettingOption('Electric', 'electric'),
+  			new SettingOption('Fighting', 'fighting'),
+  			new SettingOption('Dragon', 'dragon'),
+  		],
+  		'fire'));
+		Settings.add(new Setting('fossilOpts', 'Fossil to use:',
+  		[
+  			new SettingOption('Dome', 'dome'),
+  			new SettingOption('Helix', 'helix'),
+  			new SettingOption('Amber', 'amber'),
+  			new SettingOption('Root', 'root'),
+  			new SettingOption('Claw', 'claw'),
+  			new SettingOption('Skull', 'skull'),
+  			new SettingOption('Armor', 'armor'),
+  			new SettingOption('Plume', 'plume'),
+  			new SettingOption('Cover', 'cover'),
+  			new SettingOption('Jaw', 'jaw'),
+  			new SettingOption('Sail', 'sail'),
+  		],
+  		'dome'));
+		Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?',
+  		[
+  			new SettingOption('None', 'none'),
+  			new SettingOption('Pokéball', 'pokeB'),
+  			new SettingOption('Greatball', 'greatB'),
+  			new SettingOption('Ultraball', 'ultraB'),
+  		],
+  		'none'));
+    Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
+    Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+    /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
+  		[
+  			new SettingOption('None', 'none'),
+  			new SettingOption('Boost Mulch', 'boostM'),
+  		],
+  		'none'));*/
 
 		const settingsModal = document.getElementById('settingsModal');
 		const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
 		const tabContent = settingsModal.getElementsByClassName('tab-content')[0];
-
-		const a6Tab = document.createElement('li');
-		a6Tab.className = 'nav-item';
-
-		const a6TabInner = document.createElement('a');
-		a6TabInner.innerText = '---';
-		a6TabInner.className = 'nav-link';
-		a6TabInner.href = '#settings-a6csrq';
-		a6TabInner.dataset.toggle = 'tab';
-
-		a6Tab.appendChild(a6TabInner);
-		tabs.appendChild(a6Tab);
 
 		const a6TabEl = document.createElement('div');
 		a6TabEl.className = 'tab-pane';
@@ -148,7 +195,7 @@ window.addEventListener("load", function() {
 		a6Tab1.className = 'nav-item';
 
 		const a6Tab1Inner = document.createElement('a');
-		a6Tab1Inner.innerText = 'A6CSRQ';
+		a6Tab1Inner.innerText = 'ACSRQ';
 		a6Tab1Inner.className = 'nav-link';
 		a6Tab1Inner.href = '#settings-a6csrq1';
 		a6Tab1Inner.dataset.toggle = 'tab';
@@ -161,10 +208,13 @@ window.addEventListener("load", function() {
 		a6Tab1El.id = 'settings-a6csrq1';
 		a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
-			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
+      <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('gideBItem')}"></tr>
+      <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
+			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
+			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
 		</tbody></table>`;
 		tabContent.appendChild(a6Tab1El);
 
@@ -172,7 +222,7 @@ window.addEventListener("load", function() {
 		a6Tab2.className = 'nav-item';
 
 		const a6Tab2Inner = document.createElement('a');
-		a6Tab2Inner.innerText = 'A6CSRQ - Scripting';
+		a6Tab2Inner.innerText = 'ACSRQ - Scripting';
 		a6Tab2Inner.className = 'nav-link';
 		a6Tab2Inner.href = '#settings-a6csrq2';
 		a6Tab2Inner.dataset.toggle = 'tab';
@@ -186,18 +236,28 @@ window.addEventListener("load", function() {
 		a6Tab2El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botOptions')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botRush')}"></tr>
+			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('chestCollect')}"></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('dungeOpts')}"></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymOpts')}"></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymE4Opts')}"></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('bfOpts')}"></tr>
+			<tr style="display: none"><td class="p-2">Number of chests to open:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxChests" name="maxChests" data-bind="value: Settings.getSetting('maxChests').observableValue() || ''" value="1}"></td></tr>
 			<tr style="display: none"><td class="p-2">Maximum clears:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxClears" name="maxClears" data-bind="value: Settings.getSetting('maxClears').observableValue() || ''" value="1000}"></td></tr>
 			<tr style="display: none"><td class="p-2">Minimum DT to retain:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minDT" name="minDT" data-bind="value: Settings.getSetting('minDT').observableValue() || ''" value="10000"></td></tr>
 			<tr style="display: none"><td class="p-2">Battle Frontier level to stop at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxLvl" name="maxLvl" data-bind="value: Settings.getSetting('maxLvl').observableValue() || ''" value="100"></td></tr>
 			<tr style="display: none"><td class="p-2">Time remaining to quit Battle Frontier at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxTime" name="maxTime" data-bind="value: Settings.getSetting('maxTime').observableValue() || ''" value="30"></td></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('srOpts')}"></tr>
 			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('evoOpts')}"></tr>
+			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('breedingOpts')}"></tr>
+			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('typedEggOpts')}"></tr>
+			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('fossilOpts')}"></tr>
+      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
+      <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
+      <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
 		</tbody></table>`;
+    //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
 		tabContent.appendChild(a6Tab2El);
+
 	}, 1000);
 
 	setInterval(function(){
@@ -240,12 +300,20 @@ function main(){
 	var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
 	if (CharCard == null && App.game != undefined) {
 		a6save();
+    a6settings();
 		a6menu();
-		a6settings();
+    if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
+      ballBot();
+    }
 	} else {
 		if (localStorage.getItem('a6csrq-settings') != null) {
 			if (JSON.parse(localStorage.getItem('a6csrq-settings'))[9][2] == 1) {
 				Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[9][1];
+
+        var pSave = JSON.parse(localStorage.getItem(`player${Save.key}`))
+        pSave._lastSeen = Date.now();
+        localStorage.setItem(`player${Save.key}`, JSON.stringify(pSave));
+
 				document.querySelector('#saveSelector').remove();
 				App.start();
 			}
@@ -279,7 +347,7 @@ function a6save() {
 		localStorage.setItem(saveKey, JSON.stringify(localLocal));
 	}
 
-	localSettings = ["", false, false, false, false, false, "", "0", "0", ['','',''], "", false, "", ""];
+	localSettings = ["", false, false, false, false, false, "", "0", "0", ['','','',''], "", false, "", ""];
 	settingKey = "a6csrq-settings";
 
 	if ( localStorage.getItem(settingKey) == null ) {
@@ -289,9 +357,14 @@ function a6save() {
 	}
 
 	if (localSettings[9].length == 1) {
-		localSettings[9].push(['','','']);
+		localSettings[9] = ['','',''];
 		localStorage.setItem(settingKey, JSON.stringify(localSettings));
 	}
+
+	if (localSettings[9].length == 3) {
+    localSettings[9] = ['','','',''];
+    localStorage.setItem(settingKey, JSON.stringify(localSettings));
+  }
 
 	saveLoaded = 1;
 }
@@ -318,7 +391,7 @@ function a6menu(){
 		document.querySelector("#automationContainer").append(mainHeader);
 
 		var mainHeaderText = document.createElement('span');
-		mainHeaderText.textContent = 'A6CSRQ Info';
+		mainHeaderText.textContent = 'ACSRQ Info';
 		document.querySelector("#automationContainerHeader").append(mainHeaderText);
 
 		var mainHeaderTbl = document.createElement('table');
@@ -422,7 +495,7 @@ function a6menu(){
 		td1r06menu.id = "autoPlant";
 		var td2r06 = document.createElement('td');
 
-		var tr07 = document.createElement('tr');
+		/*var tr07 = document.createElement('tr');
     tr07.id = 'mutateBot';
 		tr07.style.display = "none";
     var td1r07 = document.createElement('td');
@@ -437,7 +510,7 @@ function a6menu(){
   		td1r07menu.appendChild(td1r07submenu);
   	}
   	td1r07menu.id = "autoMutate";
-  	var td2r07 = document.createElement('td');
+  	var td2r07 = document.createElement('td');*/
 
 		var tr2 = document.createElement('tr');
 		tr2.id = 'areaPhase';
@@ -512,8 +585,8 @@ function a6menu(){
     td2r05.appendChild(document.createTextNode('SR Bot'));
 		td1r06.appendChild(td1r06menu);
     td2r06.appendChild(document.createTextNode('Planter Bot'));
-		td1r07.appendChild(td1r07menu);
-    td2r07.appendChild(document.createTextNode('Mutate Bot'));
+		//td1r07.appendChild(td1r07menu);
+    //td2r07.appendChild(document.createTextNode('Mutate Bot'));
 		td1r2.appendChild(td1r2textbox);
 		td2r2.appendChild(document.createTextNode('Phase'));
 		td1r3.appendChild(document.createTextNode(''));
@@ -545,8 +618,8 @@ function a6menu(){
 		tr05.appendChild(td2r05);
 		tr06.appendChild(td1r06);
 		tr06.appendChild(td2r06);
-		tr07.appendChild(td1r07);
-		tr07.appendChild(td2r07);
+		//tr07.appendChild(td1r07);
+		//tr07.appendChild(td2r07);
 		tr2.appendChild(td1r2);
 		tr2.appendChild(td2r2);
 		tr3.appendChild(td1r3);
@@ -571,7 +644,7 @@ function a6menu(){
 		tbdy.appendChild(tr04);
 		tbdy.appendChild(tr05);
 		tbdy.appendChild(tr06);
-		tbdy.appendChild(tr07);
+		//tbdy.appendChild(tr07);
 		tbdy.appendChild(tr2);
 		tbdy.appendChild(tr3);
 		tbdy.appendChild(tr4);
@@ -586,8 +659,8 @@ function a6menu(){
 
 		var sFoot = document.createElement('div');
 		sFoot.id = 'shinyFooter';
-        sFoot.className = 'card-footer p-0';
-        sFoot.setAttribute('data-bind', "hidden: App.game.gameState === GameConstants.GameState.town");
+    sFoot.className = 'card-footer p-0';
+    //sFoot.setAttribute('data-bind', "hidden: App.game.gameState === GameConstants.GameState.town");
 		sFoot.appendBefore( document.querySelector("#battleContainer > div.card-footer.p-0") );
 		sFoot.style.display = "none";
 
@@ -596,37 +669,54 @@ function a6menu(){
 		sFootTbl.style.width = '100%';
 		var fbdy = document.createElement('tbody');
 
-		var fr01 = document.createElement('tr');
+    var fr00 = document.createElement('tr');
+		fr00.id = 'possibleLoot';
+		var fd1r00 = document.createElement('td');
+		fd1r00.style.width = '50%';
+		var fd2r00 = document.createElement('td');
+		fd2r00.style.width = '50%';
+
+    var fr01 = document.createElement('tr');
 		fr01.id = 'missingShiny';
 		var fd1r01 = document.createElement('td');
 		fd1r01.style.width = '50%';
 		var fd2r01 = document.createElement('td');
 		fd2r01.style.width = '50%';
 
-
+		fd1r00.appendChild(document.createTextNode('Possible Loot'));
+		fd2r00.appendChild(document.createTextNode(''));
 		fd1r01.appendChild(document.createTextNode('Needed Shiny'));
 		fd2r01.appendChild(document.createTextNode(''));
+		fr00.appendChild(fd1r00);
+		fr00.appendChild(fd2r00);
 		fr01.appendChild(fd1r01);
 		fr01.appendChild(fd2r01);
+		fbdy.appendChild(fr00);
 		fbdy.appendChild(fr01);
 		sFootTbl.appendChild(fbdy);
 		sFoot.appendChild(sFootTbl);
 
 		if ( localSettings != null ) {
-			if (localSettings[2] == true) {
+			if (Settings.getSetting('hideOak').observableValue() == true) {
 				document.querySelector("#oakItemsContainer").style.display = 'none';
 			} else {
 				document.querySelector("#oakItemsContainer").removeAttribute("style");
 			}
-			if (localSettings[3] == true) {
+			if (Settings.getSetting('gideBItem').observableValue() == true) {
 				document.querySelector("#battleItemContainer").style.display = 'none';
 			} else {
 				document.querySelector("#battleItemContainer").removeAttribute("style");
+			}
+			if (Settings.getSetting('hideNoti').observableValue() == true) {
+				document.querySelector("#toaster").style.display = 'none';
+			} else {
+				document.querySelector("#toaster").removeAttribute("style");
 			}
 			if (localSettings[9][2] == 1) {
 				document.querySelector("#srCheck").checked = true;
 				Settings.setSettingByName('disableSave', true)
 			}
+
 		}
 	} else {
 		if ( document.querySelector("#automationContainer").previousSibling.id != Settings.getSetting('menuPlace').observableValue() ) {
@@ -641,17 +731,27 @@ function a6menu(){
 		lastPokeEncounter();
 		areaClears();
 		missingShinies();
+    missingLoot();
 
-		if ( localSettings != null ) {
-			if (localSettings[2] == true) {
+    if ( localSettings != null ) {
+			if (Settings.getSetting('hideOak').observableValue() == true) {
 				document.querySelector("#oakItemsContainer").style.display = 'none';
 			} else {
 				document.querySelector("#oakItemsContainer").removeAttribute("style");
 			}
-			if (localSettings[3] == true) {
+			if (Settings.getSetting('gideBItem').observableValue() == true) {
 				document.querySelector("#battleItemContainer").style.display = 'none';
 			} else {
 				document.querySelector("#battleItemContainer").removeAttribute("style");
+			}
+			if (Settings.getSetting('hideNoti').observableValue() == true) {
+				document.querySelector("#toaster").style.display = 'none';
+			} else {
+				document.querySelector("#toaster").removeAttribute("style");
+			}
+			if (localSettings[9][2] == 1) {
+				document.querySelector("#srCheck").checked = true;
+				Settings.setSettingByName('disableSave', true)
 			}
 		}
 	}
@@ -679,6 +779,27 @@ async function a6settings() {
 	if (Settings.getSetting('dungeOpts') != null) {
 		localSettings[6] = Settings.getSetting('dungeOpts').observableValue();
 	}
+	if (Settings.getSetting('breedingOpts') != null){
+		if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
+		}
+		if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").removeAttribute("style");
+		}
+		if (Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").removeAttribute("style");
+		}
+	}
+	if (Settings.getSetting('chestCollect') != null) {
+    if (Settings.getSetting('chestCollect').observableValue() == true) {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").removeAttribute("style");
+    } else {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").style.display = "none";
+    }
+	}
 	if (Settings.getSetting('maxClears') != null) {
 		localSettings[7] = Settings.getSetting('maxClears').observableValue();
 	}
@@ -688,9 +809,11 @@ async function a6settings() {
 	if (Settings.getSetting('srOpts') != null) {
 		localSettings[9][0] = Settings.getSetting('srOpts').observableValue();
 		if (Settings.getSetting('srOpts').observableValue() == 'evo') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").removeAttribute("style");
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
+		} else if (Settings.getSetting('srOpts').observableValue() == 'fos') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").removeAttribute("style");
 		} else {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
 		}
 	}
 	if (Settings.getSetting('gymOpts') != null) {
@@ -702,19 +825,28 @@ async function a6settings() {
 	if (Settings.getSetting('bfOpts') != null) {
 		localSettings[12] = Settings.getSetting('bfOpts').observableValue();
 		if (Settings.getSetting('bfOpts').observableValue() == 'bfOptL') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").removeAttribute("style");
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").removeAttribute("style");
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
 		} else if (Settings.getSetting('bfOpts').observableValue() == 'bfOptT') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").removeAttribute("style");
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").removeAttribute("style");
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
 		} else {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").style.display = "none";
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
 		}
 	}
 	if (Settings.getSetting('evoOpts') != null) {
 		localSettings[13] = Settings.getSetting('evoOpts').observableValue();
 	}
+  if (Settings.getSetting('ballBuyOpts') != null) {
+    if (Settings.getSetting('ballBuyOpts').observableValue() == 'none') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(20)").style.display = "none";
+    } else {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(20)").removeAttribute("style");
+    }
+  }
 	localStorage.setItem(settingKey, JSON.stringify(localSettings));
 
 	if (Settings.getSetting('dungeOpts') != null && Settings.getSetting('gymOpts') != null) {
@@ -722,14 +854,14 @@ async function a6settings() {
 		var gymO = Settings.getSetting('gymOpts').observableValue();
 
 		if (dunO == 'dungOptC' || gymO == 'gymOptC') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(7)").removeAttribute("style");
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").removeAttribute("style");
 		} else {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(7)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").style.display = "none";
 		}
 		if (dunO == 'dungOptDT') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").removeAttribute("style");
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").removeAttribute("style");
 		} else {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").style.display = "none";
 		}
 	}
 
@@ -868,14 +1000,20 @@ async function a6settings() {
 			//BF Bot
 			if (MapHelper.calculateTownCssClass('Battle Frontier') != "locked") {
 				document.querySelector("#bfBot").removeAttribute("style");
-				document.querySelector("#bfCheck").disabled = false;
-				var checkBFClicker = document.querySelector("#bfCheck");
-				if (checkBFClicker.checked == true){
-					bfClick(1);
-				}
-				if (checkBFClicker.checked == false){
-					bfClick(0);
-				}
+        if ( player.route() == 0 && player.town().name == "Battle Frontier" ) {
+  				document.querySelector("#bfCheck").disabled = false;
+  				var checkBFClicker = document.querySelector("#bfCheck");
+  				if (checkBFClicker.checked == true){
+  					bfClick(1);
+  				}
+  				if (checkBFClicker.checked == false){
+  					bfClick(0);
+  				}
+        } else {
+  				document.querySelector("#bfCheck").disabled = true;
+  				document.querySelector("#bfCheck").checked = false;
+  				bfClick(0);
+  			}
 			} else {
 				document.querySelector("#bfCheck").disabled = true;
 				document.querySelector("#bfCheck").checked = false;
@@ -941,8 +1079,10 @@ async function a6settings() {
 			//document.querySelector("#mutateBot").style.display = "none";
 			//document.querySelector("#mutateBot").value = "N/A";
 			document.querySelector("#breedingBot").style.display = "none";
-			document.querySelector("#srCheck").disabled = true;
+			document.querySelector("#srBot").style.display = "none";
 			document.querySelector("#srCheck").checked = false;
+			document.querySelector("#bfBot").style.display = "none";
+			document.querySelector("#bfCheck").checked = false;
 		}
 
 		if (localSettings[11] == true) {
@@ -979,10 +1119,8 @@ async function a6settings() {
 		document.querySelector("#shinyFooter").style.display = "block";
 	} else if (player.town().dungeon != undefined) {
 		document.querySelector("#shinyFooter").style.display = "block";
-	} else if (player.town().gym != undefined) {
-		document.querySelector("#shinyFooter").style.display = "none";
-	} else if (player.town().gymList != undefined) {
-		document.querySelector("#shinyFooter").style.display = "none";
+	} else if (player.town().shops.length != 0) {
+    document.querySelector("#shinyFooter").style.display = "block";
 	} else {
 		document.querySelector("#shinyFooter").style.display = "none";
 	}
@@ -1041,14 +1179,14 @@ function uniqueCheckAll() {
 }
 
 function uniqueCheckEvent() {
-	var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)"];
+	var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)"];
 	var eventCaught = 0;
 	for (let eP = 0; eP < eventPoke.length; eP++) {
 		if ( App.game.party.alreadyCaughtPokemonByName(eventPoke[eP]) == true) {
 			eventCaught++;
 		}
 	}
-	document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/24';
+	document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/27';
 }
 
 function boostedRoute() {
@@ -1073,43 +1211,141 @@ function lastPokeEncounter() {
 	}
 }
 
+async function missingLoot() {
+  if (Settings.getSetting('showLoot') != null) {
+    if (Settings.getSetting('showLoot').observableValue() == true) {
+      if (player.town().dungeon != undefined && player.route() == 0) {
+        document.querySelector("#possibleLoot").removeAttribute("style");
+        var dLoot = player.town().dungeon.itemList;
+        var dLootA = [];
+
+        for (let x = 0; x < dLoot.length; x++) {
+          var lootI = GameConstants.humanifyString(dLoot[x].loot);
+          dLootA.push( lootI );
+        }
+        dLootA = [ ...new Set(dLootA) ].sort().join(', ');
+        document.querySelector("#possibleLoot > td:nth-child(2)").innerText = dLootA;
+      } else {
+        document.querySelector("#possibleLoot").style.display = "none";
+      }
+    } else {
+      document.querySelector("#possibleLoot").style.display = "none";
+    }
+  }
+}
+
 async function missingShinies() {
-	if (player.route() != 0) {
-		var missS = RouteHelper.getAvailablePokemonList(player.route(), player.region);
-		var missC = [];
-		for (let x = 0; x < missS.length; x++) {
-			if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-				missC.push(missS[x])
-			}
-		}
-		missS = missS.filter( ( el ) => !missC.includes( el ) );
-		if ( missS.length == 0) {
-			missS = 'N/A';
-		} else if ( missS.length == 1) {
-			missS = missS[0];
-		} else if (missS.length > 1) {
-			missS = missS.join(', ');
-		}
-		document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-	} else if (player.town().dungeon != undefined) {
-		var missS = player.town().dungeon.pokemonList;
-		missS = missS.concat(player.town().dungeon.bossPokemonList);
-		var missC = [];
-		for (let x = 0; x < missS.length; x++) {
-			if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-				missC.push(missS[x])
-			}
-		}
-		missS = missS.filter( ( el ) => !missC.includes( el ) );
-		if ( missS.length == 0) {
-			missS = 'N/A';
-		} else if ( missS.length == 1) {
-			missS = missS[0];
-		} else if (missS.length > 1) {
-			missS = missS.join(', ');
-		}
-		document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-	}
+  if (Settings.getSetting('showShiny') != null) {
+    if (Settings.getSetting('showShiny').observableValue() == true) {
+      document.querySelector("#missingShiny").removeAttribute("style");
+      //Route poke
+    	if (player.route() != 0) {
+    		missS = RouteHelper.getAvailablePokemonList(player.route(), player.region);
+    		var missC = [];
+    		for (let x = 0; x < missS.length; x++) {
+    			if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
+    				missC.push(missS[x])
+    			}
+    		}
+    		missS = missS.filter( ( el ) => !missC.includes( el ) );
+    		if ( missS.length == 0) {
+    			missS = 'N/A';
+    		} else if ( missS.length == 1) {
+    			missS = missS[0];
+    		} else if (missS.length > 1) {
+    			missS = missS.sort().join(', ');
+    		}
+    		document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
+        document.querySelector("#possibleLoot").style.display = "none";
+    	}
+      //Dungeon Poke
+      if (player.town().dungeon != undefined && player.route() == 0) {
+    		var missS = player.town().dungeon.pokemonList;
+    		missS = missS.concat(player.town().dungeon.bossPokemonList);
+    		var missC = [];
+    		for (let x = 0; x < missS.length; x++) {
+    			if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
+    				missC.push(missS[x])
+    			}
+    		}
+    		missS = missS.filter( ( el ) => !missC.includes( el ) );
+    		if ( missS.length == 0) {
+    			missS = 'N/A';
+    		} else if ( missS.length == 1) {
+    			missS = missS[0];
+    		} else if (missS.length > 1) {
+    			missS = missS.join(', ');
+    		}
+    		document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
+        //Dungeon Chest Poke
+        var lootA = [];
+        var lootL = player.town().dungeon.itemList;
+        for (let x = 0; x < lootL.length; x++) {
+            if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
+                lootA.push(lootL[x].loot);
+            }
+        }
+        var lootC = [];
+        for (let x = 0; x < lootA.length; x++) {
+    			if ( App.game.party.alreadyCaughtPokemonByName(lootA[x], true) == true) {
+    				lootC.push(lootA[x])
+    			}
+    		}
+    		lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
+        if (missS.length >= 1 && lootA.length >= 1) {
+    			missS = missS.concat(lootA);
+    			missS = missS.sort().join(', ');
+          document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
+    		} else if (missS.length == 0) {
+          if ( lootA.length == 0) {
+            lootA = 'N/A';
+          } else if ( lootA.length == 1) {
+            lootA = lootA[0];
+          } else if (lootA.length > 1) {
+            lootA = lootA.sort().join(', ');
+          }
+          document.querySelector("#missingShiny > td:nth-child(2)").innerText = lootA;
+        }
+    	}
+      //Shop Poke
+      if (player.town().shops.length != 0 && player.route() == 0) {
+        var shopS = player.town().shops;
+        var shopA = [];
+
+        for (let x = 0; x < shopS.length; x++) {
+          for (let y = 0; y < shopS[x].items.length; y++) {
+            shopA.push(shopS[x].items[y].name);
+          }
+        }
+        for( var i = 0; i < shopA.length; i++){
+          if ( PokemonHelper.getPokemonByName(shopA[i]).id == 0) {
+            shopA.splice(i, 1);
+            i--;
+          }
+        }
+        for( var i = 0; i < shopA.length; i++){
+          if ( App.game.party.alreadyCaughtPokemonByName(shopA[i], true) == true) {
+            shopA.splice(i, 1);
+            i--;
+          }
+        }
+        if ( shopA.length == 0) {
+    			shopA = 'N/A';
+    		} else if ( shopA.length == 1) {
+    			shopA = shopA[0];
+    		} else if (shopA.length > 1) {
+    			shopA = shopA.sort().join(', ');
+    		}
+        document.querySelector("#missingShiny > td:nth-child(2)").innerText = shopA;
+
+        if (player.town().dungeon == undefined) {
+          document.querySelector("#possibleLoot").style.display = "none";
+        }
+      }
+    } else {
+      document.querySelector("#missingShiny").style.display = "none";
+    }
+  }
 }
 
 async function areaClears() {
@@ -1503,8 +1739,10 @@ async function phaseCounter(arg) {
 }
 
 async function dungeonBot() {
+  //console.log('Running');
 	if (App.game.gameState == 6) {
 		stage = 0;
+    chestOpened = 0;
 		if (App.game.wallet.currencies[GameConstants.Currency.dungeonToken]() >= DungeonRunner.dungeon.tokenCost) {
 			document.querySelector("#townView > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > button.btn.btn-success.p-0").click();
 		}
@@ -1522,10 +1760,18 @@ async function dungeonBot() {
 		var pY = await DungeonRunner.map.playerPosition().y;
 
 		if (localSettings != null) {
-			if ( localSettings[5] == true) {
+			if ( Settings.getSetting('botRush').observableValue() == true) {
 				if (pX == bossB && pY == bossA) {
 					await DungeonRunner.handleClick();
 				}
+			}
+			if ( Settings.getSetting('chestCollect').observableValue() == true) {
+        if (DungeonRunner.map.currentTile().type() == 3) {
+          if (chestOpened < Settings.getSetting('maxChests').observableValue()) {
+            DungeonRunner.handleClick();
+            chestOpened++
+          }
+        }
 			}
 		}
 
@@ -2295,13 +2541,13 @@ async function srBot() {
           if (evoList[x].evolutions.length > 1) {
               for (let y = 0; y < evoList[x].evolutions.length; y++) {
                   if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-                      if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true) {
+                      if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
                           evoDone++;
                       }
                   }
               }
           } else {
-              if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[0].evolvedPokemon, true) != true) {
+              if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[0].evolvedPokemon, true) != true && evoList[x].evolutions[0].isSatisfied()) {
                   evoDone++;
               }
           }
@@ -2312,7 +2558,7 @@ async function srBot() {
 					for (let x = 0; x < evoList.length; x++) {
 						for (let y = 0; y < evoList[x].evolutions.length; y++) {
 							if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-								if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true) {
+								if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
 									localLocal[6][1] = evoList[x].evolutions[y].evolvedPokemon;
 									localStorage.setItem(saveKey, JSON.stringify(localLocal));
 									evoName = evoList[x].evolutions[y].evolvedPokemon;
@@ -2346,6 +2592,55 @@ async function srBot() {
           Save.store(player);
 				}
 			}
+			break;
+    case "fos":
+      var fossilSR = Settings.getSetting('fossilOpts').observableValue();
+		  if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
+        fossilSR = "Old Amber";
+      } else {
+        fossilSR = fossilSR.charAt(0).toUpperCase() + fossilSR.slice(1) + ' Fossil';
+      }
+      var fossilDeets = player.mineInventory().find(i => i.name == fossilSR);
+      var fossilMon = GameConstants.FossilToPokemon[fossilSR];
+      if ( fossilDeets.amount() >= 1 ) {
+        if ( App.game.party.alreadyCaughtPokemonByName(fossilMon, true) != true ) {
+          if (App.game.breeding.eggList[0]().type == -1) {
+            Underground.sellMineItem(fossilDeets.id);
+            localLocal[6][1] = fossilMon;
+            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+          }
+        }
+      }
+      if (App.game.breeding.eggList[0]().type != -1) {
+        if (App.game.breeding.eggList[0]().steps() < App.game.breeding.eggList[0]().totalSteps) {
+          console.log( 'Waiting for steps - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
+        }
+        if (App.game.breeding.eggList[0]().steps() >= App.game.breeding.eggList[0]().totalSteps) {
+          console.log( 'Hatching - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
+          Save.store(player);
+          setTimeout(function(){
+            localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
+            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+            [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+            if(App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) != true) {
+              srCount++;
+              localLocal[6][2] = srCount;
+              localStorage.setItem(saveKey, JSON.stringify(localLocal));
+              console.log( 'SR Count: ' + srCount );
+              location.reload();
+            } else {
+              console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
+              localLocal[6][1] = '';
+              localLocal[6][2] = 0;
+              localSettings[9][2] = 0;
+              srCount = 0;
+              localStorage.setItem(saveKey, JSON.stringify(localLocal));
+              localStorage.setItem(settingKey, JSON.stringify(localSettings));
+              Save.store(player);
+            }
+          }, 1500);
+        }
+      }
 			break;
 		case "poke":
 			if (player.town().shops != null || player.town().shops.length >= 1) {
@@ -2396,6 +2691,106 @@ async function srBot() {
 					}
 				}
 			}
+			break;
+		case "egg":
+			if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
+				document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[9][3];
+				BreedingController.filter.search(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
+			}
+			if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
+				localSettings[9][3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
+				localStorage.setItem(settingKey, JSON.stringify(localSettings));
+			}
+			 var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
+			  var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
+				// Only breedable Pokemon
+				if (partyPokemon.breeding || partyPokemon.level < 100) {
+				  return false;
+				}
+				// Check based on category
+				if (BreedingController.filter.category() >= 0) {
+				  if (partyPokemon.category !== BreedingController.filter.category()) {
+						return false;
+				  }
+				}
+				// Check based on shiny status
+				if (BreedingController.filter.shinyStatus() == 0) {
+				  if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+						return false;
+				  }
+				}
+				// Check based on native region
+				if (BreedingController.filter.region() > -2) {
+				  if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+						return false;
+				  }
+				}
+				//Check based on searchbox
+				if(localSettings[9][3] == ""){
+					if (!BreedingController.filter.search().test(partyPokemon.name)) {
+						return false;
+					}
+				}
+				else{
+					if (BreedingController.filter.search().test(partyPokemon.name)) {
+						return false;
+					}
+				}
+				// Check if either of the types match
+				const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
+				const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+				if (type1 !== null || type2 !== null) {
+				  const { type: types } = pokemonMap[partyPokemon.name];
+				  if ([type1, type2].includes(PokemonType.None)) {
+						const type = type1 == PokemonType.None ? type2 : type1;
+						if (!BreedingController.isPureType(partyPokemon, type)) {
+						  return false;
+						}
+				  } else if ((type1 !== null && !types.includes(type1)) || (type2 !== null && !types.includes(type2))) {
+						return false;
+				  }
+				}
+				return true;
+			  });
+			  if(filteredEggList.length > 0){
+					if(App.game.breeding.eggList[0]().type == -1){
+						App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
+					}
+					localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
+					localStorage.setItem(saveKey, JSON.stringify(localLocal));
+				}
+
+				if (localLocal[6][1] != '' && localLocal[6][1] != "MissingNo." && App.game.breeding.eggList[0]().type != -1) {
+					if (App.game.breeding.eggList[0]().steps() < App.game.breeding.eggList[0]().totalSteps) {
+						console.log( 'Waiting for steps - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
+					}
+					if (App.game.breeding.eggList[0]().steps() >= App.game.breeding.eggList[0]().totalSteps) {
+						console.log( 'Hatching - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
+						Save.store(player);
+						setTimeout(function(){
+							localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
+							localStorage.setItem(saveKey, JSON.stringify(localLocal));
+							[3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+							if(App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) != true) {
+								srCount++;
+								localLocal[6][2] = srCount;
+								localStorage.setItem(saveKey, JSON.stringify(localLocal));
+								console.log( 'SR Count: ' + srCount );
+								location.reload();
+							} else {
+								console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
+								localLocal[6][1] = '';
+								localLocal[6][2] = 0;
+								localSettings[9][2] = 0;
+								srCount = 0;
+								localStorage.setItem(saveKey, JSON.stringify(localLocal));
+								localStorage.setItem(settingKey, JSON.stringify(localSettings));
+								Save.store(player);
+							}
+						}, 1500);
+					}
+				}
+			break;
 	}
 }
 
@@ -2421,32 +2816,33 @@ async function plantBot() {
 			case 66:
 				//Starf 65 + Chople 40
 				if (App.game.farming.plotList[5].berry == -1) {
-					App.game.farming.plotList[5].plant(65);
-					App.game.farming.plotList[6].plant(65);
-					App.game.farming.plotList[7].plant(65);
-					App.game.farming.plotList[8].plant(65);
-					App.game.farming.plotList[9].plant(65);
-					App.game.farming.plotList[15].plant(65);
-					App.game.farming.plotList[16].plant(65);
-					App.game.farming.plotList[17].plant(65);
-					App.game.farming.plotList[18].plant(65);
-					App.game.farming.plotList[19].plant(65);
+          App.game.farming.plant(5,65)
+          App.game.farming.plant(6,65)
+          App.game.farming.plant(7,65)
+          App.game.farming.plant(8,65)
+          App.game.farming.plant(9,65)
+          App.game.farming.plant(15,65)
+          App.game.farming.plant(16,65)
+          App.game.farming.plant(17,65)
+          App.game.farming.plant(18,65)
+          App.game.farming.plant(19,65)
+
 					setTimeout(() => {
-						App.game.farming.plotList[0].plant(40);
-						App.game.farming.plotList[1].plant(40);
-						App.game.farming.plotList[2].plant(40);
-						App.game.farming.plotList[3].plant(40);
-						App.game.farming.plotList[4].plant(40);
-						App.game.farming.plotList[10].plant(40);
-						App.game.farming.plotList[11].plant(40);
-						App.game.farming.plotList[12].plant(40);
-						App.game.farming.plotList[13].plant(40);
-						App.game.farming.plotList[14].plant(40);
-						App.game.farming.plotList[20].plant(40);
-						App.game.farming.plotList[21].plant(40);
-						App.game.farming.plotList[22].plant(40);
-						App.game.farming.plotList[23].plant(40);
-						App.game.farming.plotList[24].plant(40);
+						App.game.farming.plant(0,40);
+						App.game.farming.plant(1,40);
+						App.game.farming.plant(2,40);
+						App.game.farming.plant(3,40);
+						App.game.farming.plant(4,40);
+						App.game.farming.plant(10,40);
+						App.game.farming.plant(11,40);
+						App.game.farming.plant(12,40);
+						App.game.farming.plant(13,40);
+						App.game.farming.plant(14,40);
+						App.game.farming.plant(20,40);
+						App.game.farming.plant(21,40);
+						App.game.farming.plant(22,40);
+						App.game.farming.plant(23,40);
+						App.game.farming.plant(24,40);
 					}, 50400000);
 				}
 				if (App.game.farming.plotList[5].age >= 50400){
@@ -2458,74 +2854,51 @@ async function plantBot() {
 			case 67:
 				//Starf 65 + Chople 40 + Petaya 62
 				if (App.game.farming.plotList[5].berry == -1) {
-					App.game.farming.plotList[5].plant(65);
-					App.game.farming.plotList[6].plant(65);
-					App.game.farming.plotList[7].plant(62);
-					App.game.farming.plotList[8].plant(65);
-					App.game.farming.plotList[9].plant(65);
-					App.game.farming.plotList[15].plant(65);
-					App.game.farming.plotList[16].plant(65);
-					App.game.farming.plotList[17].plant(65);
-					App.game.farming.plotList[18].plant(65);
-					App.game.farming.plotList[19].plant(65);
+					App.game.farming.plant(5,65);
+					App.game.farming.plant(6,65);
+					App.game.farming.plant(7,62);
+					App.game.farming.plant(8,65);
+					App.game.farming.plant(9,65);
+					App.game.farming.plant(15,65);
+					App.game.farming.plant(16,65);
+					App.game.farming.plant(17,65);
+					App.game.farming.plant(18,65);
+					App.game.farming.plant(19,65);
 					setTimeout(() => {
-						App.game.farming.plotList[0].plant(40);
-						App.game.farming.plotList[1].plant(40);
-						App.game.farming.plotList[2].plant(40);
-						App.game.farming.plotList[3].plant(40);
-						App.game.farming.plotList[4].plant(40);
-						App.game.farming.plotList[10].plant(40);
-						App.game.farming.plotList[11].plant(40);
-						App.game.farming.plotList[12].plant(40);
-						App.game.farming.plotList[13].plant(40);
-						App.game.farming.plotList[14].plant(40);
-						App.game.farming.plotList[20].plant(40);
-						App.game.farming.plotList[21].plant(40);
-						App.game.farming.plotList[22].plant(40);
-						App.game.farming.plotList[23].plant(40);
-						App.game.farming.plotList[24].plant(40);
+						App.game.farming.plant(0,40);
+						App.game.farming.plant(1,40);
+						App.game.farming.plant(2,40);
+						App.game.farming.plant(3,40);
+						App.game.farming.plant(4,40);
+						App.game.farming.plant(10,40);
+						App.game.farming.plant(11,40);
+						App.game.farming.plant(12,40);
+						App.game.farming.plant(13,40);
+						App.game.farming.plant(14,40);
+						App.game.farming.plant(20,40);
+						App.game.farming.plant(21,40);
+						App.game.farming.plant(22,40);
+						App.game.farming.plant(23,40);
+						App.game.farming.plant(24,40);
 					}, 50400000);
 				}
 				if (App.game.farming.plotList[5].age >= 50400){
 					if (App.game.farming.plotList[7].age >= 345600){
 						App.game.farming.harvest(7);
-						App.game.farming.plotList[7].plant(62);
+						App.game.farming.plant(7,62);
 					}
 				}
 				break;
 			case 68:
 				//Starf 65 + Lum 19
 				if (App.game.farming.plotList[5].berry == -1) {
-					App.game.farming.plotList[5].plant(65);
-					App.game.farming.plotList[6].plant(65);
-					App.game.farming.plotList[7].plant(65);
-					App.game.farming.plotList[8].plant(65);
-					App.game.farming.plotList[9].plant(65);
-					App.game.farming.plotList[15].plant(65);
-					App.game.farming.plotList[16].plant(65);
-					App.game.farming.plotList[17].plant(65);
-					App.game.farming.plotList[18].plant(65);
-					App.game.farming.plotList[19].plant(65);
+					[0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,65));
 					setTimeout(() => {
-						App.game.farming.plotList[0].plant(40);
-						App.game.farming.plotList[1].plant(40);
-						App.game.farming.plotList[2].plant(40);
-						App.game.farming.plotList[3].plant(40);
-						App.game.farming.plotList[4].plant(40);
-						App.game.farming.plotList[10].plant(40);
-						App.game.farming.plotList[11].plant(40);
-						App.game.farming.plotList[12].plant(40);
-						App.game.farming.plotList[13].plant(40);
-						App.game.farming.plotList[14].plant(40);
-						App.game.farming.plotList[20].plant(40);
-						App.game.farming.plotList[21].plant(40);
-						App.game.farming.plotList[22].plant(40);
-						App.game.farming.plotList[23].plant(40);
-						App.game.farming.plotList[24].plant(40);
-					}, 50400000);
+						[6,8,16,18].forEach(item => App.game.farming.plant(item,19));
+					}, 82800000);
 				}
-				if (App.game.farming.plotList[5].age >= 50400){
-					if (App.game.farming.plotList[0].age >= 71940){
+				if (App.game.farming.plotList[6].age >= 41400){
+					if (App.game.farming.plotList[0].age >= 343800){
 						App.game.farming.harvestAll();
 					}
 				}				break;
@@ -2541,17 +2914,55 @@ async function plantBot() {
 	}
 }
 
+function CalculateMulchNeeded(ArrayInPlot, ArrayInBerry) {
+	var mulchArray = []
+	for (i = 0; i < ArrayInPlot.length; i++) {
+		if (ArrayInBerry[i] == -1) {
+			mulchArray.push(0);
+		}
+		else{
+			var newGrowthTime = Math.ceil(App.game.farming.berryData[ArrayInBerry[i]].growthTime[3] * (2/3));
+			var mulchAmount = Math.ceil(newGrowthTime / 300) + 1;
+			mulchArray.push(mulchAmount);
+		}
+	}
+	return mulchArray;
+}
+
+function MulchPlots(ArrayInPlots) {
+	for (let plotIt = 0; plotIt < ArrayInPlots.length; plotIt++) {
+		if(App.game.farming.plotList[ArrayInPlots[plotIt]].mulchTimeLeft <= 3 && App.game.farming.plotList[ArrayInPlots[plotIt]].berry !== -1){
+			FarmController.selectedMulch(MulchType["Boost_Mulch"]);
+			FarmController.selectedShovel(false);
+			App.game.farming.plotList[ArrayInPlots[plotIt]].mulch;
+		}
+	}
+}
+
+function CheckIfEnoughMulch(ArrayInPlots, ArrayInBerry) {
+	if (Settings.getSetting('mutateMulch') == "boostM") {
+		if(CalculateMulchNeeded(ArrayInPlots, ArrayInBerry).reduce((a, b) => a + b, 0) >= App.game.farming.mulchList[0]()){
+			boost = (2/3);
+		} else {
+			boost = 1;
+		}
+	}
+}
+
 async function mutateBot() {
   var selectedBerry = document.querySelector("#autoMutate").value;
+
 	switch (selectedBerry) {
 		case "Persim":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(6);
+				CheckIfEnoughMulch([12, 6], [6, 2]);
+				App.game.farming.plant(12,6);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(2);
-				}, 240000);
+					App.game.farming.plant(6,2);
+				}, (240000 * boost));
 			}
 			if (App.game.farming.plotList[12].berry == 6) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 8) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2560,18 +2971,22 @@ async function mutateBot() {
 					}
 				}
 			}
-			if (App.game.farming.plotList[6].age > (App.game.farming.berryData[App.game.farming.plotList[6].berry].growthTime[4] - 5)) {
-				App.game.farming.harvestAll();
-			}
+      if (App.game.farming.plotList[6].berry != -1) {
+  			if (App.game.farming.plotList[6].age > (App.game.farming.berryData[App.game.farming.plotList[6].berry].growthTime[4] - 5)) {
+  				App.game.farming.harvestAll();
+  			}
+      }
 			break;
 		case "Razz":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(5);
+				CheckIfEnoughMulch([12, 6], [5, 0]);
+				App.game.farming.plant(12,5);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(0);
-				}, 210000);
+					App.game.farming.plant(6,0);
+				}, (210000 * boost));
 			}
 			if (App.game.farming.plotList[12].berry == 5) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 9) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2586,12 +3001,14 @@ async function mutateBot() {
 			break;
 		case "Bluk":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(5);
+				CheckIfEnoughMulch([12, 6], [5, 1]);
+				App.game.farming.plant(12,5);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(1);
-				}, 200000);
+					App.game.farming.plant(6,1);
+				}, (200000 * boost));
 			}
 			if (App.game.farming.plotList[12].berry == 5) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 10) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2606,12 +3023,14 @@ async function mutateBot() {
 			break;
 		case "Nanab":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(4);
+				CheckIfEnoughMulch([12, 6], [4, 2]);
+				App.game.farming.plant(12,4);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(2);
-				}, 60000);
+					App.game.farming.plant(6,2);
+				}, 60000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 4) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 11) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2626,12 +3045,14 @@ async function mutateBot() {
 			break;
 		case "Wepear":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(6);
+				CheckIfEnoughMulch([12, 6], [6, 3]);
+				App.game.farming.plant(12,6);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(3);
-				}, 220000);
+					App.game.farming.plant(6,3);
+				}, 220000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 6) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 12) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2646,12 +3067,14 @@ async function mutateBot() {
 			break;
 		case "Pinap":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(7);
+				CheckIfEnoughMulch([6, 12], [7, 4]);
+				App.game.farming.plant(6,7);
 				setTimeout(() => {
-					App.game.farming.plotList[12].plant(4);
-				}, 480000);
+					App.game.farming.plant(12,4);
+				}, 480000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 7) {
+				MulchPlots([6, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 13) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2666,11 +3089,13 @@ async function mutateBot() {
 			break;
 		case "Figy":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[7].plant(0);
-				App.game.farming.plotList[11].plant(0);
-				App.game.farming.plotList[12].plant(0);
+				CheckIfEnoughMulch([7, 11, 12], [0, 0, 0]);
+				App.game.farming.plant(7,0);
+				App.game.farming.plant(11,0);
+				App.game.farming.plant(12,0);
 			}
 			if (App.game.farming.plotList[12].berry == 0) {
+				MulchPlots([7, 11, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 14) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2685,11 +3110,13 @@ async function mutateBot() {
 			break;
 		case "Wiki":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[7].plant(1);
-				App.game.farming.plotList[11].plant(1);
-				App.game.farming.plotList[12].plant(1);
+				CheckIfEnoughMulch([7, 11, 12], [1, 1, 1]);
+				App.game.farming.plant(7,1);
+				App.game.farming.plant(11,1);
+				App.game.farming.plant(12,1);
 			}
 			if (App.game.farming.plotList[12].berry == 1) {
+				MulchPlots([7, 11, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 15) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2704,11 +3131,13 @@ async function mutateBot() {
 			break;
 		case "Mago":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[7].plant(2);
-				App.game.farming.plotList[11].plant(2);
-				App.game.farming.plotList[12].plant(2);
+				CheckIfEnoughMulch([7, 11, 12], [2, 2, 2]);
+				App.game.farming.plant(7,2);
+				App.game.farming.plant(11,2);
+				App.game.farming.plant(12,2);
 			}
 			if (App.game.farming.plotList[12].berry == 2) {
+				MulchPlots([7, 11, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 16) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2723,11 +3152,13 @@ async function mutateBot() {
 			break;
 		case "Aguav":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[7].plant(3);
-				App.game.farming.plotList[11].plant(3);
-				App.game.farming.plotList[12].plant(3);
+				CheckIfEnoughMulch([7, 11, 12], [3, 3, 3]);
+				App.game.farming.plant(7,3);
+				App.game.farming.plant(11,3);
+				App.game.farming.plant(12,3);
 			}
 			if (App.game.farming.plotList[12].berry == 3) {
+				MulchPlots([7, 11, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 17) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2742,11 +3173,13 @@ async function mutateBot() {
 			break;
 		case "Iapapa":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[7].plant(4);
-				App.game.farming.plotList[11].plant(4);
-				App.game.farming.plotList[12].plant(4);
+				CheckIfEnoughMulch([7, 11, 12], [4, 4, 4]);
+				App.game.farming.plant(7,4);
+				App.game.farming.plant(11,4);
+				App.game.farming.plant(12,4);
 			}
 			if (App.game.farming.plotList[12].berry == 4) {
+				MulchPlots([7, 11, 12]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 18) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2761,30 +3194,32 @@ async function mutateBot() {
 			break;
 		case "Lum":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(7);
+				CheckIfEnoughMulch([6, 7, 11, 8, 16, 13, 17, 18], [7, 6, 5, 4, 3, 2, 1, 0]);
+				App.game.farming.plant(6,7);
 				setTimeout(() => {
-					App.game.farming.plotList[7].plant(6);
-				}, 300000);
+					App.game.farming.plant(7,6);
+				}, 300000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[11].plant(5);
-				}, 360000);
+					App.game.farming.plant(11,5);
+				}, 360000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[8].plant(4);
-				}, 480000);
+					App.game.farming.plant(8,4);
+				}, 480000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[16].plant(3);
-				}, 520000);
+					App.game.farming.plant(16,3);
+				}, 520000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[13].plant(2);
-				}, 540000);
+					App.game.farming.plant(13,2);
+				}, 540000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[17].plant(1);
-				}, 560000);
+					App.game.farming.plant(17,1);
+				}, 560000 * boost);
 				setTimeout(() => {
-					App.game.farming.plotList[18].plant(0);
-				}, 570000);
+					App.game.farming.plant(18,0);
+				}, 570000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 7) {
+				MulchPlots([6, 7, 11, 8, 16, 13, 17, 18]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 19) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2800,12 +3235,14 @@ async function mutateBot() {
 		// 3x3 throigh Grepa, then 5x5
 		case "Pomeg":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(18);
+				CheckIfEnoughMulch([12, 6], [18, 16]);
+				App.game.farming.plant(12,18);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(16);
-				}, 10000);
+					App.game.farming.plant(6,16);
+				}, 10000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 18) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 20) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2820,12 +3257,14 @@ async function mutateBot() {
 			break;
 		case "Kelpsy":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(8);
+				CheckIfEnoughMulch([12, 6], [8, 1]);
+				App.game.farming.plant(12,8);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(1);
-				}, 50000);
+					App.game.farming.plant(6,1);
+				}, 50000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 8) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 21) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2840,12 +3279,14 @@ async function mutateBot() {
 			break;
 		case "Qualot":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(16);
+				CheckIfEnoughMulch([12, 6], [16, 13]);
+				App.game.farming.plant(12,16);
 				setTimeout(() => {
-					App.game.farming.plotList[6].plant(13);
-				}, 130000);
+					App.game.farming.plant(6,13);
+				}, 130000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 16) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 22) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2860,13 +3301,15 @@ async function mutateBot() {
 			break;
 		case "Hondew":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(15);
+				CheckIfEnoughMulch([12, 13, 8], [15, 17, 14]);
+				App.game.farming.plant(12,15);
 				setTimeout(() => {
-					App.game.farming.plotList[13].plant(17);
-					App.game.farming.plotList[8].plant(14);
-				}, 10000);
+					App.game.farming.plant(13,17);
+					App.game.farming.plant(8,14);
+				}, 10000 * boost);
 			}
 			if (App.game.farming.plotList[12].berry == 15) {
+				MulchPlots([12, 13, 8]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 23) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2881,10 +3324,12 @@ async function mutateBot() {
 			break;
 		case "Grepa":
 			if (App.game.farming.plotList[12].berry == -1) {
-				App.game.farming.plotList[12].plant(17);
-				App.game.farming.plotList[6].plant(14);
+				CheckIfEnoughMulch([12, 6], [17, 14]);
+				App.game.farming.plant(12,17);
+				App.game.farming.plant(6,14);
 			}
 			if (App.game.farming.plotList[12].berry == 17) {
+				MulchPlots([12, 6]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 24) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2899,15 +3344,17 @@ async function mutateBot() {
 			break;
 		case "Tamato":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(20);
-				App.game.farming.plotList[9].plant(20);
-				App.game.farming.plotList[21].plant(20);
-				App.game.farming.plotList[24].plant(20);
+				CheckIfEnoughMulch([6, 9, 21, 24, 0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17 ,18, 19, 20, 22, 23], [20, 20, 20, 20, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9]);
+				App.game.farming.plant(6,20);
+				App.game.farming.plant(9,20);
+				App.game.farming.plant(21,20);
+				App.game.farming.plant(24,20);
 				setTimeout(function(){
-          [0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23].forEach(item => App.game.farming.plotList[item].plant(9));
-				}, 5150000);
+          [0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23].forEach(item => App.game.farming.plant(item,9));
+				}, 5150000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 20) {
+				MulchPlots([6, 9, 21, 24, 0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17 ,18, 19, 20, 22, 23]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 25) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2922,24 +3369,26 @@ async function mutateBot() {
 			break;
 		case "Cornn":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(15);
-				App.game.farming.plotList[9].plant(15);
-				App.game.farming.plotList[21].plant(15);
-				App.game.farming.plotList[24].plant(15);
+				CheckIfEnoughMulch([6, 9, 21, 24, 5, 8, 20, 23, 1, 4, 16, 19], [15, 15, 15, 15, 10, 10, 10, 10, 5, 5, 5, 5]);
+				App.game.farming.plant(6,15);
+				App.game.farming.plant(9,15);
+				App.game.farming.plant(21,15);
+				App.game.farming.plant(24,15);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(10);
-					App.game.farming.plotList[8].plant(10);
-					App.game.farming.plotList[20].plant(10);
-					App.game.farming.plotList[23].plant(10);
-				}, 30000);
+					App.game.farming.plant(5,10);
+					App.game.farming.plant(8,10);
+					App.game.farming.plant(20,10);
+					App.game.farming.plant(23,10);
+				}, 30000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[1].plant(5);
-					App.game.farming.plotList[4].plant(5);
-					App.game.farming.plotList[16].plant(5);
-					App.game.farming.plotList[19].plant(5);
-				}, 120000);
+					App.game.farming.plant(1,5);
+					App.game.farming.plant(4,5);
+					App.game.farming.plant(16,5);
+					App.game.farming.plant(19,5);
+				}, 120000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 15) {
+				MulchPlots([6, 9, 21, 24, 5, 8, 20, 23, 1, 4, 16, 19]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 26) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2954,24 +3403,26 @@ async function mutateBot() {
 			break;
 		case "Magost":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(16);
-				App.game.farming.plotList[9].plant(16);
-				App.game.farming.plotList[21].plant(16);
-				App.game.farming.plotList[24].plant(16);
+				CheckIfEnoughMulch([6, 9, 21, 24, 5, 8, 20, 23, 1, 4, 16, 19], [16, 16, 16, 16, 11, 11, 11, 11, 2, 2, 2, 2]);
+				App.game.farming.plant(6,16);
+				App.game.farming.plant(9,16);
+				App.game.farming.plant(21,16);
+				App.game.farming.plant(24,16);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(11);
-					App.game.farming.plotList[8].plant(11);
-					App.game.farming.plotList[20].plant(11);
-					App.game.farming.plotList[23].plant(11);
-				}, 120000);
+					App.game.farming.plant(5,11);
+					App.game.farming.plant(8,11);
+					App.game.farming.plant(20,11);
+					App.game.farming.plant(23,11);
+				}, 120000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[1].plant(2);
-					App.game.farming.plotList[4].plant(2);
-					App.game.farming.plotList[16].plant(2);
-					App.game.farming.plotList[19].plant(2);
-				}, 310000);
+					App.game.farming.plant(1,2);
+					App.game.farming.plant(4,2);
+					App.game.farming.plant(16,2);
+					App.game.farming.plant(19,2);
+				}, 310000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 16) {
+				MulchPlots([6, 9, 21, 24, 5, 8, 20, 23, 1, 4, 16, 19]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 27) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -2986,15 +3437,17 @@ async function mutateBot() {
 			break;
 		case "Rabuta":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(17);
-				App.game.farming.plotList[9].plant(17);
-				App.game.farming.plotList[21].plant(17);
-				App.game.farming.plotList[24].plant(17);
+				CheckIfEnoughMulch([6, 9, 21, 24, 0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17 ,18, 19, 20, 22, 23], [17, 17, 17, 17, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]);
+				App.game.farming.plant(6,17);
+				App.game.farming.plant(9,17);
+				App.game.farming.plant(21,17);
+				App.game.farming.plant(24,17);
 				setTimeout(function(){
-          [0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23].forEach(item => App.game.farming.plotList[item].plant(4));
-				}, 230000);
+          [0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23].forEach(item => App.game.farming.plant(item,4));
+				}, 230000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 17) {
+				MulchPlots([6, 9, 21, 24, 0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17 ,18, 19, 20, 22, 23]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 28) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3009,12 +3462,14 @@ async function mutateBot() {
 			break;
 		case "Nomel":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(13);
-				App.game.farming.plotList[9].plant(13);
-				App.game.farming.plotList[21].plant(13);
-				App.game.farming.plotList[24].plant(13);
+				CheckIfEnoughMulch([6, 9, 21, 24], [13, 13, 13, 13]);
+				App.game.farming.plant(6,13);
+				App.game.farming.plant(9,13);
+				App.game.farming.plant(21,13);
+				App.game.farming.plant(24,13);
 			}
 			if (App.game.farming.plotList[6].berry == 13) {
+				MulchPlots([6, 9, 21, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 29) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3029,11 +3484,13 @@ async function mutateBot() {
 			break;
 		case "Spelon":
 			if (App.game.farming.plotList[6].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(25);
+					App.game.farming.plant(berryIt,25);
 				}
 			}
 			if (App.game.farming.plotList[6].berry == 25) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 30) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3048,11 +3505,13 @@ async function mutateBot() {
 			break;
 		case "Pamtre":
 			if (App.game.farming.plotList[6].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(26);
+					App.game.farming.plant(berryIt,26);
 				}
 			}
 			if (App.game.farming.plotList[6].berry == 26) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 31) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3067,11 +3526,13 @@ async function mutateBot() {
 			break;
 		case "Watmel":
 			if (App.game.farming.plotList[6].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27, 27]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(27);
+					App.game.farming.plant(berryIt,27);
 				}
 			}
 			if (App.game.farming.plotList[6].berry == 27) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 32) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3086,11 +3547,13 @@ async function mutateBot() {
 			break;
 		case "Durin":
 			if (App.game.farming.plotList[6].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(28);
+					App.game.farming.plant(berryIt,28);
 				}
 			}
 			if (App.game.farming.plotList[6].berry == 28) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 33) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3105,11 +3568,13 @@ async function mutateBot() {
 			break;
 		case "Belue":
 			if (App.game.farming.plotList[6].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29, 29]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(29);
+					App.game.farming.plant(berryIt,29);
 				}
 			}
 			if (App.game.farming.plotList[6].berry == 29) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 34) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3124,26 +3589,28 @@ async function mutateBot() {
 			break;
 		case "Occa":
 			if (App.game.farming.plotList[5].berry == -1) {
-				App.game.farming.plotList[5].plant(30);
-				App.game.farming.plotList[9].plant(30);
-				App.game.farming.plotList[22].plant(30);
+				CheckIfEnoughMulch([5, 9, 22, 0, 4, 17, 2, 15, 19, 7, 20, 24], [30, 30, 30, 25, 25 ,25, 14, 14, 14, 9, 9, 9]);
+				App.game.farming.plant(5,30);
+				App.game.farming.plant(9,30);
+				App.game.farming.plant(22,30);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(25);
-					App.game.farming.plotList[4].plant(25);
-					App.game.farming.plotList[17].plant(25);
-				}, 6840000);
+					App.game.farming.plant(0,25);
+					App.game.farming.plant(4,25);
+					App.game.farming.plant(17,25);
+				}, 6840000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(14);
-					App.game.farming.plotList[15].plant(14);
-					App.game.farming.plotList[19].plant(14);
-				}, 15130000);
+					App.game.farming.plant(2,14);
+					App.game.farming.plant(15,14);
+					App.game.farming.plant(19,14);
+				}, 15130000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[7].plant(9);
-					App.game.farming.plotList[20].plant(9);
-					App.game.farming.plotList[24].plant(9);
-				}, 15230000);
+					App.game.farming.plant(7,9);
+					App.game.farming.plant(20,9);
+					App.game.farming.plant(24,9);
+				}, 15230000 * boost);
 			}
 			if (App.game.farming.plotList[5].berry == 30) {
+				MulchPlots([5, 9, 22, 0, 4, 17, 2, 15, 19, 7, 20, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 35) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3158,26 +3625,28 @@ async function mutateBot() {
 			break;
 		case "Passho":
 			if (App.game.farming.plotList[7].berry == -1) {
-				App.game.farming.plotList[7].plant(43);
-				App.game.farming.plotList[20].plant(43);
-				App.game.farming.plotList[24].plant(43);
+				CheckIfEnoughMulch([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22], [43, 43, 43, 21, 21, 21, 6, 6, 6, 1, 1, 1]);
+				App.game.farming.plant(7,43);
+				App.game.farming.plant(20,43);
+				App.game.farming.plant(24,43);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(21);
-					App.game.farming.plotList[15].plant(21);
-					App.game.farming.plotList[19].plant(21);
-				}, 13800000);
+					App.game.farming.plant(2,21);
+					App.game.farming.plant(15,21);
+					App.game.farming.plant(19,21);
+				}, 13800000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(6);
-					App.game.farming.plotList[4].plant(6);
-					App.game.farming.plotList[17].plant(6);
-				}, 19500000);
+					App.game.farming.plant(0,6);
+					App.game.farming.plant(4,6);
+					App.game.farming.plant(17,6);
+				}, 19500000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(1);
-					App.game.farming.plotList[9].plant(1);
-					App.game.farming.plotList[22].plant(1);
-				}, 19760000);
+					App.game.farming.plant(5,1);
+					App.game.farming.plant(9,1);
+					App.game.farming.plant(22,1);
+				}, 19760000 * boost);
 			}
 			if (App.game.farming.plotList[7].berry == 30) {
+				MulchPlots([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 36) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3192,26 +3661,28 @@ async function mutateBot() {
 			break;
 		case "Wacan":
 			if (App.game.farming.plotList[7].berry == -1) {
-				App.game.farming.plotList[7].plant(24);
-				App.game.farming.plotList[20].plant(24);
-				App.game.farming.plotList[24].plant(24);
+				CheckIfEnoughMulch([7, 20, 24, 5, 9, 22, 0, 4, 17, 2, 15, 19], [24, 24, 24, 22, 22, 22, 18, 18 ,18 , 13, 13, 13]);
+				App.game.farming.plant(7,24);
+				App.game.farming.plant(20,24);
+				App.game.farming.plant(24,24);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(22);
-					App.game.farming.plotList[9].plant(22);
-					App.game.farming.plotList[22].plant(22);
-				}, 2400000);
+					App.game.farming.plant(5,22);
+					App.game.farming.plant(9,22);
+					App.game.farming.plant(22,22);
+				}, 2400000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(18);
-					App.game.farming.plotList[4].plant(18);
-					App.game.farming.plotList[17].plant(18);
-				}, 6820000);
+					App.game.farming.plant(0,18);
+					App.game.farming.plant(4,18);
+					App.game.farming.plant(17,18);
+				}, 6820000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(13);
-					App.game.farming.plotList[15].plant(13);
-					App.game.farming.plotList[19].plant(13);
-				}, 6960000);
+					App.game.farming.plant(2,13);
+					App.game.farming.plant(15,13);
+					App.game.farming.plant(19,13);
+				}, 6960000 * boost);
 			}
 			if (App.game.farming.plotList[7].berry == 24) {
+				MulchPlots([7, 20, 24, 5, 9, 22, 0, 4, 17, 2, 15, 19]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 37) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3226,16 +3697,18 @@ async function mutateBot() {
 			break;
 		case "Rindo":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(17);
-				App.game.farming.plotList[9].plant(17);
-				App.game.farming.plotList[21].plant(17);
-				App.game.farming.plotList[24].plant(17);
-				App.game.farming.plotList[0].plant(14);
-				App.game.farming.plotList[3].plant(14);
-				App.game.farming.plotList[15].plant(14);
-				App.game.farming.plotList[18].plant(14);
+				CheckIfEnoughMulch([6, 9, 21, 24, 0, 3, 15, 18], [17, 17, 17, 17, 14, 14, 14, 14]);
+				App.game.farming.plant(6,17);
+				App.game.farming.plant(9,17);
+				App.game.farming.plant(21,17);
+				App.game.farming.plant(24,17);
+				App.game.farming.plant(0,14);
+				App.game.farming.plant(3,14);
+				App.game.farming.plant(15,14);
+				App.game.farming.plant(18,14);
 			}
 			if (App.game.farming.plotList[6].berry == 17) {
+				MulchPlots([6, 9, 21, 24, 0, 3, 15, 18]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 38) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3250,17 +3723,19 @@ async function mutateBot() {
 			break;
 		case "Yache":
 			if (App.game.farming.plotList[0].berry == -1) {
-				App.game.farming.plotList[0].plant(36);
-				App.game.farming.plotList[2].plant(36);
-				App.game.farming.plotList[4].plant(36);
-				App.game.farming.plotList[10].plant(36);
-				App.game.farming.plotList[12].plant(36);
-				App.game.farming.plotList[14].plant(36);
-				App.game.farming.plotList[20].plant(36);
-				App.game.farming.plotList[22].plant(36);
-				App.game.farming.plotList[24].plant(36);
+				CheckIfEnoughMulch([0, 2, 4, 10, 12, 14, 20, 22, 24], [36, 36, 36, 36, 36, 36, 36, 36, 36]);
+				App.game.farming.plant(0,36);
+				App.game.farming.plant(2,36);
+				App.game.farming.plant(4,36);
+				App.game.farming.plant(10,36);
+				App.game.farming.plant(12,36);
+				App.game.farming.plant(14,36);
+				App.game.farming.plant(20,36);
+				App.game.farming.plant(22,36);
+				App.game.farming.plant(24,36);
 			}
 			if (App.game.farming.plotList[0].berry == 36) {
+				MulchPlots([0, 2, 4, 10, 12, 14, 20, 22, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 39) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3275,11 +3750,13 @@ async function mutateBot() {
 			break;
 		case "Chople":
 			if (App.game.farming.plotList[0].berry == -1 && OakItem["Blaze_Cassette"].isActive == true) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(30);
+					App.game.farming.plant(berryIt,30);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 30) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 40) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3294,11 +3771,13 @@ async function mutateBot() {
 			break;
 		case "Kebia":
 			if (App.game.farming.plotList[0].berry == -1 && OakItem["Poison_Barb"].isActive == true) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(31);
+					App.game.farming.plant(berryIt,31);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 31) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 41) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3313,11 +3792,13 @@ async function mutateBot() {
 			break;
 		case "Shuca":
 			if (App.game.farming.plotList[0].berry == -1 && OakItem["Sprinklotad"].isActive == true) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(32);
+					App.game.farming.plant(berryIt,32);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 32) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 42) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3332,18 +3813,20 @@ async function mutateBot() {
 			break;
 		case "Coba":
 			if (App.game.farming.plotList[0].berry == -1) {
-				App.game.farming.plotList[0].plant(15);
-				App.game.farming.plotList[3].plant(15);
-				App.game.farming.plotList[15].plant(15);
-				App.game.farming.plotList[18].plant(15);
+				CheckIfEnoughMulch([0, 3, 15, 18, 6, 9, 21, 24], [15, 15, 15, 15, 17, 17, 17, 17]);
+				App.game.farming.plant(0,15);
+				App.game.farming.plant(3,15);
+				App.game.farming.plant(15,15);
+				App.game.farming.plant(18,15);
 				setTimeout(function(){
-					App.game.farming.plotList[6].plant(17);
-					App.game.farming.plotList[9].plant(17);
-					App.game.farming.plotList[21].plant(17);
-					App.game.farming.plotList[24].plant(17);
-				}, 10000);
+					App.game.farming.plant(6,17);
+					App.game.farming.plant(9,17);
+					App.game.farming.plant(21,17);
+					App.game.farming.plant(24,17);
+				}, 10000 * boost);
 			}
 			if (App.game.farming.plotList[0].berry == 15) {
+				MulchPlots([0, 3, 15, 18, 6, 9, 21, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 43) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3358,26 +3841,28 @@ async function mutateBot() {
 			break;
 		case "Payapa":
 			if (App.game.farming.plotList[7].berry == -1) {
-				App.game.farming.plotList[7].plant(31);
-				App.game.farming.plotList[20].plant(31);
-				App.game.farming.plotList[24].plant(31);
+				CheckIfEnoughMulch([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22], [31, 31, 31, 26, 26, 26, 15, 15, 15, 10, 10, 10]);
+				App.game.farming.plant(7,31);
+				App.game.farming.plant(20,31);
+				App.game.farming.plant(24,31);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(26);
-					App.game.farming.plotList[15].plant(26);
-					App.game.farming.plotList[19].plant(26);
-				}, 9000000);
+					App.game.farming.plant(2,26);
+					App.game.farming.plant(15,26);
+					App.game.farming.plant(19,26);
+				}, 9000000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(15);
-					App.game.farming.plotList[4].plant(15);
-					App.game.farming.plotList[17].plant(15);
-				}, 17640000);
+					App.game.farming.plant(0,15);
+					App.game.farming.plant(4,15);
+					App.game.farming.plant(17,15);
+				}, 17640000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(10);
-					App.game.farming.plotList[9].plant(10);
-					App.game.farming.plotList[22].plant(10);
-				}, 17670000);
+					App.game.farming.plant(5,10);
+					App.game.farming.plant(9,10);
+					App.game.farming.plant(22,10);
+				}, 17670000 * boost);
 			}
 			if (App.game.farming.plotList[7].berry == 31) {
+				MulchPlots([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 44) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3392,9 +3877,11 @@ async function mutateBot() {
 			break;
 		case "Tanga":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(38));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24], [38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38, 38]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,38));
 			}
 			if (App.game.farming.plotList[0].berry == 38) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 45) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3409,11 +3896,13 @@ async function mutateBot() {
 			break;
 		case "Charti":
 			if (App.game.farming.plotList[0].berry == -1 && OakItem["Cell_Battery"].isActive == true) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(26);
+					App.game.farming.plant(berryIt,26);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 26) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 46) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3428,11 +3917,13 @@ async function mutateBot() {
 			break;
 		case "Kasib":
 			if (App.game.farming.plotList[0].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(0);
+					App.game.farming.plant(berryIt,0);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 26) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 47) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3444,27 +3935,29 @@ async function mutateBot() {
 			break;
 		case "Haban":
 			if (App.game.farming.plotList[1].berry == -1) {
-				App.game.farming.plotList[1].plant(38);
-				App.game.farming.plotList[9].plant(38);
-				App.game.farming.plotList[15].plant(38);
-				App.game.farming.plotList[23].plant(38);
+				CheckIfEnoughMulch([1, 9, 15, 23, 12, 3, 5, 19, 21, 2, 10, 14, 22], [38, 38, 38, 38, 35, 36, 36, 36, 36, 37, 37, 37, 37]);
+				App.game.farming.plant(1,38);
+				App.game.farming.plant(9,38);
+				App.game.farming.plant(15,38);
+				App.game.farming.plant(23,38);
 				setTimeout(function(){
-					App.game.farming.plotList[12].plant(35);
-				}, 6840000);
+					App.game.farming.plant(12,35);
+				}, 6840000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[3].plant(36);
-					App.game.farming.plotList[5].plant(36);
-					App.game.farming.plotList[19].plant(36);
-					App.game.farming.plotList[21].plant(36);
-				}, 7200000);
+					App.game.farming.plant(3,36);
+					App.game.farming.plant(5,36);
+					App.game.farming.plant(19,36);
+					App.game.farming.plant(21,36);
+				}, 7200000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(37);
-					App.game.farming.plotList[10].plant(37);
-					App.game.farming.plotList[14].plant(37);
-					App.game.farming.plotList[22].plant(37);
-				}, 27000000);
+					App.game.farming.plant(2,37);
+					App.game.farming.plant(10,37);
+					App.game.farming.plant(14,37);
+					App.game.farming.plant(22,37);
+				}, 27000000 * boost);
 			}
 			if (App.game.farming.plotList[1].berry == 38) {
+				MulchPlots([1, 9, 15, 23, 12, 3, 5, 19, 21, 2, 10, 14, 22]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 48) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3479,24 +3972,26 @@ async function mutateBot() {
 			break;
 		case "Colbur":
 			if (App.game.farming.plotList[6].berry == -1) {
-				App.game.farming.plotList[6].plant(44);
-				App.game.farming.plotList[9].plant(44);
-				App.game.farming.plotList[21].plant(44);
-				App.game.farming.plotList[24].plant(44);
+				CheckIfEnoughMulch([6, 9, 21, 24, 1, 4, 16, 19, 5, 8, 20, 23], [44, 44, 44, 44, 28, 28, 28, 28, 47, 47, 47, 47]);
+				App.game.farming.plant(6,44);
+				App.game.farming.plant(9,44);
+				App.game.farming.plant(21,44);
+				App.game.farming.plant(24,44);
 				setTimeout(function(){
-					App.game.farming.plotList[1].plant(28);
-					App.game.farming.plotList[4].plant(28);
-					App.game.farming.plotList[16].plant(28);
-					App.game.farming.plotList[19].plant(28);
-				}, 21960000);
+					App.game.farming.plant(1,28);
+					App.game.farming.plant(4,28);
+					App.game.farming.plant(16,28);
+					App.game.farming.plant(19,28);
+				}, 21960000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(47);
-					App.game.farming.plotList[8].plant(47);
-					App.game.farming.plotList[20].plant(47);
-					App.game.farming.plotList[23].plant(47);
-				}, 33900000);
+					App.game.farming.plant(5,47);
+					App.game.farming.plant(8,47);
+					App.game.farming.plant(20,47);
+					App.game.farming.plant(23,47);
+				}, 33900000 * boost);
 			}
 			if (App.game.farming.plotList[6].berry == 44) {
+				MulchPlots([6, 9, 21, 24, 1, 4, 16, 19, 5, 8, 20, 23]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 49) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3511,12 +4006,14 @@ async function mutateBot() {
 			break;
 		case "Babiri":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,7,17,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(42));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 7, 17, 20, 21, 22, 23, 24, 5, 9, 10, 11, 12, 13, 14, 15, 19], [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 47, 47, 47, 47, 47, 47, 47, 47, 47]);
+				[0,1,2,3,4,7,17,20,21,22,23,24].forEach(item => App.game.farming.plant(item,42));
 				setTimeout(function(){
-					[5,9,10,11,12,13,14,15,19].forEach(item => App.game.farming.plotList[item].plant(47));
-				}, 1800000);
+					[5,9,10,11,12,13,14,15,19].forEach(item => App.game.farming.plant(item,47));
+				}, 1800000 * boost);
 			}
 			if (App.game.farming.plotList[0].berry == 42) {
+				MulchPlots([0, 1, 2, 3, 4, 7, 17, 20, 21, 22, 23, 24, 5, 9, 10, 11, 12, 13, 14, 15, 19]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 50) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3531,11 +4028,13 @@ async function mutateBot() {
 			break;
 		case "Chilan":
 			if (App.game.farming.plotList[0].berry == -1) {
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++){
-					App.game.farming.plotList[berryIt].plant(40);
+					App.game.farming.plant(berryIt,40);
 				}
 			}
 			if (App.game.farming.plotList[0].berry == 40) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 51) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3550,26 +4049,28 @@ async function mutateBot() {
 			break;
 		case "Roseli":
 			if (App.game.farming.plotList[7].berry == -1) {
-				App.game.farming.plotList[7].plant(32);
-				App.game.farming.plotList[20].plant(32);
-				App.game.farming.plotList[24].plant(32);
+				CheckIfEnoughMulch([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22], [32, 32, 32, 27, 27, 27, 16, 16, 16, 11, 11, 11]);
+				App.game.farming.plant(7,32);
+				App.game.farming.plant(20,32);
+				App.game.farming.plant(24,32);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(27);
-					App.game.farming.plotList[15].plant(27);
-					App.game.farming.plotList[19].plant(27);
-				}, 2160000);
+					App.game.farming.plant(2,27);
+					App.game.farming.plant(15,27);
+					App.game.farming.plant(19,27);
+				}, 2160000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(16);
-					App.game.farming.plotList[4].plant(16);
-					App.game.farming.plotList[17].plant(16);
-				}, 16190000);
+					App.game.farming.plant(0,16);
+					App.game.farming.plant(4,16);
+					App.game.farming.plant(17,16);
+				}, 16190000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[5].plant(11);
-					App.game.farming.plotList[9].plant(11);
-					App.game.farming.plotList[22].plant(11);
-				}, 16310000);
+					App.game.farming.plant(5,11);
+					App.game.farming.plant(9,11);
+					App.game.farming.plant(22,11);
+				}, 16310000 * boost);
 			}
 			if (App.game.farming.plotList[7].berry == 32) {
+				MulchPlots([7, 20, 24, 2, 15, 19, 0, 4, 17, 5, 9, 22]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 52) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3584,9 +4085,11 @@ async function mutateBot() {
 			break;
 		case "Micle":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(31));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24], [31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31]);
+				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,31));
 			}
 			if (App.game.farming.plotList[0].berry == 31) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 53) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3601,9 +4104,11 @@ async function mutateBot() {
 			break;
 		case "Custap":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(32));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24], [32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32]);
+				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,32));
 			}
 			if (App.game.farming.plotList[0].berry == 32) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 54) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3618,9 +4123,11 @@ async function mutateBot() {
 			break;
 		case "Jaboca":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(33));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24], [33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33]);
+				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,33));
 			}
 			if (App.game.farming.plotList[0].berry == 33) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 55) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3635,9 +4142,11 @@ async function mutateBot() {
 			break;
 		case "Rowap":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(34));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24], [34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34]);
+				[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,34));
 			}
 			if (App.game.farming.plotList[0].berry == 34) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 56) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3652,10 +4161,12 @@ async function mutateBot() {
 			break;
 		case "Kee":
 			if (App.game.farming.plotList[0].berry == -1) {
-				[0,3,15,18].forEach(item => App.game.farming.plotList[item].plant(59));
-				[6,9,21,24].forEach(item => App.game.farming.plotList[item].plant(60));
+				CheckIfEnoughMulch([0, 3, 15, 18, 6, 9, 21, 24], [59, 59, 59 ,59, 60, 60, 60, 60]);
+				[0,3,15,18].forEach(item => App.game.farming.plant(item,59));
+				[6,9,21,24].forEach(item => App.game.farming.plant(item,60));
 			}
 			if (App.game.farming.plotList[0].berry == 59) {
+				MulchPlots([0, 3, 15, 18, 6, 9, 21, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 57) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3670,18 +4181,20 @@ async function mutateBot() {
 			break;
 		case "Maranga":
 			if (App.game.farming.plotList[0].berry == -1) {
-				App.game.farming.plotList[0].plant(61);
-				App.game.farming.plotList[3].plant(61);
-				App.game.farming.plotList[15].plant(61);
-				App.game.farming.plotList[18].plant(61);
+				CheckIfEnoughMulch([0, 3, 15, 18, 6, 9, 21, 24], [61, 61, 61, 61, 62, 62, 62, 62]);
+				App.game.farming.plant(0,61);
+				App.game.farming.plant(3,61);
+				App.game.farming.plant(15,61);
+				App.game.farming.plant(18,61);
 				setTimeout(function(){
-					App.game.farming.plotList[6].plant(62);
-					App.game.farming.plotList[9].plant(62);
-					App.game.farming.plotList[21].plant(62);
-					App.game.farming.plotList[24].plant(62);
-				}, 86400000);
+					App.game.farming.plant(6,62);
+					App.game.farming.plant(9,62);
+					App.game.farming.plant(21,62);
+					App.game.farming.plant(24,62);
+				}, 86400000 * boost);
 			}
 			if (App.game.farming.plotList[0].berry == 61) {
+				MulchPlots([0, 3, 15, 18, 6, 9, 21, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 58) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3696,9 +4209,11 @@ async function mutateBot() {
 			break;
 		case "Liechi":
 			if (App.game.farming.plotList[0].berry == -1 && App.game.party.alreadyCaughtPokemonByName("Kyogre") == true) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(36));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36, 36]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,36));
 			}
 			if (App.game.farming.plotList[0].berry == 36) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 59) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3713,9 +4228,11 @@ async function mutateBot() {
 			break;
 		case "Ganlon":
 			if (App.game.farming.plotList[0].berry == -1 && App.game.party.alreadyCaughtPokemonByName("Groudon") == true) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(42));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,42));
 			}
 			if (App.game.farming.plotList[0].berry == 42) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 60) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3730,9 +4247,11 @@ async function mutateBot() {
 			break;
 		case "Salac":
 			if (App.game.farming.plotList[0].berry == -1 && App.game.party.alreadyCaughtPokemonByName("Rayquaza") == true) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(43));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,43));
 			}
 			if (App.game.farming.plotList[0].berry == 43) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 61) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3747,60 +4266,62 @@ async function mutateBot() {
 			break;
 		case "Petaya":
 			if (App.game.farming.plotList[24].berry == -1) {
-				App.game.farming.plotList[24].plant(48);
+				CheckIfEnoughMulch([24, 16, 14, 15, 10, 21, 12, 22, 4, 13, 17, 0, 11, 23, 18, 19, 2, 20], [48, 50, 39, 42, 46, 40, 44, 38, 49, 36, 52, 35, 43, 51, 45, 37, 41, 47]);
+				App.game.farming.plant(24,48);
 				setTimeout(function(){
-					App.game.farming.plotList[16].plant(50);
-				}, 21600000);
+					App.game.farming.plant(16,50);
+				}, 21600000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[14].plant(39);
-				}, 43200000);
+					App.game.farming.plant(14,39);
+				}, 43200000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[15].plant(42);
-				}, 46800000);
+					App.game.farming.plant(15,42);
+				}, 46800000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[10].plant(46);
-				}, 48600000);
+					App.game.farming.plant(10,46);
+				}, 48600000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[21].plant(40);
-				}, 50400000);
+					App.game.farming.plant(21,40);
+				}, 50400000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[12].plant(44);
-				}, 52200000);
+					App.game.farming.plant(12,44);
+				}, 52200000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[22].plant(38);
-				}, 57600000);
+					App.game.farming.plant(22,38);
+				}, 57600000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[4].plant(49);
-				}, 59400000);
+					App.game.farming.plant(4,49);
+				}, 59400000 * boost);
+        setTimeout(function(){
+					App.game.farming.plant(13,36);
+				}, 61200000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[17].plant(52);
-				}, 61200000);
+					App.game.farming.plant(17,52);
+				}, 61200000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[0].plant(35);
-				}, 64440000);
+					App.game.farming.plant(0,35);
+				}, 64440000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[13].plant(36);
-				}, 64800000);
+					App.game.farming.plant(11,43);
+				}, 66600000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[11].plant(43);
-				}, 66600000);
+					App.game.farming.plant(23,51);
+				}, 77400000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[23].plant(51);
-				}, 77400000);
+					App.game.farming.plant(18,45);
+				}, 79800000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[18].plant(45);
-				}, 79800000);
+					App.game.farming.plant(19,37);
+				}, 82620000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[19].plant(37);
-				}, 82620000);
+					App.game.farming.plant(2,41);
+				}, 85800000 * boost);
 				setTimeout(function(){
-					App.game.farming.plotList[2].plant(41);
-				}, 85800000);
-				setTimeout(function(){
-					App.game.farming.plotList[20].plant(47);
-				}, 86100000);
+					App.game.farming.plant(20,47);
+				}, 86100000 * boost);
 			}
 			if (App.game.farming.plotList[24].berry == 48) {
+				MulchPlots([24, 16, 14, 15, 10, 21, 12, 22, 4, 13, 17, 0, 11, 23, 18, 19, 2, 20]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 62) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3815,9 +4336,11 @@ async function mutateBot() {
 			break;
 		case "Apicot":
 			if (App.game.farming.plotList[0].berry == -1 && App.game.party.alreadyCaughtPokemonByName("Palkia") == true) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(51));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51, 51]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,51));
 			}
 			if (App.game.farming.plotList[0].berry == 51) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 63) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3832,9 +4355,11 @@ async function mutateBot() {
 			break;
 		case "Lansat":
 			if (App.game.farming.plotList[0].berry == -1 && App.game.party.alreadyCaughtPokemonByName("Dialga") == true) {
-				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plotList[item].plant(52));
+				CheckIfEnoughMulch([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24], [52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52]);
+				[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,52));
 			}
 			if (App.game.farming.plotList[0].berry == 52) {
+				MulchPlots([0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
 				for (let berryIt = 0; berryIt < App.game.farming.plotList.length; berryIt++) {
 					if (App.game.farming.plotList[berryIt].berry == 64) {
 						if (App.game.farming.plotList[berryIt].age > (App.game.farming.berryData[App.game.farming.plotList[berryIt].berry].growthTime[3])) {
@@ -3852,68 +4377,185 @@ async function mutateBot() {
 
 async function autoBreed() {
   if (App.game.breeding.hasFreeEggSlot() == true) {
-	  PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
-      let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
-	  let filteredEggList = sortededHatcheryList.filter(
-      (partyPokemon) => {
-        // Only breedable Pokemon
-        if (partyPokemon.breeding || partyPokemon.level < 100) {
-          return false;
-        }
-        // Check based on category
-        if (BreedingController.filter.category() >= 0) {
-          if (
-            partyPokemon.category !== BreedingController.filter.category()
-          ) {
+	  if(Settings.getSetting('breedingOpts').observableValue() == 'none'){
+		  PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
+		  let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
+		  let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
+  			// Only breedable Pokemon
+  			if (partyPokemon.breeding || partyPokemon.level < 100) {
+  			  return false;
+  			}
+        //Check based on searchbox
+  			if (!BreedingController.filter.search().test(partyPokemon.name)) {
             return false;
-          }
         }
-        // Check based on shiny status
-        if (BreedingController.filter.shinyStatus() >= 0) {
-          if (
-            +partyPokemon.shiny !== BreedingController.filter.shinyStatus()
-          ) {
-            return false;
-          }
-        }
-        // Check based on native region
-        if (BreedingController.filter.region() > -2) {
-          if (
-            PokemonHelper.calcNativeRegion(partyPokemon.name) !==
-            BreedingController.filter.region()
-          ) {
-            return false;
-          }
-        }
-        // Check if either of the types match
-        const type1 =
-          BreedingController.filter.type1() > -2
-            ? BreedingController.filter.type1()
-            : null;
-        const type2 =
-          BreedingController.filter.type2() > -2
-            ? BreedingController.filter.type2()
-            : null;
-        if (type1 !== null || type2 !== null) {
-          const { type: types } = pokemonMap[partyPokemon.name];
-          if ([type1, type2].includes(PokemonType.None)) {
-            const type = type1 == PokemonType.None ? type2 : type1;
-            if (!BreedingController.isPureType(partyPokemon, type)) {
-              return false;
-            }
-          } else if (
-            (type1 !== null && !types.includes(type1)) ||
-            (type2 !== null && !types.includes(type2))
-          ) {
-            return false;
-          }
-        }
-        return true;
+  			// Check based on category
+  			if (BreedingController.filter.category() >= 0) {
+  			  if (partyPokemon.category !== BreedingController.filter.category()) {
+    				return false;
+  			  }
+  			}
+  			// Check based on shiny status
+  			if (BreedingController.filter.shinyStatus() >= 0) {
+  			  if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+    				return false;
+  			  }
+  			}
+  			// Check based on native region
+  			if (BreedingController.filter.region() > -2) {
+  			  if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+    				return false;
+  			  }
+  			}
+  			// Check if either of the types match
+  			const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
+  			const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+  			if (type1 !== null || type2 !== null) {
+  			  const { type: types } = pokemonMap[partyPokemon.name];
+  			  if ([type1, type2].includes(PokemonType.None)) {
+    				const type = type1 == PokemonType.None ? type2 : type1;
+    				if (!BreedingController.isPureType(partyPokemon, type)) {
+    				  return false;
+    				}
+  			  } else if ((type1 !== null && !types.includes(type1)) || (type2 !== null && !types.includes(type2))) {
+    				return false;
+  			  }
+  			}
+  			return true;
+		  });
+  		[3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+  		App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
+    } else if(Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
+		  if (player.itemList["Mystery_egg"]() >= 1) {
+			  ItemList["Mystery_egg"].use();
+		  } else {
+        Settings.setSettingByName('breedingOpts','none');
+        Notifier.notify({
+        title: `[SCRIPT] ACSRQ`,
+          message: `You're out of eggs!`,
+          type: NotificationConstants.NotificationOption.warning,
+          timeout: 5 * GameConstants.SECOND,
+        });
       }
-    );
-    [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-    App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
+      [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+	  } else if(Settings.getSetting('breedingOpts').observableValue() == 'typed') {
+  	  var typeEggU = Settings.getSetting('typedEggOpts').observableValue();
+  	  typeEggU = typeEggU.charAt(0).toUpperCase() + typeEggU.slice(1) + '_egg';
+      if (player._itemList[typeEggU]() >= 1) {
+        ItemList[typeEggU].use();
+      } else {
+        Settings.setSettingByName('breedingOpts','none');
+        Notifier.notify({
+        title: `[SCRIPT] ACSRQ`,
+          message: `You're out of eggs!`,
+          type: NotificationConstants.NotificationOption.warning,
+          timeout: 5 * GameConstants.SECOND,
+        });
+      }
+  	  [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+	  } else if(Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
+		  var fossilU = Settings.getSetting('fossilOpts').observableValue();
+		  if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
+        fossilU = "Old Amber";
+      } else {
+        fossilU = fossilU.charAt(0).toUpperCase() + fossilU.slice(1) + ' Fossil';
+      }
+      if (player.mineInventory().find(i => i.name == fossilU).amount() >= 1) {
+        Underground.sellMineItem(player.mineInventory().find(i => i.name == fossilU).id);
+      } else {
+        Settings.setSettingByName('breedingOpts','none');
+        Notifier.notify({
+        title: `[SCRIPT] ACSRQ`,
+          message: `You're out of ${fossilU}s!`,
+          type: NotificationConstants.NotificationOption.warning,
+          timeout: 5 * GameConstants.SECOND,
+        });
+      }
+		  [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+	  }
   } else {
     [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
+  }
+}
+
+async function ballBot() {
+  var purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
+  var minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
+
+	if (App.game.badgeCase.hasBadge(26) == true) {
+		ShopHandler.showShop(pokeMartShop);
+		ShopHandler.shopObservable().items;
+		if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
+			if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
+				ShopHandler.shopObservable().items[0].buy(purAmount);
+			}
+		}
+		if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
+			if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
+				ShopHandler.shopObservable().items[1].buy(purAmount);
+			}
+		}
+		if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
+			if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
+				ShopHandler.shopObservable().items[2].buy(purAmount);
+			}
+		}
+	} else {
+    switch (player.region) {
+      case 0:
+        if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
+          if (MapHelper.accessToTown('Viridian City') == true) {
+            ShopHandler.showShop(ViridianCityShop);
+            ShopHandler.shopObservable().items;
+            if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
+    					ShopHandler.shopObservable().items[0].buy(purAmount);
+    				}
+          }
+        }
+        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
+          if (MapHelper.accessToTown('Lavender Town') == true) {
+            ShopHandler.showShop(LavenderTownShop);
+            ShopHandler.shopObservable().items;
+            if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
+    					ShopHandler.shopObservable().items[0].buy(purAmount);
+    				}
+          }
+        }
+        if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
+          if (MapHelper.accessToTown('Fuchsia City') == true) {
+            ShopHandler.showShop(FuchsiaCityShop);
+            ShopHandler.shopObservable().items;
+            if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
+    					ShopHandler.shopObservable().items[0].buy(purAmount);
+    				}
+          }
+        }
+        break;
+      case 1:
+        if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
+          if (MapHelper.accessToTown('New Bark Town') == true) {
+            ShopHandler.showShop(NewBarkTownShop);
+            ShopHandler.shopObservable().items;
+            if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
+              ShopHandler.shopObservable().items[0].buy(purAmount);
+            }
+          }
+        }
+        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB' || Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
+          if (MapHelper.accessToTown('Goldenrod City') == true) {
+            ShopHandler.showShop(GoldenrodDepartmentStoreShop);
+            ShopHandler.shopObservable().items;
+            if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
+              if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
+                ShopHandler.shopObservable().items[1].buy(purAmount);
+              }
+            } else if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
+              if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
+                ShopHandler.shopObservable().items[2].buy(purAmount);
+              }
+            }
+          }
+        }
+    }
   }
 }
