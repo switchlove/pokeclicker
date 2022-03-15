@@ -2657,7 +2657,7 @@ async function srBot() {
 				}
 				if (smnNeed >= 1 ) {
 					for (let x = 0; x < smnList.length; x++) {
-						if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+						if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) {
 							if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
 								smnName = smnList[x].name;
 								ShopHandler.shopObservable().items[x].buy(1);
