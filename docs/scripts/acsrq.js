@@ -2651,13 +2651,13 @@ async function srBot() {
 				var smnList = ShopHandler.shopObservable().items;
 				var smnNeed = 0;
 				for (let x = 0; x < smnList.length; x++) {
-					if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+					if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
 						smnNeed++;
 					}
 				}
 				if (smnNeed >= 1 ) {
 					for (let x = 0; x < smnList.length; x++) {
-						if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) {
+						if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
 							if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
 								smnName = smnList[x].name;
 								ShopHandler.shopObservable().items[x].buy(1);
