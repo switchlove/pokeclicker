@@ -17,10 +17,10 @@
     <script src="libs/Sortable.min.js"></script>
 
     <!-- New module-based code from './modules' -->
-    <script src="scripts/modules.min.js?v=0.8.14"></script>
+    <script src="scripts/modules.min.js?v=0.8.15"></script>
 
     <!--Minified scripts-->
-    <script src="scripts/script.min.js?v=0.8.14"></script>
+    <script src="scripts/script.min.js?v=0.8.15"></script>
 
     <!--Popper.js-->
     <script src="libs/popper.min.js"></script>
@@ -44,7 +44,7 @@
     <link href="libs/introjs-modern.css" rel="stylesheet">
 
     <!--Minified styles-->
-    <link href="styles/styles.min.css?v=0.8.14" rel="stylesheet">
+    <link href="styles/styles.min.css?v=0.8.15" rel="stylesheet">
 
     <!-- Google Analytics-->
         <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -189,13 +189,26 @@
     </button>
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
-            <a class="dropdown-item" href="#profileModal" data-toggle="modal">Profile</a>
-        </li>
-        <li>
             <a class="dropdown-item" href="#pokedexModal" data-toggle="modal">Pokédex</a>
         </li>
         <li>
+            <a class="dropdown-item" href="#showItemsModal" data-toggle="modal">Items</a>
+        </li>
+        <li data-bind="attr: {  title: App.game.gems.canAccess() ? '' : 'Progress further to unlock...'}">
+            <a class="dropdown-item" href="#" data-bind="click:function(){App.game.gems.openGemModal()},
+            attr: {class: App.game.gems.canAccess() ? 'dropdown-item' : 'dropdown-item disabled all-pointers'}">Gems</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#profileModal" data-toggle="modal">Profile</a>
+        </li>
+        <li>
             <a class="dropdown-item" href="#badgeCaseModal" data-toggle="modal">Badge Case</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#saveModal" data-toggle="modal">Save</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="#settingsModal" data-toggle="modal">Settings</a>
         </li>
         <li>
             <button class="dropdown-item" href="#statisticsModal" data-toggle="modal">Statistics</button>
@@ -206,21 +219,8 @@
         <li>
             <a class="dropdown-item" href="#logBookModal" data-toggle="modal">Log Book</a>
         </li>
-        <li data-bind="attr: {  title: App.game.shards.canAccess() ? '' : 'Progress further to unlock...'}">
-            <a class="dropdown-item" href="#" data-bind="click:function(){App.game.shards.openShardModal()},
-            attr: {class: App.game.shards.canAccess() ? 'dropdown-item' : 'dropdown-item disabled all-pointers'}">Shards</a>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#showItemsModal" data-toggle="modal">Items</a>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#settingsModal" data-toggle="modal">Settings</a>
-        </li>
         <li>
             <a class="dropdown-item" href="#damageCalculatorModal" data-toggle="modal">Damage Calculator</a>
-        </li>
-        <li>
-            <a class="dropdown-item" href="#saveModal" data-toggle="modal">Save</a>
         </li>
         <li>
             <a class="dropdown-item" href="#challengeModeModal" data-toggle="modal">Challenge Modes</a>
@@ -1193,7 +1193,7 @@
 
                     <!--TownView-->
                     <knockout data-bind="if: App.game.gameState === GameConstants.GameState.town">
-<div id="townView" data-bind="style: { backgroundImage: 'url(\'assets/images/towns/' + player.town().name + '.png\')' }"
+<div id="townView" data-bind="style: { backgroundImage: `url('assets/images/towns/${player.town().name.replace(/'/, `\\'`)}.png')` }"
      class="justify-content-center no-gutters no-select">
     <div class="row justify-content-center no-gutters">
         <div class="col no-gutters">
@@ -10176,12 +10176,6 @@
 
 
 
-<image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
-    x="912"
-    y="832"
-    height="48"
-    width="96"
-    data-bind="visible: MapHelper.ableToTravel() &amp;&amp; player.starter() == GameConstants.Starter.Pikachu"/>
 <rect class="city"
     data-town="Professor Sycamore&#39;s Blimp"
     x="912"
@@ -10190,10 +10184,8 @@
     width="96"
     data-bind="visible: MapHelper.ableToTravel() &amp;&amp; player.starter() == GameConstants.Starter.Pikachu, click:function(){MapHelper.moveToTown(&#39;Vaniville Town&#39;)}, attr:{ class: MapHelper.calculateTownCssClass(&#39;Vaniville Town&#39;) }">
 </rect>
+    <!-- /ko -->
 
-</g>
-
-                            <g data-bind='visible: player.region == GameConstants.Region.alola'>
     <!-- ko if: player.subregion == SubRegions.getSubRegion(GameConstants.Region.alola, 'Melemele & Akala islands').id -->
     <image width="1600" height="960" xlink:href="assets/images/alola.png" href="assets/images/alola.png"></image>
 
@@ -12081,10 +12073,33 @@
     data-bind="click:function(){MapHelper.moveToTown('Resolution Cave')},
         attr: { class: MapHelper.calculateTownCssClass('Resolution Cave') }">
 </rect>
+
+    <!-- ------------------ -->
+    <!-- PLACES OF INTEREST -->
+    <!-- ------------------ -->
+
+    <!-- TODO: REMOVE IF UB QUESTLINE GETS MERGED -->
+
+
+<image href="assets/images/map/transparent.png" xlink:href="assets/images/map/transparent.png"
+    x="576"
+    y="480"
+    height="48"
+    width="64"
+    data-bind="visible: App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(&#39;Poni Meadow&#39;)]() &gt;= 1"/>
+<rect class="city"
+    data-town="Access Denied - Future Content"
+    x="576"
+    y="480"
+    height="48"
+    width="64"
+    data-bind="visible: App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(&#39;Poni Meadow&#39;)]() &gt;= 1, click:function(){MapHelper.moveToTown(&#39;Seafolk Village&#39;)}, attr:{ class: MapHelper.calculateTownCssClass(&#39;Seafolk Village&#39;) }">
+</rect>
     <!-- /ko -->
 </g>
 
                             <g data-bind='visible: player.region == GameConstants.Region.galar'>
+    <!-- ko if: player.subregion == SubRegions.getSubRegion(GameConstants.Region.galar, 'Galar').id -->
     <image width="1600" height="960" xlink:href="assets/images/galar.png" href="assets/images/galar.png"></image>
 
     <!-- ------ -->
@@ -13118,6 +13133,7 @@
     width="32"
     data-bind="click:function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Hulbury&#39;) }">
 </rect>
+    <!-- /ko -->
 </g>
 
 
@@ -13219,7 +13235,7 @@
 
             <!-- Current Quest -->
             <div id="questDisplayContainer" class="card sortable border-secondary mb-3">
-    <!-- ko if: QuestLineHelper.isQuestLineCompleted('Tutorial Quests') -->
+    <!-- ko if: App.game.quests.isDailyQuestsUnlocked() -->
         <div class="card-header p-0" data-toggle="collapse" href="#questDisplayBody">
             <span data-bind='text: "Quests (" + App.game.quests.currentQuests().length + "/" + App.game.quests.questSlots() + ")"'></span>
         </div>
@@ -13230,7 +13246,7 @@
     <!-- /ko -->
 
     <div id="questDisplayBody" class="card-body p-0 show">
-        <!-- ko if: App.game.quests.currentQuests().length == 0 && QuestLineHelper.isQuestLineCompleted('Tutorial Quests') -->
+        <!-- ko if: App.game.quests.currentQuests().length == 0 && App.game.quests.isDailyQuestsUnlocked() -->
             <span class="pt-2 pb-2">No active quest</span>
         <!-- /ko -->
         <table width="100%">
@@ -13414,7 +13430,7 @@
             <div class="modal-body">
                 <p>
                     <strong>Activate in game challenge modes!</strong><br/>
-                    Once you activate a challenge you will not be able to disable it later on, decide carefully.
+                    Challenges can be disabled later, but cannot be re-enabled.
                 </p>
                 <br/>
                 <table class="table" width="100%">
@@ -13550,7 +13566,7 @@ aria-labelledby="receiveBadgeModalLabel" aria-hidden="true">
    <div class="modal-content">
        <div class="modal-header">
            <div style="width: 100%;">
-               <img src=""
+               <img src="" onerror="this.src='assets/images/trainers/Mysterious Trainer.png'"
                     data-bind="attr:{ src: 'assets/images/gymLeaders/' + GymRunner.gymObservable().leaderName + '.png'}">
                <h5 class="modal-title" id="receiveBadgeModalLabel"
                    data-bind="text: GymRunner.gymObservable().leaderName.replace(/\d/g,'')">Modal title</h5>
@@ -13560,7 +13576,7 @@ aria-labelledby="receiveBadgeModalLabel" aria-hidden="true">
        <div class="modal-body">
            <p data-bind="text: GymRunner.gymObservable().defeatMessage"></p>
            <!-- ko if: !BadgeEnums[GymRunner.gymObservable().badgeReward].startsWith('Elite') -->
-           <img src="" width="56px" data-bind="attr:{ src: 'assets/images/badges/' + BadgeEnums[GymRunner.gymObservable().badgeReward] + '.png'}">
+           <img src="" width="56px" data-bind="attr:{ src: 'assets/images/badges/' + BadgeEnums[GymRunner.gymObservable().badgeReward] + '.png'}" onerror="this.src='assets/images/badges/Unknown.png'">
            <!-- /ko -->
 
        </div>
@@ -14502,47 +14518,47 @@ aria-labelledby="hallOfFameModalLabel" aria-hidden="true">
 </div>
 
 
-<!-- Shards Modal -->
-<div class="modal fade noselect" id="shardModal" tabindex="-1" role="dialog" aria-badgeledby="shardModal">
+<!-- Gems Modal -->
+<div class="modal fade noselect" id="gemModal" tabindex="-1" role="dialog" aria-badgeledby="gemModal">
     <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
        <div class="modal-content">
             <div class="modal-header">
-                <h5>Shards</h5>
+                <h5>Gems</h5>
                 <button type="button" class="btn btn-info"
                         style="position: absolute; right: 0px; top: 0px; width: auto; height: 63px; padding: 10px;"
-                        data-bind="tooltip: { title: 'Use shards to upgrade the type effectiveness of your Pokémon. When you defeat a Pokémon, you get shards based on its type.', trigger: 'hover', placement:'left' }">
+                        data-bind="tooltip: { title: 'Use gems to upgrade the type effectiveness of your Pokémon. When you defeat a Pokémon, you get gems based on its type.', trigger: 'hover', placement:'left' }">
                     ?
                 </button>
 
             </div>
             <div class="modal-body p-0">
-                <p data-bind="visible: App.game.challenges.list.disableShards.active()" class="bg-danger my-0 sticky-top">
-                    Shard bonuses are disabled.
+                <p data-bind="visible: App.game.challenges.list.disableGems.active()" class="bg-danger my-0 sticky-top">
+                    Gem bonuses are disabled.
                 </p>
                 <table class='table table-sm table-hover m-0'>
-                    <!-- ko foreach: Array(Shards.nTypes) -->
+                    <!-- ko foreach: Array(Gems.nTypes) -->
                         <thead>
                             <tr>
-                                <th colspan="4" class="clickable text-left table-dark text-light" data-toggle="collapse" data-bind="attr: { 'href': '#collapse-shard-' + $index() }, click: function() { App.game.shards.shardCollapsed[$index()] = !App.game.shards.shardCollapsed[$index()]; }">
+                                <th colspan="4" class="clickable text-left table-dark text-light" data-toggle="collapse" data-bind="attr: { 'href': '#collapse-gem-' + $index() }, click: function() { App.game.gems.gemCollapsed[$index()] = !App.game.gems.gemCollapsed[$index()]; }">
                                     <h3>
                                         <knockout data-bind="text: PokemonType[$index()]"></knockout>
                                         <div class="float-right">
-                                            <img width=20px data-bind='attr: { src: Shards.image($index()) }'/>
-                                            <knockout data-bind="text: App.game.shards.shardWallet[$index()]().toLocaleString('en-US')"></knockout>
+                                            <img width=20px data-bind='attr: { src: Gems.image($index()) }'/>
+                                            <knockout data-bind="text: App.game.gems.gemWallet[$index()]().toLocaleString('en-US')"></knockout>
                                         </div>
                                     </h3>
                                 </th>
                             </tr>
                         </thead>
-                        <tbody data-bind="class: 'collapse' + (App.game.shards.shardCollapsed[$index()] ? '' : ' show'), attr: { id: 'collapse-shard-' + $index()}">
-                            <!-- ko foreach: Array(Shards.nEffects) -->
-                                <tr data-bind='if: App.game.shards.isValidUpgrade($parentContext.$index(), $index())'>
+                        <tbody data-bind="class: 'collapse' + (App.game.gems.gemCollapsed[$index()] ? '' : ' show'), attr: { id: 'collapse-gem-' + $index()}">
+                            <!-- ko foreach: Array(Gems.nEffects) -->
+                                <tr data-bind='if: App.game.gems.isValidUpgrade($parentContext.$index(), $index())'>
                                     <td data-bind='text: GameConstants.TypeEffectiveness[$index()]'></td>
                                     <td width='50%'>
                                         <div class="progress"
                                             data-bind="style: { 'background-color': '#' + TypeHelper.typeColorsLocked[$parentContext.$index()] }">
                                             <div class='progress-bar' role="progressbar"
-                                                data-bind="style: { width: (App.game.shards.getShardUpgrade($parentContext.$index(), $index()) * 10) + '%',
+                                                data-bind="style: { width: (App.game.gems.getGemUpgrade($parentContext.$index(), $index()) * 10) + '%',
                                                                         'background-color': '#' + TypeHelper.typeColors[$parentContext.$index()] }"
                                                 aria-valuemin="0" aria-valuemax="100">
                                             </div>
@@ -14552,12 +14568,12 @@ aria-labelledby="hallOfFameModalLabel" aria-hidden="true">
                                         </div>
                                     </td>
                                     <td data-bind='text: (GameConstants.TypeEffectivenessValue[GameConstants.TypeEffectiveness[$index()]]
-                                        + (App.game.shards.getShardUpgrade($parentContext.$index(), $index()) * Shards.SHARD_UPGRADE_STEP)).toFixed(1) + "x"'></td>
+                                        + (App.game.gems.getGemUpgrade($parentContext.$index(), $index()) * Gems.GEM_UPGRADE_STEP)).toFixed(1) + "x"'></td>
                                     <td>
                                         <button class='btn btn-block btn-primary'
-                                                data-bind='click: function(){App.game.shards.buyShardUpgrade($parentContext.$index(), $index())},
-                                                    css: {disabled: !App.game.shards.canBuyShardUpgrade($parentContext.$index(), $index())},
-                                                    text: (App.game.shards.hasMaxUpgrade($parentContext.$index(), $index()) ?  "MAXED" : "Buy (" + App.game.shards.getShardUpgradeCost($parentContext.$index(), $index()) + ")")'>
+                                                data-bind='click: function(){App.game.gems.buyGemUpgrade($parentContext.$index(), $index())},
+                                                    css: {disabled: !App.game.gems.canBuyGemUpgrade($parentContext.$index(), $index())},
+                                                    text: (App.game.gems.hasMaxUpgrade($parentContext.$index(), $index()) ?  "MAXED" : "Buy (" + App.game.gems.getGemUpgradeCost($parentContext.$index(), $index()) + ")")'>
                                         </button>
                                     </td>
                                 </tr>
@@ -14901,7 +14917,7 @@ aria-labelledby="breedingModalLabel" aria-hidden="true">
                     <br/>Every time you mine out all items in a level, you will recover one Skip.</p>
 
                     <h4><u>Treasures</u></h4>
-                    <p>Sell your treasures for shards or diamonds!</p>
+                    <p>Sell your treasures for gems or diamonds!</p>
                     <p>If you have found any fossils, you can hatch the Pokémon they contain from the Treasures tab, or from the Day Care.</p>
 
                     <h4><u>Upgrades</u></h4>
