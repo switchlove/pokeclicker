@@ -92,13 +92,14 @@ window.addEventListener("load", function() {
 		Settings.add(new Setting('maxTime', 'maxTime', [], '30'));
 		Settings.add(new Setting('srOpts', 'Soft Reset Type:',
   		[
-  			new SettingOption('Mystery Eggs', 'mys'),
+        new SettingOption('None', 'none'),
+        new SettingOption('Mystery Eggs', 'mys'),
   			new SettingOption('Evo Items', 'evo'),
   			new SettingOption('Fossils', 'fos'),
   			new SettingOption('Shop Mon', 'poke'),
-  			//new SettingOption('Regular Eggs', 'egg'),
+  			new SettingOption('Regular Eggs', 'egg'),
   		],
-  		'mys'));
+  		'none'));
 		Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item:',
   		[
   			new SettingOption('Dawn Stone', 'Dawn_stone'),
@@ -132,12 +133,14 @@ window.addEventListener("load", function() {
   		'Water_stone'));
 		Settings.add(new Setting('breedingOpts', 'Breeding options:',
   		[
-  			new SettingOption('None', 'none'),
+        new SettingOption('None', 'none'),
+        new SettingOption('Upto Attack', 'attack'),
   			new SettingOption('Mystery Eggs', 'mystery'),
   			new SettingOption('Typed Eggs', 'typed'),
   			new SettingOption('Fossils', 'fossil'),
   		],
   		'none'));
+    Settings.add(new Setting('minBreedAttack', 'minBreedAttack', [], '1000'));
 		Settings.add(new Setting('typedEggOpts', 'Typed egg to use:',
   		[
   			new SettingOption('Fire', 'fire'),
@@ -163,6 +166,7 @@ window.addEventListener("load", function() {
   			new SettingOption('Sail', 'sail'),
   		],
   		'dome'));
+    Settings.add(new Setting('evoItemCount', 'evoItemCount', [], '1'));
 		Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?',
   		[
   			new SettingOption('None', 'none'),
@@ -247,9 +251,11 @@ window.addEventListener("load", function() {
 			<tr style="display: none"><td class="p-2">Time remaining to quit Battle Frontier at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxTime" name="maxTime" data-bind="value: Settings.getSetting('maxTime').observableValue() || ''" value="30"></td></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('srOpts')}"></tr>
 			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('evoOpts')}"></tr>
+      <tr style="display: none"><td class="p-2">Evo items to use:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="evoItemCount" name="evoItemCount" data-bind="value: Settings.getSetting('evoItemCount').observableValue() || ''" value="1"></td></tr>
+      <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('fossilOpts')}"></tr>
 			<tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('breedingOpts')}"></tr>
+      <tr style="display: none"><td class="p-2">Breed each Pokemon up to this attack power:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBreedAttack" name="minBreedAttack" data-bind="value: Settings.getSetting('minBreedAttack').observableValue() || ''" value="1000"></td></tr>
 			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('typedEggOpts')}"></tr>
-			<tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('fossilOpts')}"></tr>
       <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
       <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
       <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
@@ -777,20 +783,44 @@ async function a6settings() {
 	if (Settings.getSetting('dungeOpts') != null) {
 		localSettings[6] = Settings.getSetting('dungeOpts').observableValue();
 	}
-	if (Settings.getSetting('breedingOpts') != null){
+	if (Settings.getSetting('breedingOpts') != null && Settings.getSetting('srOpts') != null){
 		if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
 		}
-		if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
+    if (Settings.getSetting('breedingOpts').observableValue() == 'attack') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
+		}
+    if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").removeAttribute("style");
+		}
+		if (Settings.getSetting('breedingOpts').observableValue() == 'fossil' || Settings.getSetting('srOpts').observableValue() == 'fos') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
 		}
-		if (Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").removeAttribute("style");
+    if (Settings.getSetting('srOpts').observableValue() == 'evo') {
+			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").removeAttribute("style");
+		} else {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
 		}
 	}
+
 	if (Settings.getSetting('chestCollect') != null) {
     if (Settings.getSetting('chestCollect').observableValue() == true) {
       document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").removeAttribute("style");
@@ -804,16 +834,20 @@ async function a6settings() {
 	if (Settings.getSetting('minDT') != null) {
 		localSettings[8] = Settings.getSetting('minDT').observableValue();
 	}
-	if (Settings.getSetting('srOpts') != null) {
+	/*if (Settings.getSetting('srOpts') != null) {
 		localSettings[9][0] = Settings.getSetting('srOpts').observableValue();
-		if (Settings.getSetting('srOpts').observableValue() == 'evo') {
+		if (Settings.getSetting('srOpts').observableValue() == 'none') {
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
+		} else if (Settings.getSetting('srOpts').observableValue() == 'evo') {
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
 		} else if (Settings.getSetting('srOpts').observableValue() == 'fos') {
       document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").removeAttribute("style");
 		} else {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
 		}
-	}
+	}*/
 	if (Settings.getSetting('gymOpts') != null) {
 		localSettings[10] = Settings.getSetting('gymOpts').observableValue();
 	}
@@ -838,11 +872,11 @@ async function a6settings() {
 	}
   if (Settings.getSetting('ballBuyOpts') != null) {
     if (Settings.getSetting('ballBuyOpts').observableValue() == 'none') {
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(20)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").style.display = "none";
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").style.display = "none";
     } else {
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").removeAttribute("style");
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(20)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").removeAttribute("style");
+      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").removeAttribute("style");
     }
   }
 	localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -2483,7 +2517,7 @@ async function srBot() {
 	}
 	localSettings[9][1] = Save.key;
 	localStorage.setItem(settingKey, JSON.stringify(localSettings));
-	switch(localSettings[9][0]) {
+	switch(Settings.getSetting('srOpts').observableValue()) {
 		case "mys":
 			if (ItemList.Mystery_egg.getCaughtStatus() != 2 ) {
 				if (localLocal[6][1] == '') {
@@ -2531,66 +2565,70 @@ async function srBot() {
 				}
 			}
 			break;
-		case "evo":
-			var evoUse = Settings.getSetting('evoOpts').observableValue();
-			var evoList = PokemonHelper.getPokemonsWithEvolution(GameConstants.StoneType[evoUse]);
-			var evoDone = 0;
+    case "evo":
+      var evoUse = Settings.getSetting('evoOpts').observableValue();
+      var evoUseCount = Number(Settings.getSetting('evoItemCount').observableValue());
+      var evoList = PokemonHelper.getPokemonsWithEvolution(GameConstants.StoneType[evoUse]);
+      var evoDone = 0;
       for (let x = 0; x < evoList.length; x++) {
-          if (evoList[x].evolutions.length > 1) {
+        if (evoList[x].evolutions.length > 1) {
+          for (let y = 0; y < evoList[x].evolutions.length; y++) {
+            if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
+              if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
+                evoDone++;
+              }
+            }
+          }
+        } else {
+          if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[0].evolvedPokemon, true) != true && evoList[x].evolutions[0].isSatisfied()) {
+            evoDone++;
+          }
+        }
+      }
+      if (evoDone >= 1 ) {
+        if (player._itemList[evoUse]() >= 1) {
+          evoLoop:
+            for (let x = 0; x < evoList.length; x++) {
               for (let y = 0; y < evoList[x].evolutions.length; y++) {
-                  if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-                      if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
-                          evoDone++;
-                      }
+                if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
+                  if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
+                    localLocal[6][1] = evoList[x].evolutions[y].evolvedPokemon;
+                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
+                    evoName = evoList[x].evolutions[y].evolvedPokemon;
+                    player.itemList[evoUse](player.itemList[evoUse]() - 1);
+                    ItemHandler.stoneSelected(evoUse);
+                    ItemHandler.pokemonSelected(evoList[x].name);
+                    ItemHandler.amountSelected(evoUseCount);
+                    ItemHandler.useStones();
+                    evoUsed = 1;
+                    break evoLoop;
                   }
+                }
               }
-          } else {
-              if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[0].evolvedPokemon, true) != true && evoList[x].evolutions[0].isSatisfied()) {
-                  evoDone++;
-              }
+            }
           }
       }
-			if (evoDone >= 1 ) {
-				if (player._itemList[evoUse]() >= 1) {
-          evoLoop:
-					for (let x = 0; x < evoList.length; x++) {
-						for (let y = 0; y < evoList[x].evolutions.length; y++) {
-							if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-								if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
-									localLocal[6][1] = evoList[x].evolutions[y].evolvedPokemon;
-									localStorage.setItem(saveKey, JSON.stringify(localLocal));
-									evoName = evoList[x].evolutions[y].evolvedPokemon;
-									player.itemList[evoUse](player.itemList[evoUse]() - 1);
-									ItemList[evoUse].use(evoList[x].name);
-									evoUsed = 1;
-									break evoLoop;
-								}
-							}
-						}
-					}
-				}
-			}
-			if (evoUsed == 1) {
-				if (App.game.party.alreadyCaughtPokemonByName(evoName, true) != true) {
-					srCount++;
-					localLocal[6][2] = srCount;
-					localStorage.setItem(saveKey, JSON.stringify(localLocal));
-					console.log( '[FAILED] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
-					location.reload();
-				} else {
-					console.log( '[CAUGHT] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
-					localLocal[6][1] = '';
-					localLocal[6][2] = 0;
-					localSettings[9][2] = 0;
-					srCount = 0;
-					localStorage.setItem(saveKey, JSON.stringify(localLocal));
-					localStorage.setItem(settingKey, JSON.stringify(localSettings));
-					evoUsed = 0;
-					evoName = '';
+      if (evoUsed == 1) {
+        if (App.game.party.alreadyCaughtPokemonByName(evoName, true) != true) {
+          srCount++;
+          localLocal[6][2] = srCount;
+          localStorage.setItem(saveKey, JSON.stringify(localLocal));
+          console.log( '[FAILED] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
+          location.reload();
+        } else {
+          console.log( '[CAUGHT] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
+          localLocal[6][1] = '';
+          localLocal[6][2] = 0;
+          localSettings[9][2] = 0;
+          srCount = 0;
+          localStorage.setItem(saveKey, JSON.stringify(localLocal));
+          localStorage.setItem(settingKey, JSON.stringify(localSettings));
+          evoUsed = 0;
+          evoName = '';
           Save.store(player);
-				}
-			}
-			break;
+        }
+      }
+      break;
     case "fos":
       var fossilSR = Settings.getSetting('fossilOpts').observableValue();
 		  if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
@@ -2651,13 +2689,13 @@ async function srBot() {
 				var smnList = ShopHandler.shopObservable().items;
 				var smnNeed = 0;
 				for (let x = 0; x < smnList.length; x++) {
-					if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+					if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
 						smnNeed++;
 					}
 				}
 				if (smnNeed >= 1 ) {
 					for (let x = 0; x < smnList.length; x++) {
-						if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+						if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
 							if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
 								smnName = smnList[x].name;
 								ShopHandler.shopObservable().items[x].buy(1);
@@ -4226,7 +4264,7 @@ async function mutateBot() {
 
 async function autoBreed() {
   if (App.game.breeding.hasFreeEggSlot() == true) {
-	  if(Settings.getSetting('breedingOpts').observableValue() == 'none'){
+    if(Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'attack'){
 		  PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
 		  let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
 		  let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
@@ -4270,10 +4308,18 @@ async function autoBreed() {
     				return false;
   			  }
   			}
+			if(Settings.getSetting('breedingOpts').observableValue() == 'attack') {
+				var breedAtk = Settings.getSetting('minBreedAttack').observableValue();
+				if (partyPokemon._attack() > breedAtk) {
+					return false;
+				}
+		    }
   			return true;
 		  });
   		[3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-  		App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
+      if (filteredEggList[0] != undefined) {
+  		    App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
+  		}
     } else if(Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
 		  if (player.itemList["Mystery_egg"]() >= 1) {
 			  ItemList["Mystery_egg"].use();
