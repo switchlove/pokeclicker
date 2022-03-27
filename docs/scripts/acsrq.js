@@ -32,11 +32,7 @@ window.addEventListener("load", function() {
 			main();
 		}, 500);
 
-    Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
-    Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-    Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
-    Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
-		Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this:',
+    Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this:',
 			[
 				new SettingOption('Achievement Tracker', 'achivementTrackerContainer'),
 				new SettingOption('Battle Items', 'battleItemContainer'),
@@ -48,7 +44,12 @@ window.addEventListener("load", function() {
 				new SettingOption('Pokéballs', 'pokeballSelector'),
 			],
 			'pokeballSelector'));
+    Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
+    Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
+    Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
 		Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
+    Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
+    Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
 		Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
     Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
 
@@ -215,7 +216,8 @@ window.addEventListener("load", function() {
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('gideBItem')}"></tr>
       <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
-			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
+      <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
+      <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
 			<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
 		</tbody></table>`;
@@ -265,15 +267,28 @@ window.addEventListener("load", function() {
 
 	}, 1000);
 
-	setInterval(function(){
-		if (Settings.getSetting('disableSave') != null) {
-			if (typeof localSettings !== 'undefined' ) {
-				if (localSettings[1] == true) {
-					Save.counter = 0;
-				}
-			}
+  setInterval(function(){
+		if (Settings.getSetting('disableSave') == true) {
+				Save.counter = 0;
 		}
 	}, 1000);
+
+  setInterval(function(){
+    if (Settings.getSetting('noWander').observableValue() == true) {
+      var wanLog = []
+      for(var x = 0; x < App.game.logbook.logs().length; x++){
+        if(App.game.logbook.logs()[x].description.includes("wandered")){
+          if(App.game.logbook.logs()[x].description.includes("shiny")){
+            wanLog.push(App.game.logbook.logs()[x]);
+          }
+        }
+        else{
+          wanLog.push(App.game.logbook.logs()[x]);
+        }
+      }
+      App.game.logbook.logs(wanLog);
+    }
+	}, 5000);
 
 	setInterval(function(){
 		if (clickEngagedD == 1){
@@ -312,8 +327,8 @@ function main(){
     }
 	} else {
 		if (localStorage.getItem('a6csrq-settings') != null) {
-			if (JSON.parse(localStorage.getItem('a6csrq-settings'))[9][2] == 1) {
-				Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[9][1];
+			if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
+				Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[1];
 
         var pSave = JSON.parse(localStorage.getItem(`player${Save.key}`))
         pSave._lastSeen = Date.now();
@@ -352,7 +367,7 @@ function a6save() {
 		localStorage.setItem(saveKey, JSON.stringify(localLocal));
 	}
 
-	localSettings = ["", false, false, false, false, false, "", "0", "0", ['','','',''], "", false, "", ""];
+	localSettings = ['','','',''];
 	settingKey = "a6csrq-settings";
 
 	if ( localStorage.getItem(settingKey) == null ) {
@@ -361,13 +376,8 @@ function a6save() {
 		localSettings = JSON.parse(localStorage.getItem(settingKey));
 	}
 
-	if (localSettings[9].length == 1) {
-		localSettings[9] = ['','',''];
-		localStorage.setItem(settingKey, JSON.stringify(localSettings));
-	}
-
-	if (localSettings[9].length == 3) {
-    localSettings[9] = ['','','',''];
+  if (localSettings.length == 14) {
+    localSettings = localSettings.splice(9,1)[0];
     localStorage.setItem(settingKey, JSON.stringify(localSettings));
   }
 
@@ -700,29 +710,28 @@ function a6menu(){
 		sFootTbl.appendChild(fbdy);
 		sFoot.appendChild(sFootTbl);
 
-		if ( localSettings != null ) {
-			if (Settings.getSetting('hideOak').observableValue() == true) {
-				document.querySelector("#oakItemsContainer").style.display = 'none';
-			} else {
-				document.querySelector("#oakItemsContainer").removeAttribute("style");
-			}
-			if (Settings.getSetting('gideBItem').observableValue() == true) {
-				document.querySelector("#battleItemContainer").style.display = 'none';
-			} else {
-				document.querySelector("#battleItemContainer").removeAttribute("style");
-			}
-			if (Settings.getSetting('hideNoti').observableValue() == true) {
-				document.querySelector("#toaster").style.display = 'none';
-			} else {
-				document.querySelector("#toaster").removeAttribute("style");
-			}
-			if (localSettings[9][2] == 1) {
-				document.querySelector("#srCheck").checked = true;
-				Settings.setSettingByName('disableSave', true)
-			}
-
+		if (Settings.getSetting('hideOak').observableValue() == true) {
+			document.querySelector("#oakItemsContainer").style.display = 'none';
+		} else {
+			document.querySelector("#oakItemsContainer").removeAttribute("style");
 		}
+		if (Settings.getSetting('gideBItem').observableValue() == true) {
+			document.querySelector("#battleItemContainer").style.display = 'none';
+		} else {
+			document.querySelector("#battleItemContainer").removeAttribute("style");
+		}
+		if (Settings.getSetting('hideNoti').observableValue() == true) {
+			document.querySelector("#toaster").style.display = 'none';
+		} else {
+			document.querySelector("#toaster").removeAttribute("style");
+		}
+		if (localSettings[2] == 1) {
+			document.querySelector("#srCheck").checked = true;
+			Settings.setSettingByName('disableSave', true)
+		}
+
 	} else {
+
 		if ( document.querySelector("#automationContainer").previousSibling.id != Settings.getSetting('menuPlace').observableValue() ) {
 			document.querySelector("#automationContainer").appendAfter( document.querySelector( "#" + Settings.getSetting('menuPlace').observableValue() ));
 			menuPos = document.querySelector("#automationContainer").previousSibling.id;
@@ -737,52 +746,29 @@ function a6menu(){
 		missingShinies();
     missingLoot();
 
-    if ( localSettings != null ) {
-			if (Settings.getSetting('hideOak').observableValue() == true) {
-				document.querySelector("#oakItemsContainer").style.display = 'none';
-			} else {
-				document.querySelector("#oakItemsContainer").removeAttribute("style");
-			}
-			if (Settings.getSetting('gideBItem').observableValue() == true) {
-				document.querySelector("#battleItemContainer").style.display = 'none';
-			} else {
-				document.querySelector("#battleItemContainer").removeAttribute("style");
-			}
-			if (Settings.getSetting('hideNoti').observableValue() == true) {
-				document.querySelector("#toaster").style.display = 'none';
-			} else {
-				document.querySelector("#toaster").removeAttribute("style");
-			}
-			if (localSettings[9][2] == 1) {
-				document.querySelector("#srCheck").checked = true;
-				Settings.setSettingByName('disableSave', true)
-			}
+		if (Settings.getSetting('hideOak').observableValue() == true) {
+			document.querySelector("#oakItemsContainer").style.display = 'none';
+		} else {
+			document.querySelector("#oakItemsContainer").removeAttribute("style");
+		}
+		if (Settings.getSetting('gideBItem').observableValue() == true) {
+			document.querySelector("#battleItemContainer").style.display = 'none';
+		} else {
+			document.querySelector("#battleItemContainer").removeAttribute("style");
+		}
+		if (Settings.getSetting('hideNoti').observableValue() == true) {
+			document.querySelector("#toaster").style.display = 'none';
+		} else {
+			document.querySelector("#toaster").removeAttribute("style");
+		}
+		if (localSettings[2] == 1) {
+			document.querySelector("#srCheck").checked = true;
+			Settings.setSettingByName('disableSave', true)
 		}
 	}
 }
 
 async function a6settings() {
-	if (Settings.getSetting('menuPlace') != null) {
-		localSettings[0] = Settings.getSetting('menuPlace').observableValue();
-	}
-	if (Settings.getSetting('hideOak') != null) {
-		localSettings[2] = Settings.getSetting('hideOak').observableValue();
-	}
-	if (Settings.getSetting('gideBItem') != null) {
-		localSettings[3] = Settings.getSetting('gideBItem').observableValue();
-	}
-	if (Settings.getSetting('disableSave') != null) {
-		localSettings[1] = Settings.getSetting('disableSave').observableValue();
-	}
-	if (Settings.getSetting('botOptions') != null) {
-		localSettings[4] = Settings.getSetting('botOptions').observableValue();
-	}
-	if (Settings.getSetting('botRush') != null) {
-		localSettings[5] = Settings.getSetting('botRush').observableValue();
-	}
-	if (Settings.getSetting('dungeOpts') != null) {
-		localSettings[6] = Settings.getSetting('dungeOpts').observableValue();
-	}
 	if (Settings.getSetting('breedingOpts') != null && Settings.getSetting('srOpts') != null){
 		if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
@@ -828,34 +814,7 @@ async function a6settings() {
       document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").style.display = "none";
     }
 	}
-	if (Settings.getSetting('maxClears') != null) {
-		localSettings[7] = Settings.getSetting('maxClears').observableValue();
-	}
-	if (Settings.getSetting('minDT') != null) {
-		localSettings[8] = Settings.getSetting('minDT').observableValue();
-	}
-	/*if (Settings.getSetting('srOpts') != null) {
-		localSettings[9][0] = Settings.getSetting('srOpts').observableValue();
-		if (Settings.getSetting('srOpts').observableValue() == 'none') {
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
-		} else if (Settings.getSetting('srOpts').observableValue() == 'evo') {
-			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
-		} else if (Settings.getSetting('srOpts').observableValue() == 'fos') {
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").removeAttribute("style");
-		} else {
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-      document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(17)").style.display = "none";
-		}
-	}*/
-	if (Settings.getSetting('gymOpts') != null) {
-		localSettings[10] = Settings.getSetting('gymOpts').observableValue();
-	}
-	if (Settings.getSetting('disEvent') != null) {
-		localSettings[11] = Settings.getSetting('disEvent').observableValue();
-	}
 	if (Settings.getSetting('bfOpts') != null) {
-		localSettings[12] = Settings.getSetting('bfOpts').observableValue();
 		if (Settings.getSetting('bfOpts').observableValue() == 'bfOptL') {
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").removeAttribute("style");
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
@@ -866,9 +825,6 @@ async function a6settings() {
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
 			document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
 		}
-	}
-	if (Settings.getSetting('evoOpts') != null) {
-		localSettings[13] = Settings.getSetting('evoOpts').observableValue();
 	}
   if (Settings.getSetting('ballBuyOpts') != null) {
     if (Settings.getSetting('ballBuyOpts').observableValue() == 'none') {
@@ -899,7 +855,7 @@ async function a6settings() {
 
 
 	if (Settings.getSetting('botOptions') != null) {
-		if (localSettings[4] == true) {
+		if (Settings.getSetting('botOptions').observableValue() == true) {
       //Breeding Bot
       if (App.game.breeding.canAccess() == true && App.game.party.hasMaxLevelPokemon()) {
         document.querySelector("#breedingBot").removeAttribute("style");
@@ -1059,15 +1015,16 @@ async function a6settings() {
 				var checkSrClicker = document.querySelector("#srCheck");
 				if (checkSrClicker.checked == true){
 					srClick(1);
-					localSettings[9][2] = 1;
+					localSettings[2] = 1;
 					localStorage.setItem(settingKey, JSON.stringify(localSettings));
 				}
 				if (checkSrClicker.checked == false){
 					srClick(0);
 					srCount = 0;
-					localSettings[9][2] = 0;
+					localSettings[2] = 0;
 					localStorage.setItem(settingKey, JSON.stringify(localSettings));
-					localLocal[6][1] = '';
+          localLocal[6][1] = '';
+          localLocal[6][2] = '';
 					localStorage.setItem(saveKey, JSON.stringify(localLocal));
 				}
 			} else {
@@ -1075,7 +1032,7 @@ async function a6settings() {
 				document.querySelector("#srCheck").checked = false;
 				srClick(0);
 				srCount = 0;
-				localSettings[9][2] = 0;
+				localSettings[2] = 0;
 				localStorage.setItem(settingKey, JSON.stringify(localSettings));
 			}
 
@@ -1117,7 +1074,7 @@ async function a6settings() {
 			document.querySelector("#bfCheck").checked = false;
 		}
 
-		if (localSettings[11] == true) {
+		if (Settings.getSetting('disEvent').observableValue() == true) {
 			if (new Date().getTime() <= new Date(new Date().getFullYear(), 0, 24, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 1, 7, 23).getTime()) {
 				RoamingPokemonList.remove(GameConstants.Region.kalos, 'Vivillon (Fancy)');
 			}
@@ -1591,6 +1548,7 @@ async function phaseCounter(arg) {
 							lastPokeType = 'B: ';
 							localLocal[4][1] = lastPokeType;
 						} else if ( DungeonBattle.trainer() != null ) {
+              App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
 							lastPokeType = 'T: ';
 							localLocal[4][1] = lastPokeType;
 						} else {
@@ -1611,6 +1569,7 @@ async function phaseCounter(arg) {
 							lastPokeType = 'B: ';
 							localLocal[4][1] = lastPokeType;
 						} else if ( DungeonBattle.trainer() != null ) {
+              App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
 							lastPokeType = 'T: ';
 							localLocal[4][1] = lastPokeType;
 						} else {
@@ -1685,6 +1644,7 @@ async function phaseCounter(arg) {
 				}
 				if (GymBattle.enemyPokemon().shiny == true) {
 					if (lastPoke == 0) {
+            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().gym.town} Gym] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
 						lastPokeType = 'T: ';
 						localLocal[4][1] = lastPokeType;
 						lastPoke = GymBattle.enemyPokemon().id;
@@ -1697,6 +1657,7 @@ async function phaseCounter(arg) {
 					} else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
 						break;
 					} else {
+            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().gym.town} Gym] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
 						lastPokeType = 'T: ';
 						localLocal[4][1] = lastPokeType;
 						lastPoke = GymBattle.enemyPokemon().id;
@@ -1726,6 +1687,7 @@ async function phaseCounter(arg) {
 				}
 				if (GymBattle.enemyPokemon().shiny == true) {
 					if (lastPoke == 0) {
+            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().name}] You encountered a ${player.town().gymList[0].town}'s Shiny ${this.enemyPokemon().name}.`);
 						lastPokeType = 'T: ';
 						localLocal[4][1] = lastPokeType;
 						lastPoke = GymBattle.enemyPokemon().id;
@@ -1738,6 +1700,7 @@ async function phaseCounter(arg) {
 					} else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
 						break;
 					} else {
+            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().name}] You encountered a ${player.town().gymList[0].town}'s Shiny ${this.enemyPokemon().name}.`);
 						lastPokeType = 'T: ';
 						localLocal[4][1] = lastPokeType;
 						lastPoke = GymBattle.enemyPokemon().id;
@@ -1791,20 +1754,18 @@ async function dungeonBot() {
 		var pX = await DungeonRunner.map.playerPosition().x;
 		var pY = await DungeonRunner.map.playerPosition().y;
 
-		if (localSettings != null) {
-			if ( Settings.getSetting('botRush').observableValue() == true) {
-				if (pX == bossB && pY == bossA) {
-					await DungeonRunner.handleClick();
-				}
+		if ( Settings.getSetting('botRush').observableValue() == true) {
+			if (pX == bossB && pY == bossA) {
+				await DungeonRunner.handleClick();
 			}
-			if ( Settings.getSetting('chestCollect').observableValue() == true) {
-        if (DungeonRunner.map.currentTile().type() == 3) {
-          if (chestOpened < Settings.getSetting('maxChests').observableValue()) {
-            DungeonRunner.handleClick();
-            chestOpened++
-          }
+		}
+		if ( Settings.getSetting('chestCollect').observableValue() == true) {
+      if (DungeonRunner.map.currentTile().type() == 3) {
+        if (chestOpened < Settings.getSetting('maxChests').observableValue()) {
+          DungeonRunner.handleClick();
+          chestOpened++
         }
-			}
+      }
 		}
 
 		var dSize = player.region;
@@ -2515,7 +2476,7 @@ async function srBot() {
 	} else {
 		srCount = 0;
 	}
-	localSettings[9][1] = Save.key;
+	localSettings[1] = Save.key;
 	localStorage.setItem(settingKey, JSON.stringify(localSettings));
 	switch(Settings.getSetting('srOpts').observableValue()) {
 		case "mys":
@@ -2553,7 +2514,7 @@ async function srBot() {
 									console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
 									localLocal[6][1] = '';
 									localLocal[6][2] = 0;
-									localSettings[9][2] = 0;
+									localSettings[2] = 0;
 									srCount = 0;
 									localStorage.setItem(saveKey, JSON.stringify(localLocal));
 									localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -2619,7 +2580,7 @@ async function srBot() {
           console.log( '[CAUGHT] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
           localLocal[6][1] = '';
           localLocal[6][2] = 0;
-          localSettings[9][2] = 0;
+          localSettings[2] = 0;
           srCount = 0;
           localStorage.setItem(saveKey, JSON.stringify(localLocal));
           localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -2668,7 +2629,7 @@ async function srBot() {
               console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
               localLocal[6][1] = '';
               localLocal[6][2] = 0;
-              localSettings[9][2] = 0;
+              localSettings[2] = 0;
               srCount = 0;
               localStorage.setItem(saveKey, JSON.stringify(localLocal));
               localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -2717,7 +2678,7 @@ async function srBot() {
 						console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
 						localLocal[6][1] = '';
 						localLocal[6][2] = 0;
-						localSettings[9][2] = 0;
+						localSettings[2] = 0;
 						srCount = 0;
 						localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -2730,11 +2691,11 @@ async function srBot() {
 			break;
 		case "egg":
 			if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
-				document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[9][3];
+				document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[3];
 				BreedingController.filter.search(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
 			}
 			if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
-				localSettings[9][3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
+				localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
 				localStorage.setItem(settingKey, JSON.stringify(localSettings));
 			}
 			 var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
@@ -2762,7 +2723,7 @@ async function srBot() {
 				  }
 				}
 				//Check based on searchbox
-				if(localSettings[9][3] == ""){
+				if(localSettings[3] == ""){
 					if (!BreedingController.filter.search().test(partyPokemon.name)) {
 						return false;
 					}
@@ -2817,7 +2778,7 @@ async function srBot() {
 								console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
 								localLocal[6][1] = '';
 								localLocal[6][2] = 0;
-								localSettings[9][2] = 0;
+								localSettings[2] = 0;
 								srCount = 0;
 								localStorage.setItem(saveKey, JSON.stringify(localLocal));
 								localStorage.setItem(settingKey, JSON.stringify(localSettings));
