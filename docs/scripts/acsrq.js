@@ -268,7 +268,7 @@ window.addEventListener("load", function() {
 	}, 1000);
 
   setInterval(function(){
-		if (Settings.getSetting('disableSave') == true) {
+		if (Settings.getSetting('disableSave').observableValue() == true) {
 				Save.counter = 0;
 		}
 	}, 1000);
