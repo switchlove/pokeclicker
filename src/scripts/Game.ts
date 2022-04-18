@@ -44,10 +44,6 @@ class Game {
         public multiplier: Multiplier
     ) {
         this._gameState = ko.observable(GameConstants.GameState.paused);
-
-        AchievementHandler.initialize(multiplier, challenges);
-        FarmController.initialize();
-        EffectEngineRunner.initialize(multiplier);
     }
 
     load() {
@@ -67,6 +63,10 @@ class Game {
     }
 
     initialize() {
+        AchievementHandler.initialize(this.multiplier, this.challenges);
+        FarmController.initialize();
+        EffectEngineRunner.initialize(this.multiplier);
+        ItemHandler.initilizeEvoStones();
         this.profile.initialize();
         this.breeding.initialize();
         this.pokeballs.initialize();
@@ -78,13 +78,19 @@ class Game {
         this.load();
 
         // TODO refactor to proper initialization methods
-        Battle.generateNewEnemy();
+        if (player.starter() != GameConstants.Starter.None) {
+            Battle.generateNewEnemy();
+        } else {
+            const battlePokemon = new BattlePokemon('MissingNo.', 0, PokemonType.None, PokemonType.None, 0, 0, 0, 0, new Amount(0, GameConstants.Currency.money), false);
+            Battle.enemyPokemon(battlePokemon);
+        }
         this.farming.resetAuras();
         //Safari.load();
         Underground.energyTick(this.underground.getEnergyRegenTime());
         AchievementHandler.calculateMaxBonus(); //recalculate bonus based on active challenges
 
         const now = new Date();
+        SeededDateRand.seedWithDate(now);
         DailyDeal.generateDeals(this.underground.getDailyDealsMax(), now);
         BerryDeal.generateDeals(now);
         Weather.generateWeather(now);
@@ -133,7 +139,9 @@ class Game {
                 type: NotificationConstants.NotificationOption.info,
                 title: 'Offline progress',
                 message: `Defeated: ${numberOfPokemonDefeated.toLocaleString('en-US')} Pokémon\nEarned: <img src="./assets/images/currency/money.svg" height="24px"/> ${moneyToEarn.toLocaleString('en-US')}`,
+                strippedMessage: `Defeated: ${numberOfPokemonDefeated.toLocaleString('en-US')} Pokémon\nEarned: ${moneyToEarn.toLocaleString('en-US')} money`,
                 timeout: 2 * GameConstants.MINUTE,
+                setting: NotificationConstants.NotificationSetting.General.offline_earnings,
             });
         }
     }
@@ -184,10 +192,14 @@ class Game {
         }
 
         this.interval = setInterval(() => !this.worker || !Settings.getSetting('useWebWorkerForGameTicks').value ? this.gameTick() : null, GameConstants.TICK_TIME);
+        window.onbeforeunload = () => {
+            this.save();
+        };
     }
 
     stop() {
         clearTimeout(this.interval);
+        window.onbeforeunload = () => {};
     }
 
     gameTick() {
@@ -242,6 +254,7 @@ class Game {
 
             // Check if it's a new day
             if (old.toLocaleDateString() !== now.toLocaleDateString()) {
+                SeededDateRand.seedWithDate(now);
                 // Give the player a free quest refresh
                 this.quests.freeRefresh(true);
                 //Refresh the Underground deals
@@ -250,7 +263,7 @@ class Game {
                 if (this.underground.canAccess() || App.game.quests.isDailyQuestsUnlocked()) {
                     Notifier.notify({
                         title: 'It\'s a new day!',
-                        message: `${this.underground.canAccess() ? 'Your Underground deals have been updated.<br/>' : ''}` +
+                        message: `${this.underground.canAccess() ? 'Your Underground deals have been updated.\n' : ''}` +
                         `${App.game.quests.isDailyQuestsUnlocked() ? '<i>You have a free quest refresh.</i>' : ''}`,
                         type: NotificationConstants.NotificationOption.info,
                         timeout: 3e4,
@@ -264,9 +277,7 @@ class Game {
                 RoamingPokemonList.generateIncreasedChanceRoutes(now);
             }
 
-            // Save the game
-            player._lastSeen = Date.now();
-            Save.store(player);
+            this.save();
         }
 
         // Underground
@@ -299,7 +310,8 @@ class Game {
     }
 
     save() {
-
+        player._lastSeen = Date.now();
+        Save.store(player);
     }
 
     // Knockout getters/setters
