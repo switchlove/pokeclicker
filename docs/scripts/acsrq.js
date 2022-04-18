@@ -867,7 +867,7 @@ async function a6settings() {
         }
       }
 			//Dungeon Bot
-			if (App.game.keyItems.hasKeyItem(KeyItems.KeyItem.Dungeon_ticket) == true) {
+			if (App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket) == true) {
 				document.querySelector("#dungeonBot").removeAttribute("style");
 				if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) != -1 ) {
 					document.querySelector("#dungeonCheck").disabled = false;
