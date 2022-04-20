@@ -319,12 +319,14 @@ window.addEventListener("load", function() {
 function main(){
 	var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
 	if (CharCard == null && App.game != undefined) {
-		a6save();
-    a6settings();
-		a6menu();
+    a6save();
+    a6menu();
     if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
       ballBot();
     }
+    setTimeout(function(){
+      a6settings();
+  	}, 1500);
 	} else {
 		if (localStorage.getItem('a6csrq-settings') != null) {
 			if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
@@ -342,7 +344,23 @@ function main(){
 }
 
 function a6save() {
-	localLocal = [[["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], "", "", ["0",""], "", ["", "", ""]];
+	localLocal = [
+    [
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+      ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+    ],
+    ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+    "",
+    "",
+    ["0",""],
+    "",
+    ["", "", ""]
+  ];
 	saveKey = "a6csrq-" + Save.key;
 
 	if ( localStorage.getItem(saveKey) == null ) {
@@ -362,8 +380,24 @@ function a6save() {
 		localLocal[0] = newArr;
 		localStorage.setItem(saveKey, JSON.stringify(localLocal));
 	}
-	if (localLocal[1].length == 10) {
+  if (localLocal[0].length == 6) {
+    newArr = [];
+    newArr.push(localLocal[0][0]);
+    newArr.push(localLocal[0][1]);
+    newArr.push(localLocal[0][2]);
+    newArr.push(localLocal[0][3]);
+    newArr.push(localLocal[0][4]);
+    newArr.push(localLocal[0][5]);
+		newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
+    localLocal[0] = newArr;
+		localStorage.setItem(saveKey, JSON.stringify(localLocal));
+  }
+  if (localLocal[1].length == 10) {
 		localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+		localStorage.setItem(saveKey, JSON.stringify(localLocal));
+	}
+  if (localLocal[1].length == 98) {
+		localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
 		localStorage.setItem(saveKey, JSON.stringify(localLocal));
 	}
 
@@ -1734,7 +1768,6 @@ async function phaseCounter(arg) {
 }
 
 async function dungeonBot() {
-  //console.log('Running');
 	if (App.game.gameState == 6) {
 		stage = 0;
     chestOpened = 0;
@@ -1777,11 +1810,14 @@ async function dungeonBot() {
 			dSize = player.region - 1;
 		} else if (dClears < 1000) {
 			dSize = player.region - 2;
-		} else if (dClears < 10000) {
+    } else if (dClears < 10000) {
 			dSize = player.region - 3;
-		} else {
+    } else if (dClears < 100000) {
 			dSize = player.region - 4;
-        }
+		} else {
+			dSize = player.region - 5;
+    }
+
 		if (dSize < 0) {
 			dSize = 0;
 		}
@@ -2377,6 +2413,143 @@ async function dungeonBot() {
 				if (DungeonRunner.fightingBoss() == true) {
 					stage = 12;
 				}
+      case 6:
+				if ( stage == 0 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 10) {
+						stage = 1;
+					}
+				}
+				if ( stage == 1 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 10) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 10 && pY == 9) {
+						stage = 2;
+					}
+				}
+				if ( stage == 2 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 9) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 0 && pY == 8) {
+						stage = 3;
+					}
+				}
+				if ( stage == 3 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 8) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 10 && pY == 7) {
+						stage = 4;
+					}
+				}
+				if ( stage == 4 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 7) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 0 && pY == 6) {
+						stage = 5;
+					}
+				}
+				if ( stage == 5 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 6) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 10 && pY == 5) {
+						stage = 6;
+					}
+				}
+				if ( stage == 6 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 5) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 0 && pY == 4) {
+						stage = 7;
+					}
+				}
+				if ( stage == 7 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 4) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 10 && pY == 3) {
+						stage = 8;
+					}
+				}
+				if ( stage == 8 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 3) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 0 && pY == 2) {
+						stage = 9;
+					}
+				}
+				if ( stage == 9 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 2) {
+						await DungeonRunner.map.moveUp();
+					}
+					if (pX == 10 && pY == 1) {
+						stage = 10;
+					}
+				}
+				if ( stage == 10 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveLeft();
+					if (pX == 0 && pY == 1) {
+            await DungeonRunner.map.moveUp();
+					}
+					if (pX == 0 && pY == 0) {
+						stage = 11;
+					}
+        }
+        if ( stage == 11 ) {
+					pX = DungeonRunner.map.playerPosition().x;
+					pY = DungeonRunner.map.playerPosition().y;
+					DungeonRunner.map.moveRight();
+					if (pX == 10 && pY == 0) {
+						stage = 12;
+					}
+        }
+				if ( stage == 12 ) {
+					await DungeonRunner.map.moveToCoordinates(bossB,bossA);
+					if (pX == bossB && pY == bossA) {
+						await DungeonRunner.handleClick();
+					}
+				}
+				if (DungeonRunner.fightingBoss() == true) {
+					stage = 13;
+				}
+
 		}
 	}
 }
