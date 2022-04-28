@@ -282,24 +282,21 @@ class GameController {
                 // Within towns
                 if (App.game.gameState === GameConstants.GameState.town) {
                     if (key === Settings.getSetting('hotkey.town.start').value) {
-                        if (player.town().gym) {
-                            GymRunner.startGym(player.town().gym);
-                        } else if (player.town().dungeon) {
-                            if (player.town() instanceof DungeonTown) {
-                                DungeonRunner.initializeDungeon(player.town().dungeon);
-                            } else {
-                                MapHelper.moveToTown(player.town().dungeon.name);
-                            }
+                        if (player.town() instanceof DungeonTown) {
+                            DungeonRunner.initializeDungeon(player.town().dungeon);
+                        } else {
+                            player.town().content[0].protectedOnclick();
                         }
                         return e.preventDefault();
-                    } else if ('gymList' in player.town()) {
-                        if (isNumberKey) {
-                            // Check if a number higher than 0 and less than total Gyms was pressed
-                            if (numberKey < player.town().gymList.length) {
-                                GymRunner.startGym(player.town().gymList[numberKey]);
-                            }
-                            return e.preventDefault();
+                    } else if (isNumberKey) {
+                        // Check if a number higher than 0 and less than our towns content was pressed
+                        const filteredConent = player.town().content.filter(c => c.isVisible());
+                        if (numberKey < filteredConent.length) {
+                            filteredConent[numberKey].protectedOnclick();
+                        } else if (player.town().npcs && numberKey < filteredConent.length + player.town().npcs.length) {
+                            player.town().npcs[numberKey - filteredConent.length].openDialog();
                         }
+                        return e.preventDefault();
                     }
                 }
             }
