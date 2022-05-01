@@ -42,8 +42,8 @@ class PokemonFactory {
             Notifier.notify({
                 message: `✨ You encountered a shiny ${name}! ✨`,
                 type: NotificationConstants.NotificationOption.warning,
-                sound: NotificationConstants.NotificationSound.shiny_long,
-                setting: NotificationConstants.NotificationSetting.encountered_shiny,
+                sound: NotificationConstants.NotificationSound.General.shiny_long,
+                setting: NotificationConstants.NotificationSetting.General.encountered_shiny,
             });
 
             // Track shinies encountered, and rate of shinies
@@ -89,7 +89,7 @@ class PokemonFactory {
         const bonus = skipBonus ? 1 : App.game.multiplier.getBonus('shiny');
 
         if (Rand.chance(chance / bonus)) {
-            App.game.oakItems.use(OakItems.OakItem.Shiny_Charm);
+            App.game.oakItems.use(OakItemType.Shiny_Charm);
             return true;
         }
         return false;
@@ -106,8 +106,7 @@ class PokemonFactory {
      * @param index index of the Pokémon that is being generated.
      * @returns {any}
      */
-    public static generateGymPokemon(gymName: string, index: number): BattlePokemon {
-        const gym = gymList[gymName];
+    public static generateGymPokemon(gym: Gym, index: number): BattlePokemon {
         const pokemon = gym.pokemons[index];
         const basePokemon = PokemonHelper.getPokemonByName(pokemon.name);
 
@@ -129,8 +128,8 @@ class PokemonFactory {
             Notifier.notify({
                 message: `✨ You encountered a shiny ${name}! ✨`,
                 type: NotificationConstants.NotificationOption.warning,
-                sound: NotificationConstants.NotificationSound.shiny_long,
-                setting: NotificationConstants.NotificationSetting.encountered_shiny,
+                sound: NotificationConstants.NotificationSound.General.shiny_long,
+                setting: NotificationConstants.NotificationSetting.General.encountered_shiny,
             });
 
             // Track shinies encountered, and rate of shinies
@@ -166,8 +165,8 @@ class PokemonFactory {
             Notifier.notify({
                 message: `✨ You encountered a shiny ${name}! ✨`,
                 type: NotificationConstants.NotificationOption.warning,
-                sound: NotificationConstants.NotificationSound.shiny_long,
-                setting: NotificationConstants.NotificationSetting.encountered_shiny,
+                sound: NotificationConstants.NotificationSound.General.shiny_long,
+                setting: NotificationConstants.NotificationSetting.General.encountered_shiny,
             });
 
             // Track shinies encountered, and rate of shinies
@@ -248,6 +247,10 @@ class PokemonFactory {
 
         if (EffectEngineRunner.isActive(GameConstants.BattleItemType.Item_magnet)()) {
             chance /= 1.5;
+        }
+
+        if (FluteEffectRunner.isActive(GameConstants.FluteItemType.Black_Flute)()) {
+            chance /= (FluteEffectRunner.getFluteMultiplier(GameConstants.FluteItemType.Black_Flute) * AchievementHandler.achievementBonus());
         }
 
         if (Rand.chance(chance)) {
