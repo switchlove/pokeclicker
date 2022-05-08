@@ -2590,7 +2590,7 @@ async function gymBot() {
         if (gymsFound <= 1) {
             switch(Settings.getSetting('gymOpts').observableValue()) {
                 case "gymOptC":
-                    if (townContent[x].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
+                    if (townContent[gymAtX].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
                         GymRunner.startGym(townContent[gymAtX]);
                     }
                     break;
