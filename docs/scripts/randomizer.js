@@ -30,7 +30,41 @@ function RandomizeEncounters(){
 	currentRoute = player.route();
 	currentTown = player.town();
 	MapHelper.moveToTown(GameConstants.StartingTowns[player.region]);
+	
 	for(var region = 0; region < 10; region++){
+		//Overwrite Dungeon Pokemon
+		Object.keys(TownList).forEach(town => {
+			if(TownList[town] instanceof DungeonTown && TownList[town].region == region){
+				//Dungeon Encounters & Trainers
+				var dungeon = TownList[town].dungeon;
+				if(dungeon !== undefined){
+					if(dungeon.name !== undefined){
+						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
+							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
+								for(var poke = 0; poke < dungeon.enemyList[enemy].team.length; poke++){
+									dungeon.enemyList[enemy].team[poke].name = getIndexValue(1);
+								}
+							}
+							else{
+								dungeon.enemyList[enemy] = getIndexValue(0);
+							}
+						}
+					}
+					if(dungeon.name !== undefined){
+						for(var enemy = 0; enemy < dungeon.bossList.length; enemy++){
+							if(dungeon.bossList[enemy] instanceof DungeonTrainer){
+								for(var poke = 0; poke < dungeon.bossList[enemy].team.length; poke++){
+									dungeon.bossList[enemy].team[poke].name = getIndexValue(1);
+								}
+							}
+							else{
+								dungeon.bossList[enemy].name = getIndexValue(0);
+							}
+						}
+					}
+				}
+			}
+		});
 		//Overwrite Routes
 		var routes = Routes.getRoutesByRegion(region);
 		for(var y = 0; y < routes.length; y++){
@@ -51,44 +85,17 @@ function RandomizeEncounters(){
 				routes[y].pokemon.special[poke] = getIndexValue(0);
 			}
 		}
-		//Overwrite Dungeon Pokemon
-		Object.keys(TownList).forEach(town => {
-			if(TownList[town] instanceof DungeonTown && TownList[town].region == region){
-				//Dungeon Encounters & Trainers
-				var dungeon = TownList[town].dungeon;
-				if(dungeon !== undefined){
-					if(dungeon.name !== undefined){
-						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
-							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
-								for(var poke = 0; poke < dungeon.enemyList[enemy].team.length; poke++){
-									dungeon.enemyList[enemy].team[poke].name = getIndexValue(1);
-								}
-							}
-							else{
-								dungeon.enemyList[enemy].pokemon = getIndexValue(0);
-							}
-						}
-					}
-					if(dungeon.name !== undefined){
-						for(var enemy = 0; enemy < dungeon.bossList.length; enemy++){
-							if(dungeon.bossList[enemy] instanceof DungeonTrainer){
-								for(var poke = 0; poke < dungeon.bossList[enemy].team.length; poke++){
-									dungeon.bossList[enemy].team[poke].name = getIndexValue(1);
-								}
-							}
-							else{
-								dungeon.bossList[enemy].name = getIndexValue(0);
-							}
-						}
-					}
-				}
-				
-			}
-		});
+		
 	}
 	//Overwrite Eggs
-	for(var x = 0; x < App.game.breeding.hatchList[0][0].length; x++){
-		App.game.breeding.hatchList[0][0][x] = getIndexValue(0);
+	var eggArray = [];
+	Object.keys(App.game.breeding.hatchList).every(eggs => eggArray.push(App.game.breeding.hatchList[eggs]));
+	for(var x = 0; x < eggArray.length; x++){
+		for(var y = 0; y < eggArray[x].length; y++){
+			for(var z = 0; z < eggArray[x][y].length; z++){
+				App.game.breeding.hatchList[x][y][z] = getIndexValue(0);
+			}
+		}
 	}
 	UpdateEggs();
 	//Move player to starting town and back
