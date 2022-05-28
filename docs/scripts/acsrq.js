@@ -1,4 +1,4 @@
-var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
+var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
 
 var bossA = 0;
 var bossB = 0;
@@ -7,10 +7,16 @@ var lastCounts = 0;
 var lastECount = 0;
 var lastEPoke = 0;
 var lastPoke = 0;
+var moveBoss = 0;
 var mystSCount = 0;
-var stage = 0;
 var boost = 1;
-
+var started = 0;
+var phases = [];
+var hasRun = 0;
+var maxPhaseCount = 0;
+var isCatching = false;
+var catchValue = 0;
+var isCurrentShiny = 0;
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -172,6 +178,8 @@ window.addEventListener("load", function() {
         new SettingOption('None', 'none'),
         new SettingOption('Boost Mulch', 'boostM'),
         ], 'none'));*/
+        /*Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		Settings.add(new Setting('phaseCount', 'phaseCount', [], '0'));*/
 
         const settingsModal = document.getElementById('settingsModal');
         const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
@@ -253,11 +261,39 @@ window.addEventListener("load", function() {
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
 
+        /*const a6Tab3 = document.createElement('li');
+        a6Tab3.className = 'nav-item';
+
+        const a6Tab3Inner = document.createElement('a');
+        a6Tab3Inner.innerText = 'Phase Tracker';
+        a6Tab3Inner.className = 'nav-link';
+        a6Tab3Inner.href = '#settings-a6csrq3';
+        a6Tab3Inner.dataset.toggle = 'tab';
+
+        a6Tab3.appendChild(a6Tab3Inner);
+        tabs.appendChild(a6Tab3);
+
+		const a6Tab3El = document.createElement('div');
+        a6Tab3El.className = 'tab-pane';
+        a6Tab3El.id = 'settings-a6csrq3';
+        a6Tab3El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
+		<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+		<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="10"></td></tr>
+		</tbody></table>
+		<table class="table table-striped table-hover m-0" id="phaseTable">
+		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
+		</table>`;
+        tabContent.appendChild(a6Tab3El);*/
     }, 1000);
 
     setInterval(function(){
         if (Settings.getSetting('disableSave').observableValue() == true) {
             Save.counter = 0;
+            window.onbeforeunload = [];
+        } else {
+            window.onbeforeunload = function () {
+                Save.store(player);
+            };
         }
     }, 1000);
 
@@ -309,9 +345,42 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
+        //a6phases();
+
+        var srCheckboxL = document.querySelector("#srCheck");
+        srCheckboxL.addEventListener('change', function() {
+            if (this.checked) {
+                clickEngagedSR = 1;
+                localSettings[2] = 1;
+                localStorage.setItem(settingKey, JSON.stringify(localSettings));
+            } else {
+                clickEngagedSR = 0;
+                srCount = 0;
+                localSettings[2] = 0;
+                localStorage.setItem(settingKey, JSON.stringify(localSettings));
+                localLocal[6][1] = '';
+                localLocal[6][2] = '';
+                localStorage.setItem(saveKey, JSON.stringify(localLocal));
+            }
+        });
+        if (srCheckboxL.checked) {
+            clickEngagedSR = 1;
+            localSettings[2] = 1;
+            localStorage.setItem(settingKey, JSON.stringify(localSettings));
+        } else {
+            clickEngagedSR = 0;
+            srCount = 0;
+            localSettings[2] = 0;
+            localStorage.setItem(settingKey, JSON.stringify(localSettings));
+            localLocal[6][1] = '';
+            localLocal[6][2] = '';
+            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+        }
+
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
         }
+
         setTimeout(function(){
             a6settings();
         }, 1500);
@@ -716,6 +785,56 @@ function a6menu(){
         sFootTbl.appendChild(fbdy);
         sFoot.appendChild(sFootTbl);
 
+        var ptModal = document.createElement('div');
+        ptModal.className = 'modal noselect show';
+        ptModal.id = 'phaseModal';
+        ptModal.tabindex = -1;
+        ptModal.style = "z-index: 1040; display: block; padding-right: 6.9968px;";
+        ptModal.style.display = "none";
+        ptModal.ariaModal = true;
+        ptModal.setAttribute("role", "dialog");
+
+        var ptModalScroll = document.createElement('div');
+        ptModalScroll.className = 'modal-dialog modal-dialog-scrollable modal-lg';
+        ptModalScroll.setAttribute("role", "document");
+
+        var ptModalContent = document.createElement('div');
+        ptModalContent.className = 'modal-content';
+
+        var ptModalHeader = document.createElement('div');
+        ptModalHeader.className = 'modal-header';
+        ptModalHeader.setAttribute("role", "document");
+
+        var ptModalHeaderN = document.createElement('h4');
+        ptModalHeaderN.style = 'margin-bottom: 0';
+        ptModalHeaderN.textContent = "Phase Tracker";
+
+        var ptModalBody = document.createElement('div');
+        ptModalBody.className = 'modal-body';
+        ptModalBody.setAttribute("role", "document");
+
+        var ptModalBodyC = document.createElement('div');
+        ptModalBodyC.className = 'mainPhase';
+
+        var ptModalFooter = document.createElement('div');
+        ptModalFooter.className = 'modal-footer';
+
+        var ptModalFooterB = document.createElement('button');
+        ptModalFooterB.className = 'btn btn-primary';
+        ptModalFooterB.dataset.dismiss = 'modal';
+        ptModalFooterB.textContent = 'Close';
+
+        document.body.appendChild(ptModal);
+        ptModal.appendChild(ptModalScroll);
+        ptModalScroll.appendChild(ptModalContent);
+        ptModalContent.appendChild(ptModalHeader);
+        ptModalHeader.appendChild(ptModalHeaderN);
+        ptModalContent.appendChild(ptModalBody);
+        ptModalBody.appendChild(ptModalBodyC);
+        ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
+        ptModalContent.appendChild(ptModalFooter);
+        ptModalFooter.appendChild(ptModalFooterB);
+
         if (Settings.getSetting('hideOak').observableValue() == true) {
             document.querySelector("#oakItemsContainer").style.display = 'none';
         } else {
@@ -1012,28 +1131,9 @@ async function a6settings() {
             if (App.game.breeding.canAccess() == true) {
                 document.querySelector("#srBot").removeAttribute("style");
                 document.querySelector("#srCheck").disabled = false;
-                var checkSrClicker = document.querySelector("#srCheck");
-                if (checkSrClicker.checked == true){
-                    srClick(1);
-                    localSettings[2] = 1;
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                }
-                if (checkSrClicker.checked == false){
-                    srClick(0);
-                    srCount = 0;
-                    localSettings[2] = 0;
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                    localLocal[6][1] = '';
-                    localLocal[6][2] = '';
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                }
             } else {
                 document.querySelector("#srCheck").disabled = true;
                 document.querySelector("#srCheck").checked = false;
-                srClick(0);
-                srCount = 0;
-                localSettings[2] = 0;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
             }
 
             //Farm Bots
@@ -1115,6 +1215,13 @@ async function a6settings() {
     } else {
         document.querySelector("#shinyFooter").style.display = "none";
     }
+
+    /*if(Settings.getSetting('trackPhases').observableValue() == true){
+        document.querySelector("#phaseTable").removeAttribute("style");
+    } else {
+        document.querySelector("#phaseTable").style.display = "none";
+    }*/
+
 }
 
 function dungeonClick(x) {
@@ -1146,14 +1253,6 @@ function bfClick(x) {
         clickEngagedBF = 1;
     } else if (x == 0){
         clickEngagedBF = 0;
-    }
-}
-
-function srClick(x) {
-    if (x == 1){
-        clickEngagedSR = 1;
-    } else if (x == 0){
-        clickEngagedSR = 0;
     }
 }
 
@@ -1353,7 +1452,6 @@ async function areaClears() {
         }
     }
 
-
     if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
         clears = 0;
         if (Safari.inProgress() != false) {
@@ -1384,7 +1482,7 @@ async function areaClears() {
         lastRegion = player.region;
         await phaseCounter(2);
     } else if (App.game.gameState == 6) {
-        if (gymsFound <= 1) {
+        if (gymsFound == 1) {
             clears = townContent[gymAtX].clears()
             if (lastArea != townContent[gymAtX].leaderName || lastRegion != player.region) {
                 lastPoke = 0;
@@ -1408,6 +1506,8 @@ async function areaClears() {
             lastArea = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName;
             lastRegion = player.region;
             await phaseCounter(5);
+        } else {
+            clears = 0;
         }
     } else {
         clears = 0;
@@ -1420,6 +1520,14 @@ async function phaseCounter(arg) {
 
     if (localStorage.getItem(saveKey) != null) {
         localLocal[3] = JSON.parse(localStorage.getItem(saveKey))[3];
+    }
+
+    var gymFound = 0;
+    var townC = player.town().content;
+    for (let x = 0; x < townC.length; x++) {
+        if (townC[x].constructor.name == 'Gym') {
+            gymFound++;
+        }
     }
 
     if (phaseVal == '' || phaseVal == null || phaseVal == undefined){
@@ -1459,9 +1567,7 @@ async function phaseCounter(arg) {
                     phaseVal = localLocal[1][cArea];
                 }
             }
-        } else if (player.town().gym != null ) {
-            phaseVal = 0;
-        } else if (player.town().gymList != undefined) {
+        } else if (gymFound >= 1) {
             phaseVal = 0;
         }
     } else if (document.querySelector("#phaseCount").value != phaseVal) {
@@ -1529,6 +1635,11 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+
+						isCurrentShiny = 1;
+
+
+
                     } else if ( lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -1541,8 +1652,36 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+
+						isCurrentShiny = 1;
                     }
                 }
+				else{
+					if(isCurrentShiny == 1){
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+
+						for(var x = 0; x < 3; x++){
+							var phaseLog = phaseLogs[x];
+							if(phaseLog.type.label == "ESCAPED"){
+								catchStatus = "Failed";
+								break;
+							}
+							else if(phaseLog.type.label == "CAUGHT"){
+								catchStatus = "Captured";
+								break;
+							}
+						}
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						//a6phases();
+					}
+				}
             }
             break;
         case 2: //dungeons
@@ -1566,7 +1705,7 @@ async function phaseCounter(arg) {
                             lastPokeType = 'B: ';
                             localLocal[4][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
-                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
+                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[4][1] = lastPokeType;
                         } else {
@@ -1580,6 +1719,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     } else if ( lastPoke == DungeonBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -1587,7 +1727,7 @@ async function phaseCounter(arg) {
                             lastPokeType = 'B: ';
                             localLocal[4][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
-                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
+                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[4][1] = lastPokeType;
                         } else {
@@ -1601,8 +1741,62 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     }
                 }
+				else{
+					if(isCurrentShiny == 1){
+						var encounterType = "";
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+						phaseLoop:
+						for(var x = 0; x < 3; x++){
+							var phaseLog = phaseLogs[x];
+							if(phaseLog.type.label == "SHINY" && lastPokeType == 'B: '){
+								if(phaseLog.description.includes("trainer")){
+									catchStatus = "Boss Trainer";
+									encounterType = "Boss"
+									break phaseLoop;
+								}
+								else{
+									if(phaseLogs[x-1].type.label == "CAUGHT"){
+										catchStatus = "Boss Captured";
+										encounterType = "Boss";
+										break phaseLoop;
+									}
+									else if(phaseLogs[x-1].type.label == "ESCAPED"){
+										catchStatus = "Boss Failed";
+										encounterType = "Boss";
+										break phaseLoop;
+									}
+								}
+							}
+							else if(phaseLog.type.label == "SHINY" && lastPokeType == 'T: '){
+								catchStatus = "Trainer";
+								encounterType = "Trainer";
+								break phaseLoop;
+							}
+							else if(phaseLog.type.label == "CAUGHT" && lastPokeType == 'W: '){
+								catchStatus = "Captured";
+								encounterType = "Wild";
+								break phaseLoop;
+							}
+							else if(phaseLog.type.label == "ESCAPED" && lastPokeType == 'W: '){
+								catchStatus = "Failed";
+								encounterType = "Wild";
+								break phaseLoop;
+							}
+						}
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, player.town().dungeon.name, encounterType, App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						//a6phases();
+					}
+				}
             }
             break;
         case 3: //safari
@@ -1629,6 +1823,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[5] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     } else if ( lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]() ) {
                         break;
                     } else {
@@ -1641,8 +1836,35 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[5] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     }
                 }
+				else{
+					if(isCurrentShiny == 1){
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+
+						for(var x = 0; x < 3; x++){
+							var phaseLog = phaseLogs[x];
+							if(phaseLog.type.label == "ESCAPED"){
+								catchStatus = "Failed";
+								break;
+							}
+							else if(phaseLog.type.label == "CAUGHT"){
+								catchStatus = "Captured";
+								break;
+							}
+						}
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, "Safari Zone", "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, "N/A"];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						//a6phases();
+					}
+				}
             }
             break;
         case 4: //gym
@@ -1742,19 +1964,65 @@ async function phaseCounter(arg) {
         document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[3].toLocaleString('en-US');
     }
     localStorage.setItem(saveKey, JSON.stringify(localLocal));
+}
 
-    /*
-    if (localLocal[3].toLocaleString('en-US') == '') {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = 0;
-    } else {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[3].toLocaleString('en-US');
-    }
-    localStorage.setItem(saveKey, JSON.stringify(localLocal));*/
+function removePhase(id){
+	var newArray = [];
+	for(var x = 0; x < phases.length; x++){
+		if(x !== id){
+			newArray.push(phases[x]);
+		}
+	}
+	phases = newArray;
+	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+	hasRun = 0;
+	//a6phases();
+}
+
+function a6phases(){
+	var newArray = [];
+	var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
+	if(phaseCountDifference > 0){
+		for(var phase = 0; phase < phases.length; phase++){
+			if(phaseCountDifference > 0){
+				phaseCountDifference--;
+			}
+			else{
+				newArray.push(phases[phase]);
+			}
+		}
+		phases = newArray;
+	}
+	if(hasRun == 0){
+		//Phases
+		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
+		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
+		</table>`;
+		for(var x = 0; x < phases.length; x++){
+			var tablePhase = document.createElement('tr');
+			//Add all phases to table
+			var phaseId = "phase" + x;
+			tablePhaseQuery = "<tr><td>" + phases[x][0] + "</td>" + "<td>" + phases[x][1] + "</td>" + "<td>" + phases[x][2] + "</td>" + "<td>" + phases[x][3] + "</td>" + "<td>" + phases[x][4] + "</td>" + "<td>" + phases[x][5] + "</td>" + "<td>" + "<button type=\"button\" class=\"btn btn-primary\" onclick=\"removePhase(" + x + ")\">Remove</button>" + "</td></tr>";
+			tablePhase.innerHTML = tablePhaseQuery;
+			tablePhase.style.display = "none";
+			phaseTable.append(tablePhase);
+			var childNumber = x + 2;
+			if(x < Number(Settings.getSetting('phaseCount').observableValue())){
+				//Display phase
+				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
+				document.querySelector(displayQuery).removeAttribute("style");
+				hasRun = 1;
+			}
+		}
+	}
+	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 }
 
 async function dungeonBot() {
     if (App.game.gameState == 6) {
         stage = 0;
+        started = 0;
         chestOpened = 0;
         if (App.game.wallet.currencies[GameConstants.Currency.dungeonToken]() >= DungeonRunner.dungeon.tokenCost) {
             DungeonRunner.initializeDungeon(player.town().dungeon);
@@ -1771,11 +2039,16 @@ async function dungeonBot() {
         }
         var pX = DungeonRunner.map.playerPosition().x;
         var pY = DungeonRunner.map.playerPosition().y;
-
         if ( Settings.getSetting('botRush').observableValue() == true) {
             if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(DungeonRunner.dungeon.name)]() >= 200) {
                 if (Math.abs(DungeonRunner.map.playerPosition().y - bossA) <= 1) {
                     if (pX == bossB) {
+                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
+                        await DungeonRunner.handleClick();
+                    }
+                }
+                if (Math.abs(DungeonRunner.map.playerPosition().x - bossB) <= 1) {
+                    if (pY == bossA) {
                         await DungeonRunner.map.moveToCoordinates(bossB,bossA);
                         await DungeonRunner.handleClick();
                     }
@@ -1793,784 +2066,59 @@ async function dungeonBot() {
                 }
             }
         }
-
-        var dSize = player.region;
         var dClears = App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]();
+        var dSize = player.region;
 
-        if (dClears < 10) {
-            dSize = player.region;
-        } else if (dClears < 100) {
-            dSize = player.region - 1;
-        } else if (dClears < 1000) {
-            dSize = player.region - 2;
-        } else if (dClears < 10000) {
-            dSize = player.region - 3;
-        } else if (dClears < 100000) {
-            dSize = player.region - 4;
+        if (started == 0){
+            moveBoss = 0;
+            if (dClears < 10) {
+                dSize = player.region;
+                dMax = 4 + player.region;
+            } else if (dClears < 100) {
+                dSize = player.region - 1;
+                dMax = 4 + player.region - 1;
+            } else if (dClears < 1000) {
+                dSize = player.region - 2;
+                dMax = 4 + player.region - 2;
+            } else if (dClears < 10000) {
+                dSize = player.region - 3;
+                dMax = 4 + player.region - 3;
+            } else if (dClears < 100000) {
+                dSize = player.region - 4;
+                dMax = 4 + player.region - 4;
+            } else {
+                dSize = player.region - 5;
+                dMax = 4 + player.region - 5;
+            }
+            if (dSize < 0) {
+                dSize = 0;
+            }
+            if (dMax < 4) {
+                dMax = 4;
+            }
+            dMaxY = dMax;
+            if (pY == dMax) {
+                DungeonRunner.map.moveLeft();
+                if (pX == 0 && pY == dMax) {
+                    started = 1;
+                }
+            }
         } else {
-            dSize = player.region - 5;
-        }
-
-        if (dSize < 0) {
-            dSize = 0;
-        }
-
-        // 5x5 to 11x11
-
-        switch (dSize) {
-            case 0:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        stage = 1;
-                    }
+            if (moveBoss == 1) {
+                if (pX == bossB && pY == bossA) {
+                    await DungeonRunner.handleClick();
                 }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 4 && pY == 3) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 4 && pY == 1) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 0) {
-                        stage = 6
-                    }
-                }
-                if ( stage == 6 ) {
+            } else {
+                DungeonRunner.map.moveRight();
+                if (pX == dMax && pY == dMaxY) {
+                    await DungeonRunner.map.moveToCoordinates(0,dMaxY);
+                    await DungeonRunner.map.moveUp();
+                    dMaxY = dMaxY - 1;
+                } else if (pX == dMax && pY == 0) {
                     await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
+                    moveBoss = 1;
                 }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 7;
-                }
-                break;
-            case 1:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 4) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 2) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 0) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 8;
-                }
-                break;
-            case 2:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 6) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 5) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 3) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 1) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 0) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 9;
-                }
-                break;
-            case 3:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 6) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 5) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 4) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 2) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 0) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 10;
-                }
-                break;
-            case 4:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 8) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 7) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 6) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 5) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 3) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 1) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 0) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 11;
-                }
-                break;
-            case 5:
-                console.log('Case 5!');
-                if ( stage == 0 ) {
-                    stage = 0;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move left! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 9) {
-                        stage = 1;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 1 ) {
-                    stage = 1;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move right! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveRight();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 9 && pY == 9) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 8) {
-                        stage = 2;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 2 ) {
-                    stage = 2;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move left! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 7) {
-                        stage = 3;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 3 ) {
-                    stage = 3;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move right! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveRight();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 9 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 6) {
-                        stage = 4;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 4 ) {
-                    stage = 4;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    console.log('Move left! Stage: ' + stage);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 5) {
-                        stage = 5;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 4) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 2) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 0) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 11;
-                    }
-                }
-                if ( stage == 11 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 12;
-                }
-            case 6:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 10) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 10) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 9) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 9) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 8) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 7) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 6) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 5) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 3) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 1) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 11;
-                    }
-                }
-                if ( stage == 11 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 0) {
-                        stage = 12;
-                    }
-                }
-                if ( stage == 12 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 13;
-                }
-
+            }
         }
     }
 }
@@ -2688,7 +2236,7 @@ async function srBot() {
         case "mys":
             if (ItemList.Mystery_egg.getCaughtStatus() != 2 ) {
                 if (localLocal[6][1] == '') {
-                    if (App.game.breeding.eggList[0]().type == -1) {
+                    if (App.game.breeding.eggList[0]().type == -1 && player.itemList["Mystery_egg"]() > 0) {
                         ItemList['Mystery_egg'].use();
                         if(App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true) == true) {
                             console.log( 'Already have - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
@@ -2846,52 +2394,55 @@ async function srBot() {
             }
             break;
         case "poke":
-            if (player.town().shops != null || player.town().shops.length >= 1) {
-                if (player.town().name == 'Pastoria City') {
-                    var sSName = eval(PastoriaShop);
-                } else {
-                    var sSName = eval(player.town().name.replace(/\s/g, '') + 'Shop');
-                }
-                ShopHandler.showShop(sSName);
-                var smnList = ShopHandler.shopObservable().items;
-                var smnNeed = 0;
-                for (let x = 0; x < smnList.length; x++) {
-                    if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        smnNeed++;
-                    }
-                }
-                if (smnNeed >= 1 ) {
-                    for (let x = 0; x < smnList.length; x++) {
-                        if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                            if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
-                                smnName = smnList[x].name;
-                                ShopHandler.shopObservable().items[x].buy(1);
-                                smnUsed = 1;
-                                break;
-                            }
+            var shopA = player.town().content;
+            for (let x = 0; x < shopA.length; x++) {
+                if (shopA[x].constructor.name == 'Shop') {
+                    for (let y = 0; y < shopA[x].items.length; y++) {
+                        if (shopA[x].items[y].constructor.name == 'PokemonItem') {
+                            var sSName = shopA[x];
                         }
                     }
                 }
-                if (smnUsed == 1) {
-                    if (App.game.party.alreadyCaughtPokemonByName(smnName, true) != true) {
-                        srCount++;
-                        localLocal[6][2] = srCount;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        console.log( '[FAILED] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                        location.reload();
-                    } else {
-                        smnNeed = smnNeed - 1;
-                        console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                        localLocal[6][1] = '';
-                        localLocal[6][2] = 0;
-                        localSettings[2] = 0;
-                        srCount = 0;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                        smnUsed = 0;
-                        smnName = '';
-                        Save.store(player);
+            }
+            ShopHandler.showShop(sSName);
+            var smnList = ShopHandler.shopObservable().items;
+            var smnNeed = 0;
+            for (let x = 0; x < smnList.length; x++) {
+                if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                    smnNeed++;
+                }
+            }
+            if (smnNeed >= 1 ) {
+                for (let x = 0; x < smnList.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                        if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
+                            smnName = smnList[x].name;
+                            ShopHandler.shopObservable().items[x].buy(1);
+                            smnUsed = 1;
+                            break;
+                        }
                     }
+                }
+            }
+            if (smnUsed == 1) {
+                if (App.game.party.alreadyCaughtPokemonByName(smnName, true) != true) {
+                    srCount++;
+                    localLocal[6][2] = srCount;
+                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
+                    console.log( '[FAILED] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
+                    location.reload();
+                } else {
+                    smnNeed = smnNeed - 1;
+                    console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
+                    localLocal[6][1] = '';
+                    localLocal[6][2] = 0;
+                    localSettings[2] = 0;
+                    srCount = 0;
+                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
+                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
+                    smnUsed = 0;
+                    smnName = '';
+                    Save.store(player);
                 }
             }
             break;
