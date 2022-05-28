@@ -46,7 +46,7 @@ function RandomizeEncounters(){
 								}
 							}
 							else{
-								dungeon.enemyList[enemy] = getIndexValue(0);
+								dungeon.enemyList[enemy].pokemon = getIndexValue(0);
 							}
 						}
 					}
