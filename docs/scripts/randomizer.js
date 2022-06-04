@@ -30,10 +30,12 @@ function RandomizeEncounters(){
 	currentRoute = player.route();
 	currentTown = player.town();
 	MapHelper.moveToTown(GameConstants.StartingTowns[player.region]);
-	
+
 	for(var region = 0; region < 10; region++){
 		//Overwrite Dungeon Pokemon
+
 		Object.keys(TownList).forEach(town => {
+			var hasTrainers = false;
 			if(TownList[town] instanceof DungeonTown && TownList[town].region == region){
 				//Dungeon Encounters & Trainers
 				var dungeon = TownList[town].dungeon;
@@ -41,14 +43,26 @@ function RandomizeEncounters(){
 					if(dungeon.name !== undefined){
 						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
 							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
+								hasTrainers = true;
+							}
+						}
+						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
+							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
 								for(var poke = 0; poke < dungeon.enemyList[enemy].team.length; poke++){
 									dungeon.enemyList[enemy].team[poke].name = getIndexValue(1);
 								}
 							}
 							else{
-								dungeon.enemyList[enemy].pokemon = getIndexValue(0);
+								if(hasTrainers == true){
+									dungeon.enemyList[enemy].pokemon = getIndexValue(0);
+								}
+								else{
+									dungeon.enemyList[enemy] = getIndexValue(0);
+								}
+
 							}
 						}
+
 					}
 					if(dungeon.name !== undefined){
 						for(var enemy = 0; enemy < dungeon.bossList.length; enemy++){
@@ -85,7 +99,7 @@ function RandomizeEncounters(){
 				routes[y].pokemon.special[poke] = getIndexValue(0);
 			}
 		}
-		
+
 	}
 	//Overwrite Eggs
 	var eggArray = [];
