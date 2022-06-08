@@ -25,6 +25,7 @@ function makeRandom(){
     console.log("Randomizing...");
     declareRandomizer();
     RandomizeEncounters();
+	setFunctions();
 }
 function RandomizeEncounters(){
 	currentRoute = player.route();
@@ -33,7 +34,6 @@ function RandomizeEncounters(){
 
 	for(var region = 0; region < 10; region++){
 		//Overwrite Dungeon Pokemon
-
 		Object.keys(TownList).forEach(town => {
 			var hasTrainers = false;
 			if(TownList[town] instanceof DungeonTown && TownList[town].region == region){
@@ -62,7 +62,6 @@ function RandomizeEncounters(){
 
 							}
 						}
-
 					}
 					if(dungeon.name !== undefined){
 						for(var enemy = 0; enemy < dungeon.bossList.length; enemy++){
@@ -99,7 +98,6 @@ function RandomizeEncounters(){
 				routes[y].pokemon.special[poke] = getIndexValue(0);
 			}
 		}
-
 	}
 	//Overwrite Eggs
 	var eggArray = [];
@@ -223,5 +221,96 @@ function getIndexValue(arrayType){
 			selectedPokemonTrainerIndex = 0;
 		}
 		return selectedPokemonTrainer[selectedPokemonTrainerIndex];
+	}
+}
+
+function setFunctions(){
+	//Pokedex List
+	PokedexHelper.getList = function() {
+        const filter = PokedexHelper.getFilters();
+        const highestEncountered = App.game.statistics.pokemonEncountered.highestID;
+        const highestDefeated = App.game.statistics.pokemonDefeated.highestID;
+        const highestCaught = App.game.statistics.pokemonCaptured.highestID;
+        const highestDex = Math.max(highestEncountered, highestDefeated, highestCaught);
+        return pokemonList.filter((pokemon) => {
+            // Checks based on caught/shiny status
+            const alreadyCaught = App.game.party.alreadyCaughtPokemon(pokemon.id);
+            const alreadyCaughtShiny = App.game.party.alreadyCaughtPokemon(pokemon.id, true);
+            // If the Pokemon shouldn't be unlocked yet
+            const nativeRegion = PokemonHelper.calcNativeRegion(pokemon.name);
+            if (nativeRegion > 9) {
+                return false;
+            }
+            // If not showing this region
+            const region = filter['region'] ? parseInt(filter['region'], 10) : null;
+            if (region != null && region != nativeRegion) {
+                return false;
+            }
+            // If we haven't seen a pokemon this high yet
+            if (pokemon.id > highestDex) {
+                return false;
+            }
+            // Check if the name contains the string
+            if (filter['name'] && !pokemon.name.toLowerCase().includes(filter['name'].toLowerCase().trim())) {
+                return false;
+            }
+            // Check if either of the types match
+            const type1 = filter['type1'] ? parseInt(filter['type1'], 10) : null;
+            const type2 = filter['type2'] ? parseInt(filter['type2'], 10) : null;
+            if ([type1, type2].includes(PokemonType.None)) {
+                const type = (type1 == PokemonType.None) ? type2 : type1;
+                if (!PokedexHelper.isPureType(pokemon, type)) {
+                    return false;
+                }
+            }
+            else if ((type1 != null && !pokemon.type.includes(type1)) || (type2 != null && !pokemon.type.includes(type2))) {
+                return false;
+            }
+            // Only uncaught
+            if (filter['caught-shiny'] == 'uncaught' && alreadyCaught) {
+                return false;
+            }
+            // All caught
+            if (filter['caught-shiny'] == 'caught' && !alreadyCaught) {
+                return false;
+            }
+            // Only caught not shiny
+            if (filter['caught-shiny'] == 'caught-not-shiny' && (!alreadyCaught || alreadyCaughtShiny)) {
+                return false;
+            }
+            // Only caught shiny
+            if (filter['caught-shiny'] == 'caught-shiny' && !alreadyCaughtShiny) {
+                return false;
+            }
+            // Only pokemon with a hold item
+            if (filter['held-item'] && !BagHandler.displayName(pokemon.heldItem)) {
+                return false;
+            }
+            return true;
+        });
+    }
+	//Move to Region
+	MapHelper.ableToTravel = function() {
+        var _a, _b;
+        // If player already reached highest region, they can't move on
+        if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
+            return false;
+        }
+        // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
+        if (!App.game.challenges.list.requireCompletePokedex.active()) {
+            return (_b = (_a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || _a === void 0 ? void 0 : _a.isUnlocked()) !== null && _b !== void 0 ? _b : false;
+        }
+        // Check if Champion of Region
+		if(App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13){
+			return true;
+		}
+		else{
+			return false;
+		}
+    }
+	//Shiny Code
+	App.game.redeemableCodes.codeList[1].rewardFunction = function(){
+		const pokemon = pokemonMap.randomRegion(9);
+		App.game.party.gainPokemonById(pokemon.id, true, true);
 	}
 }
