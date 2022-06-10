@@ -1,22 +1,21 @@
-var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
+var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phases, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
 
 var bossA = 0;
 var bossB = 0;
+var catchValue = 0;
+var hasRun = 0;
+var hasExported = 0;
+var isCatching = false;
+var isCurrentShiny = 0;
 var lastCount = 0;
 var lastCounts = 0;
 var lastECount = 0;
 var lastEPoke = 0;
 var lastPoke = 0;
+var maxPhaseCount = 0;
 var moveBoss = 0;
 var mystSCount = 0;
-var boost = 1;
 var started = 0;
-var phases = [];
-var hasRun = 0;
-var maxPhaseCount = 0;
-var isCatching = false;
-var catchValue = 0;
-var isCurrentShiny = 0;
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -57,6 +56,8 @@ window.addEventListener("load", function() {
         Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
         Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
         Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
+        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
 
         Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
         Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -178,8 +179,6 @@ window.addEventListener("load", function() {
         new SettingOption('None', 'none'),
         new SettingOption('Boost Mulch', 'boostM'),
         ], 'none'));*/
-        /*Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		Settings.add(new Setting('phaseCount', 'phaseCount', [], '0'));*/
 
         const settingsModal = document.getElementById('settingsModal');
         const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
@@ -216,6 +215,9 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+		<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
+		</tbody></table>
         </tbody></table>`;
         tabContent.appendChild(a6Tab1El);
 
@@ -260,30 +262,6 @@ window.addEventListener("load", function() {
         </tbody></table>`;
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
-
-        /*const a6Tab3 = document.createElement('li');
-        a6Tab3.className = 'nav-item';
-
-        const a6Tab3Inner = document.createElement('a');
-        a6Tab3Inner.innerText = 'Phase Tracker';
-        a6Tab3Inner.className = 'nav-link';
-        a6Tab3Inner.href = '#settings-a6csrq3';
-        a6Tab3Inner.dataset.toggle = 'tab';
-
-        a6Tab3.appendChild(a6Tab3Inner);
-        tabs.appendChild(a6Tab3);
-
-		const a6Tab3El = document.createElement('div');
-        a6Tab3El.className = 'tab-pane';
-        a6Tab3El.id = 'settings-a6csrq3';
-        a6Tab3El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
-		<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-		<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="10"></td></tr>
-		</tbody></table>
-		<table class="table table-striped table-hover m-0" id="phaseTable">
-		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
-		</table>`;
-        tabContent.appendChild(a6Tab3El);*/
     }, 1000);
 
     setInterval(function(){
@@ -345,7 +323,7 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
-        //a6phases();
+        a6phases();
 
         var srCheckboxL = document.querySelector("#srCheck");
         srCheckboxL.addEventListener('change', function() {
@@ -376,6 +354,24 @@ function main(){
             localLocal[6][2] = '';
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
+
+        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
+        phaseLink.addEventListener("click", function() {
+            document.querySelector("#phaseModal").style.display = "block";
+        });
+
+        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
+        phaseExport.addEventListener("click", function() {
+            if (hasExported == 0) {
+                a6export();
+                hasExported = 1;
+            }
+        });
+
+        var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
+        phaseClose.addEventListener("click", function() {
+            document.querySelector("#phaseModal").style.display = "none";
+        });
 
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
@@ -444,6 +440,17 @@ function a6save() {
 
     localSettings = ['','','',''];
     settingKey = "a6csrq-settings";
+
+
+    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    } else {
+        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
+    }
+
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+
 
     if ( localStorage.getItem(settingKey) == null ) {
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -611,6 +618,7 @@ function a6menu(){
         td1r2textbox.id = "phaseCount";
         td1r2textbox.style.textAlign = "center";
         var td2r2 = document.createElement('td');
+        td2r2.innerHTML = '<a href="#">Phase</a>';
 
         var tr3 = document.createElement('tr');
         tr3.id = 'lastEncounterPoke';
@@ -678,7 +686,7 @@ function a6menu(){
         td1r07.appendChild(td1r07menu);
         td2r07.appendChild(document.createTextNode('Mutate Bot'));
         td1r2.appendChild(td1r2textbox);
-        td2r2.appendChild(document.createTextNode('Phase'));
+        //td2r2.appendChild(document.createTextNode('Phase'));
         td1r3.appendChild(document.createTextNode(''));
         td2r3.appendChild(document.createTextNode('Last Shiny'));
         td1r4.appendChild(document.createTextNode(''));
@@ -804,10 +812,7 @@ function a6menu(){
         var ptModalHeader = document.createElement('div');
         ptModalHeader.className = 'modal-header';
         ptModalHeader.setAttribute("role", "document");
-
-        var ptModalHeaderN = document.createElement('h4');
-        ptModalHeaderN.style = 'margin-bottom: 0';
-        ptModalHeaderN.textContent = "Phase Tracker";
+        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><button class="btn btn-secondary" type="button" data-toggle="collapse" style="margin-left: 25px;">Export</button>`;
 
         var ptModalBody = document.createElement('div');
         ptModalBody.className = 'modal-body';
@@ -815,6 +820,7 @@ function a6menu(){
 
         var ptModalBodyC = document.createElement('div');
         ptModalBodyC.className = 'mainPhase';
+        ptModalBodyC.innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable"><tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr></table>`;
 
         var ptModalFooter = document.createElement('div');
         ptModalFooter.className = 'modal-footer';
@@ -824,14 +830,14 @@ function a6menu(){
         ptModalFooterB.dataset.dismiss = 'modal';
         ptModalFooterB.textContent = 'Close';
 
+
         document.body.appendChild(ptModal);
         ptModal.appendChild(ptModalScroll);
         ptModalScroll.appendChild(ptModalContent);
         ptModalContent.appendChild(ptModalHeader);
-        ptModalHeader.appendChild(ptModalHeaderN);
         ptModalContent.appendChild(ptModalBody);
         ptModalBody.appendChild(ptModalBodyC);
-        ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
+        //ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
@@ -1215,13 +1221,6 @@ async function a6settings() {
     } else {
         document.querySelector("#shinyFooter").style.display = "none";
     }
-
-    /*if(Settings.getSetting('trackPhases').observableValue() == true){
-        document.querySelector("#phaseTable").removeAttribute("style");
-    } else {
-        document.querySelector("#phaseTable").style.display = "none";
-    }*/
-
 }
 
 function dungeonClick(x) {
@@ -1635,11 +1634,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-
 						isCurrentShiny = 1;
-
-
-
                     } else if ( lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -1652,26 +1647,25 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-
 						isCurrentShiny = 1;
                     }
-                }
-				else{
-					if(isCurrentShiny == 1){
+                } else {
+					if (isCurrentShiny == 1) {
 						var catchStatus = "";
 						phaseLogs = App.game.logbook.logs();
-
-						for(var x = 0; x < 3; x++){
+						for (var x = 0; x < 3; x++) {
 							var phaseLog = phaseLogs[x];
-							if(phaseLog.type.label == "ESCAPED"){
+							if(phaseLog.type.label == "ESCAPED") {
 								catchStatus = "Failed";
 								break;
-							}
-							else if(phaseLog.type.label == "CAUGHT"){
+							} else if (phaseLog.type.label == "CAUGHT") {
 								catchStatus = "Captured";
 								break;
 							}
 						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
 						catchValue = 0;
 						isCurrentShiny = 0;
 						newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
@@ -1679,7 +1673,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1743,50 +1737,47 @@ async function phaseCounter(arg) {
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
                     }
-                }
-				else{
-					if(isCurrentShiny == 1){
+                } else {
+					if (isCurrentShiny == 1) {
 						var encounterType = "";
 						var catchStatus = "";
 						phaseLogs = App.game.logbook.logs();
 						phaseLoop:
-						for(var x = 0; x < 3; x++){
+						for (var x = 0; x < 3; x++) {
 							var phaseLog = phaseLogs[x];
-							if(phaseLog.type.label == "SHINY" && lastPokeType == 'B: '){
-								if(phaseLog.description.includes("trainer")){
+							if (phaseLog.type.label == "SHINY" && lastPokeType == 'B: ') {
+								if (phaseLog.description.includes("trainer")) {
 									catchStatus = "Boss Trainer";
 									encounterType = "Boss"
 									break phaseLoop;
-								}
-								else{
-									if(phaseLogs[x-1].type.label == "CAUGHT"){
+								} else {
+									if (phaseLogs[x-1].type.label == "CAUGHT") {
 										catchStatus = "Boss Captured";
 										encounterType = "Boss";
 										break phaseLoop;
-									}
-									else if(phaseLogs[x-1].type.label == "ESCAPED"){
+									} else if (phaseLogs[x-1].type.label == "ESCAPED") {
 										catchStatus = "Boss Failed";
 										encounterType = "Boss";
 										break phaseLoop;
 									}
 								}
-							}
-							else if(phaseLog.type.label == "SHINY" && lastPokeType == 'T: '){
+							} else if (phaseLog.type.label == "SHINY" && lastPokeType == 'T: ') {
 								catchStatus = "Trainer";
 								encounterType = "Trainer";
 								break phaseLoop;
-							}
-							else if(phaseLog.type.label == "CAUGHT" && lastPokeType == 'W: '){
+							} else if(phaseLog.type.label == "CAUGHT" && lastPokeType == 'W: ') {
 								catchStatus = "Captured";
 								encounterType = "Wild";
 								break phaseLoop;
-							}
-							else if(phaseLog.type.label == "ESCAPED" && lastPokeType == 'W: '){
+							} else if(phaseLog.type.label == "ESCAPED" && lastPokeType == 'W: ') {
 								catchStatus = "Failed";
 								encounterType = "Wild";
 								break phaseLoop;
 							}
 						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
 						catchValue = 0;
 						isCurrentShiny = 0;
 						newPhase = [phaseVal, player.town().dungeon.name, encounterType, App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
@@ -1794,7 +1785,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1838,23 +1829,23 @@ async function phaseCounter(arg) {
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
                     }
-                }
-				else{
-					if(isCurrentShiny == 1){
+                } else {
+					if (isCurrentShiny == 1) {
 						var catchStatus = "";
 						phaseLogs = App.game.logbook.logs();
-
-						for(var x = 0; x < 3; x++){
+						for (var x = 0; x < 3; x++) {
 							var phaseLog = phaseLogs[x];
-							if(phaseLog.type.label == "ESCAPED"){
+							if (phaseLog.type.label == "ESCAPED") {
 								catchStatus = "Failed";
 								break;
-							}
-							else if(phaseLog.type.label == "CAUGHT"){
+							} else if (phaseLog.type.label == "CAUGHT") {
 								catchStatus = "Captured";
 								break;
 							}
 						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
 						catchValue = 0;
 						isCurrentShiny = 0;
 						newPhase = [phaseVal, "Safari Zone", "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, "N/A"];
@@ -1862,7 +1853,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1955,7 +1946,6 @@ async function phaseCounter(arg) {
                 }
             }
     }
-
     document.querySelector("#phaseCount").value = phaseVal;
 
     if (localLocal[3].toLocaleString('en-US') == '') {
@@ -1977,46 +1967,59 @@ function removePhase(id){
 	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 	hasRun = 0;
-	//a6phases();
+	a6phases();
 }
 
-function a6phases(){
-	var newArray = [];
-	var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
-	if(phaseCountDifference > 0){
-		for(var phase = 0; phase < phases.length; phase++){
-			if(phaseCountDifference > 0){
-				phaseCountDifference--;
-			}
-			else{
-				newArray.push(phases[phase]);
-			}
-		}
-		phases = newArray;
-	}
-	if(hasRun == 0){
-		//Phases
-		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
-		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
-		</table>`;
-		for(var x = 0; x < phases.length; x++){
-			var tablePhase = document.createElement('tr');
-			//Add all phases to table
-			var phaseId = "phase" + x;
-			tablePhaseQuery = "<tr><td>" + phases[x][0] + "</td>" + "<td>" + phases[x][1] + "</td>" + "<td>" + phases[x][2] + "</td>" + "<td>" + phases[x][3] + "</td>" + "<td>" + phases[x][4] + "</td>" + "<td>" + phases[x][5] + "</td>" + "<td>" + "<button type=\"button\" class=\"btn btn-primary\" onclick=\"removePhase(" + x + ")\">Remove</button>" + "</td></tr>";
-			tablePhase.innerHTML = tablePhaseQuery;
-			tablePhase.style.display = "none";
-			phaseTable.append(tablePhase);
-			var childNumber = x + 2;
-			if(x < Number(Settings.getSetting('phaseCount').observableValue())){
-				//Display phase
-				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
-				document.querySelector(displayQuery).removeAttribute("style");
-				hasRun = 1;
-			}
-		}
-	}
-	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+function a6export() {
+    var test_array = phases;
+    var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
+    var data = encodeURI('data:text/csv;charset=utf-8,' + csv);
+
+    const link = document.createElement('a');
+    link.setAttribute('href', data);
+    link.setAttribute('download', 'phases.csv');
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    hasExported = 0;
+}
+
+function a6phases() {
+    if (Settings.getSetting('trackPhases').observableValue() == true) {
+        var newArray = [];
+    	var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
+    	if (phaseCountDifference > 0) {
+    		for (var phase = 0; phase < phases.length; phase++) {
+    			if (phaseCountDifference > 0) {
+    				phaseCountDifference--;
+    			} else {
+    				newArray.push(phases[phase]);
+    			}
+    		}
+    		phases = newArray;
+    	}
+    	if (hasRun == 0) {
+    		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
+    		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
+    		</table>`;
+    		for(var x = 0; x < phases.length; x++){
+    			var tablePhase = document.createElement('tr');
+    			var phaseId = "phase" + x;
+    			tablePhaseQuery = "<tr><td>" + phases[x][0] + "</td>" + "<td>" + phases[x][1] + "</td>" + "<td>" + phases[x][2] + "</td>" + "<td>" + phases[x][3] + "</td>" + "<td>" + phases[x][4] + "</td>" + "<td>" + phases[x][5] + "</td>" + "<td>" + "<button type=\"button\" class=\"btn btn-primary\" onclick=\"removePhase(" + x + ")\">Remove</button>" + "</td></tr>";
+    			tablePhase.innerHTML = tablePhaseQuery;
+    			tablePhase.style.display = "none";
+    			phaseTable.append(tablePhase);
+    			var childNumber = x + 2;
+    			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
+    				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
+    				document.querySelector(displayQuery).removeAttribute("style");
+    				hasRun = 1;
+    			}
+    		}
+    	}
+    	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    }
 }
 
 async function dungeonBot() {
@@ -2134,40 +2137,41 @@ async function gymBot() {
                 gymAtX = x;
             }
         }
-
-        if (gymsFound <= 1) {
-            switch(Settings.getSetting('gymOpts').observableValue()) {
-                case "gymOptC":
-                    if (townContent[gymAtX].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
+        if (gymsFound == 1) {
+            if (townContent[gymAtX].isUnlocked() == true) {
+                switch(Settings.getSetting('gymOpts').observableValue()) {
+                    case "gymOptC":
+                        if (townContent[gymAtX].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
+                            GymRunner.startGym(townContent[gymAtX]);
+                        }
+                        break;
+                    case "gymOptN":
                         GymRunner.startGym(townContent[gymAtX]);
-                    }
-                    break;
-                case "gymOptN":
-                    GymRunner.startGym(townContent[gymAtX]);
+                }
             }
-
         } else if (gymsFound > 1) {
-            switch (Settings.getSetting('gymE4Opts').observableValue()) {
-                case "1":
-                    GymRunner.startGym(townContent[0]);
-                    break;
-                case "2":
-                    GymRunner.startGym(townContent[1]);
-                    break;
-                case "3":
-                    GymRunner.startGym(townContent[2]);
-                    break;
-                case "4":
-                    GymRunner.startGym(townContent[3]);
-                    break;
-                case "5":
-                    GymRunner.startGym(townContent[4]);
-                    break;
-                default:
-                    GymRunner.startGym(townContent[0]);
+            if (townContent[gymAtX].isUnlocked() == true) {
+                switch (Settings.getSetting('gymE4Opts').observableValue()) {
+                    case "1":
+                        GymRunner.startGym(townContent[0]);
+                        break;
+                    case "2":
+                        GymRunner.startGym(townContent[1]);
+                        break;
+                    case "3":
+                        GymRunner.startGym(townContent[2]);
+                        break;
+                    case "4":
+                        GymRunner.startGym(townContent[3]);
+                        break;
+                    case "5":
+                        GymRunner.startGym(townContent[4]);
+                        break;
+                    default:
+                        GymRunner.startGym(townContent[0]);
+                }
             }
         }
-
     }
 }
 
@@ -2196,7 +2200,6 @@ async function safariBot() {
 async function bfBot() {
     if (App.game.gameState == 8) {
         switch(Settings.getSetting('bfOpts').observableValue()) {
-            // BattleFrontierRunner.battleQuit();
             case "bfOptL":
                 if (BattleFrontierRunner.started() == true) {
                     if (BattleFrontierRunner.stage() >= Number(Settings.getSetting('maxLvl').observableValue())) {
