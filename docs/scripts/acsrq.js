@@ -56,8 +56,8 @@ window.addEventListener("load", function() {
         Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
         Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
         Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
-        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
+        //Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		//Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
 
         Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
         Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -215,11 +215,13 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-		<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
 		</tbody></table>
         </tbody></table>`;
         tabContent.appendChild(a6Tab1El);
+/*
+<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
+*/
 
         const a6Tab2 = document.createElement('li');
         a6Tab2.className = 'nav-item';
@@ -323,7 +325,7 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
-        a6phases();
+        //a6phases();
 
         var srCheckboxL = document.querySelector("#srCheck");
         srCheckboxL.addEventListener('change', function() {
@@ -793,7 +795,7 @@ function a6menu(){
         sFootTbl.appendChild(fbdy);
         sFoot.appendChild(sFootTbl);
 
-        var ptModal = document.createElement('div');
+        /*var ptModal = document.createElement('div');
         ptModal.className = 'modal noselect show';
         ptModal.id = 'phaseModal';
         ptModal.tabindex = -1;
@@ -839,7 +841,7 @@ function a6menu(){
         ptModalBody.appendChild(ptModalBodyC);
         //ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
         ptModalContent.appendChild(ptModalFooter);
-        ptModalFooter.appendChild(ptModalFooterB);
+        ptModalFooter.appendChild(ptModalFooterB);*/
 
         if (Settings.getSetting('hideOak').observableValue() == true) {
             document.querySelector("#oakItemsContainer").style.display = 'none';
@@ -1673,7 +1675,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						a6phases();
+						//a6phases();
 					}
 				}
             }
@@ -1785,7 +1787,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						a6phases();
+						//a6phases();
 					}
 				}
             }
@@ -1853,7 +1855,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						a6phases();
+						//a6phases();
 					}
 				}
             }
@@ -2137,6 +2139,7 @@ async function gymBot() {
                 gymAtX = x;
             }
         }
+
         if (gymsFound == 1) {
             if (townContent[gymAtX].isUnlocked() == true) {
                 switch(Settings.getSetting('gymOpts').observableValue()) {
