@@ -443,16 +443,15 @@ function a6save() {
     localSettings = ['','','',''];
     settingKey = "a6csrq-settings";
 
-
+    /*
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
     } else {
         phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
     }
-
     localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
     localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-
+    */
 
     if ( localStorage.getItem(settingKey) == null ) {
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
