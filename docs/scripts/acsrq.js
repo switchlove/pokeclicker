@@ -357,7 +357,7 @@ function main(){
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
 
-        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
+/*        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
         phaseLink.addEventListener("click", function() {
             document.querySelector("#phaseModal").style.display = "block";
         });
@@ -373,7 +373,7 @@ function main(){
         var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
         phaseClose.addEventListener("click", function() {
             document.querySelector("#phaseModal").style.display = "none";
-        });
+        });*/
 
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
