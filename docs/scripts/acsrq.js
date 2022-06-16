@@ -443,8 +443,8 @@ function a6save() {
     localSettings = ['','','',''];
     settingKey = "a6csrq-settings";
 
-
-    /*if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+    /*
+    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
     } else {
         phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
@@ -1350,6 +1350,7 @@ async function missingShinies() {
             }
             //Dungeon Poke
             if (player.town().dungeon != undefined && player.route() == 0) {
+                var neededS = '';
                 var missS = player.town().dungeon.pokemonList;
                 missS = missS.concat(player.town().dungeon.bossPokemonList);
                 var missC = [];
@@ -1360,13 +1361,13 @@ async function missingShinies() {
                 }
                 missS = missS.filter( ( el ) => !missC.includes( el ) );
                 if ( missS.length == 0) {
-                    missS = 'N/A';
+                    neededS = 'N/A';
                 } else if ( missS.length == 1) {
-                    missS = missS[0];
+                    neededS = missS[0];
                 } else if (missS.length > 1) {
-                    missS = missS.join(', ');
+                    neededS = missS.join(', ');
                 }
-                document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
+                document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
                 var lootA = [];
                 var lootL = player.town().dungeon.itemList;
@@ -2413,13 +2414,13 @@ async function srBot() {
             var smnList = ShopHandler.shopObservable().items;
             var smnNeed = 0;
             for (let x = 0; x < smnList.length; x++) {
-                if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
                     smnNeed++;
                 }
             }
             if (smnNeed >= 1 ) {
                 for (let x = 0; x < smnList.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                    if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
                         if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
                             smnName = smnList[x].name;
                             ShopHandler.shopObservable().items[x].buy(1);
