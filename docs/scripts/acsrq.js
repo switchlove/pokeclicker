@@ -2418,10 +2418,12 @@ async function srBot() {
                     smnNeed++;
                 }
             }
+            console.log(smnNeed);
             if (smnNeed >= 1 ) {
                 for (let x = 0; x < smnList.length; x++) {
                     if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
+                        console.log(App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]());
+                        if (App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
                             smnName = smnList[x].name;
                             ShopHandler.shopObservable().items[x].buy(1);
                             smnUsed = 1;
