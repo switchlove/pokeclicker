@@ -1135,7 +1135,7 @@ async function a6settings() {
             }
 
             //SR Bot
-            if (App.game.breeding.canAccess() == true) {
+            if (App.game.statistics.routeKills['kanto'][3]() >= 10) {
                 document.querySelector("#srBot").removeAttribute("style");
                 document.querySelector("#srCheck").disabled = false;
             } else {
