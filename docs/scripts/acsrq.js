@@ -4252,11 +4252,26 @@ function setupShinyRequirements() {
         ) {
             const routes = Routes.getRoutesByRegion(regIdx);
             for (let routeIdx = 0; routeIdx <= routes.length; routeIdx++) {
-                replaceRequirements(routes[routeIdx]?.requirements);
+                if (routes[routeIdx]) {
+                    replaceRequirements(routes[routeIdx]?.requirements);
+                    Object.assign(routes[routeIdx], {
+                        isUnlocked: function () {
+                            return (
+                                App.game.statistics.routeKills[this.region][
+                                    this.number
+                                ]() ||
+                                this.requirements.every((requirement) =>
+                                    requirement.isCompleted()
+                                )
+                            );
+                        }
+                    });
+                }
             }
         }
 
         for (let town of Object.values(TownList)) {
+            console.log(town)
             replaceRequirements(town?.requirements);
         }
     } else {
