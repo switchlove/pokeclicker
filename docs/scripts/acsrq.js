@@ -4192,34 +4192,19 @@ function setupShinyRequirements() {
                     replaceRequirements(requirements[reqIdx].requirements);
                     break;
                 case "RouteKillRequirement":
-                    Object.defineProperty(
-                        requirements[reqIdx],
-                        "availablePkm",
-                        {
-                            get: function () {
-                                return RouteHelper.getAvailablePokemonList(
-                                    this.route,
-                                    this.region,
-                                    true
-                                );
-                            },
-                        }
-                    );
-                    Object.defineProperty(
-                        requirements[reqIdx],
-                        "requiredValue",
-                        {
-                            get: function () {
-                                return this.availablePkm.length;
-                            },
-                        }
-                    );
+                    Object.defineProperty(requirements[reqIdx], "availablePkm", {
+                        get: function () {
+                            return RouteHelper.getAvailablePokemonList(this.route, this.region, true);
+                        },
+                    });
+                    Object.defineProperty(requirements[reqIdx], "requiredValue", {
+                        get: function () {
+                            return this.availablePkm.length;
+                        },
+                    });
                     Object.assign(requirements[reqIdx], {
                         hint: function () {
-                            return `${Routes.getName(
-                                this.route,
-                                this.region
-                            )} still needs to be completed.`;
+                            return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${Routes.getName(this.route, this.region)}}.`;
                         },
                         getProgress: function () {
                             let count = 0;
@@ -4239,12 +4224,48 @@ function setupShinyRequirements() {
                     });
                     break;
                 case "ClearDungeonRequirement":
+                    Object.defineProperty(requirements[reqIdx], "availablePkm", {
+                        get: function () {
+                            return Object.values(dungeonList)[this.dungeonIndex]?.allAvailablePokemon();
+                        }
+                    });
+                    if (requirements[reqIdx].availablePkm?.length > 0) {
+                        Object.defineProperty(requirements[reqIdx], "requiredValue", {
+                            get: function () {
+                                return this.availablePkm.length;
+                            },
+                        });
+                        Object.assign(requirements[reqIdx], {
+                            hint: function () {
+                                return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${GameConstants.RegionDungeons.flat()[this.dungeonIndex]}.`;
+                            },
+                            getProgress: function () {
+                                let count = 0;
+                                for (let i = 0; i < this.availablePkm.length; i++) {
+                                    if (
+                                        App.game.party.alreadyCaughtPokemon(
+                                            PokemonHelper.getPokemonByName(
+                                                this.availablePkm[i]
+                                            ).id,
+                                            true
+                                        )
+                                    )
+                                        count++;
+                                }
+                                return Math.min(count, this.requiredValue);
+                            },
+                        });
+                    }
                     break;
             }
         }
     }
 
     if (App.game != undefined) {
+        for (let town of Object.values(TownList)) {
+            replaceRequirements(town?.requirements);
+        }
+
         for (
             let regIdx = 0;
             GameConstants.Region[regIdx] != undefined;
@@ -4268,11 +4289,6 @@ function setupShinyRequirements() {
                     });
                 }
             }
-        }
-
-        for (let town of Object.values(TownList)) {
-            console.log(town)
-            replaceRequirements(town?.requirements);
         }
     } else {
         setTimeout(setupShinyRequirements, 100);
