@@ -2157,8 +2157,9 @@ async function gymBot() {
                 }
             }
         } else if (gymsFound > 1) {
-            if (townContent[gymAtX].isUnlocked() == true) {
-                switch (Settings.getSetting('gymE4Opts').observableValue()) {
+            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
+            if (townContent[pickE4 - 1].isUnlocked() == true) {
+                switch (pickE4) {
                     case "1":
                         GymRunner.startGym(townContent[0]);
                         break;
@@ -2467,6 +2468,7 @@ async function srBot() {
                 localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
                 localStorage.setItem(settingKey, JSON.stringify(localSettings));
             }
+            PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
