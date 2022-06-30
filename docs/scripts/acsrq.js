@@ -56,8 +56,8 @@ window.addEventListener("load", function() {
         Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
         Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
         Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
-        //Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		//Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
+        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
 
         Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
         Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -215,13 +215,11 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+        <tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
 		</tbody></table>
         </tbody></table>`;
         tabContent.appendChild(a6Tab1El);
-/*
-<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
-*/
 
         const a6Tab2 = document.createElement('li');
         a6Tab2.className = 'nav-item';
@@ -325,7 +323,7 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
-        //a6phases();
+        a6phases();
 
         var srCheckboxL = document.querySelector("#srCheck");
         srCheckboxL.addEventListener('change', function() {
@@ -357,7 +355,7 @@ function main(){
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
 
-/*        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
+        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
         phaseLink.addEventListener("click", function() {
             document.querySelector("#phaseModal").style.display = "block";
         });
@@ -373,7 +371,7 @@ function main(){
         var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
         phaseClose.addEventListener("click", function() {
             document.querySelector("#phaseModal").style.display = "none";
-        });*/
+        });
 
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
@@ -443,16 +441,6 @@ function a6save() {
     localSettings = ['','','',''];
     settingKey = "a6csrq-settings";
 
-    /*
-    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
-        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-    } else {
-        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
-    }
-    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-    */
-
     if ( localStorage.getItem(settingKey) == null ) {
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
     } else {
@@ -463,6 +451,15 @@ function a6save() {
         localSettings = localSettings.splice(9,1)[0];
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
     }
+
+    phases = [];
+    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    } else {
+        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
+    }
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 
     saveLoaded = 1;
 }
@@ -794,7 +791,7 @@ function a6menu(){
         sFootTbl.appendChild(fbdy);
         sFoot.appendChild(sFootTbl);
 
-        /*var ptModal = document.createElement('div');
+        var ptModal = document.createElement('div');
         ptModal.className = 'modal noselect show';
         ptModal.id = 'phaseModal';
         ptModal.tabindex = -1;
@@ -840,7 +837,7 @@ function a6menu(){
         ptModalBody.appendChild(ptModalBodyC);
         //ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
         ptModalContent.appendChild(ptModalFooter);
-        ptModalFooter.appendChild(ptModalFooterB);*/
+        ptModalFooter.appendChild(ptModalFooterB);
 
         if (Settings.getSetting('hideOak').observableValue() == true) {
             document.querySelector("#oakItemsContainer").style.display = 'none';
@@ -988,7 +985,6 @@ async function a6settings() {
 
     if (Settings.getSetting('botOptions') != null) {
         if (Settings.getSetting('botOptions').observableValue() == true) {
-            // New town content
             var townContent = player.town().content;
 
             //Breeding Bot
@@ -1351,21 +1347,28 @@ async function missingShinies() {
             //Dungeon Poke
             if (player.town().dungeon != undefined && player.route() == 0) {
                 var neededS = '';
-                var missS = player.town().dungeon.pokemonList;
-                missS = missS.concat(player.town().dungeon.bossPokemonList);
-                var missC = [];
-                for (let x = 0; x < missS.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-                        missC.push(missS[x])
+                var missTemp = [];
+                var missDP = player.town().dungeon.pokemonList;
+                var missDBP = player.town().dungeon.bossPokemonList;
+                var missDBPa = player.town().dungeon.bossEncounterList;
+                for (let x = 0; x < missDP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                        missTemp.push(missDP[x])
                     }
                 }
-                missS = missS.filter( ( el ) => !missC.includes( el ) );
-                if ( missS.length == 0) {
+                for (let x = 0; x < missDBP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                        if ( missDBPa[x].lock != true ) {
+                            missTemp.push(missDBP[x])
+                        }
+                    }
+                }
+                if ( missTemp.length == 0) {
                     neededS = 'N/A';
-                } else if ( missS.length == 1) {
-                    neededS = missS[0];
-                } else if (missS.length > 1) {
-                    neededS = missS.join(', ');
+                } else if ( missTemp.length == 1) {
+                    neededS = missTemp[0];
+                } else if (missTemp.length > 1) {
+                    neededS = missTemp.join(', ');
                 }
                 document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
@@ -1383,11 +1386,11 @@ async function missingShinies() {
                     }
                 }
                 lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
-                if (missS.length >= 1 && lootA.length >= 1) {
-                    missS = missS.concat(lootA);
-                    missS = missS.sort().join(', ');
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-                } else if (missS.length == 0) {
+                if (missTemp.length >= 1 && lootA.length >= 1) {
+                    missTemp = missTemp.concat(lootA);
+                    missTemp = missTemp.sort().join(', ');
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = missTemp;
+                } else if (missTemp.length == 0) {
                     if ( lootA.length == 0) {
                         lootA = 'N/A';
                     } else if ( lootA.length == 1) {
@@ -1675,7 +1678,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1787,7 +1790,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1855,7 +1858,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -2457,7 +2460,7 @@ async function srBot() {
         case "egg":
             if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
                 document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[3];
-                BreedingController.filter.search(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
+                BreedingFilters.search.value(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
             }
             if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
                 localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
@@ -2465,42 +2468,36 @@ async function srBot() {
             }
             var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() == 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() == 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                //Check based on searchbox
                 if(localSettings[3] == ""){
-                    if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
                 else{
-                    if (BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
@@ -3994,35 +3991,29 @@ async function autoBreed() {
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                //Check based on searchbox
-                if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() >= 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() >= 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
