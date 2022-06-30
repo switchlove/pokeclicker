@@ -4264,6 +4264,16 @@ function setupShinyRequirements() {
     if (App.game != undefined) {
         for (let town of Object.values(TownList)) {
             replaceRequirements(town?.requirements);
+            if (town.constructor.name === "DungeonTown") {
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        return (
+                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.dungeon)]() ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            }
         }
 
         for (
@@ -4278,12 +4288,8 @@ function setupShinyRequirements() {
                     Object.assign(routes[routeIdx], {
                         isUnlocked: function () {
                             return (
-                                App.game.statistics.routeKills[this.region][
-                                    this.number
-                                ]() ||
-                                this.requirements.every((requirement) =>
-                                    requirement.isCompleted()
-                                )
+                                App.game.statistics.routeKills[this.region][this.number]() ||
+                                this.requirements.every(requirement => requirement.isCompleted())
                             );
                         }
                     });
