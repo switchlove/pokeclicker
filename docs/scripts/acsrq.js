@@ -4204,7 +4204,7 @@ function setupShinyRequirements() {
                     });
                     Object.assign(requirements[reqIdx], {
                         hint: function () {
-                            return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${Routes.getName(this.route, this.region)}}.`;
+                            return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${Routes.getName(this.route, this.region)}.`;
                         },
                         getProgress: function () {
                             let count = 0;
@@ -4269,6 +4269,33 @@ function setupShinyRequirements() {
                     isUnlocked: function () {
                         return (
                             App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.dungeon)]() ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            } else {
+                town.hasGym = -1;
+                town.hasDungeon = -1;
+
+                for (let i = 0; i < town.content.length; i++ ) {
+                    if (town.content[i]?.constructor.name === "Gym")
+                        town.hasGym = i;
+                    if (town.content[i]?.constructor.name === "MoveToDungeon")
+                        town.hasDungeon = i;
+                }
+
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        const alreadyClearGym = (
+                            this.hasGym >= 0 && 
+                            App.game.badgeCase.hasBadge(this.content[this.hasGym]?.badgeReward)
+                        );
+                        const alreadyClearDungeon = (
+                            this.hasDungeon >=0 && 
+                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.content[this.hasDungeon]?.dungeon)]() 
+                        );
+                        return (
+                            alreadyClearGym || alreadyClearDungeon ||
                             this.requirements.every(requirement => requirement.isCompleted())
                         );
                     }
