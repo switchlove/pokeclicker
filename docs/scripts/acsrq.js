@@ -1653,6 +1653,7 @@ async function phaseCounter(arg) {
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
+
                     }
                 } else {
 					if (isCurrentShiny == 1) {
