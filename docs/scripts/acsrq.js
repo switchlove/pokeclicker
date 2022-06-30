@@ -839,17 +839,15 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('gideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
+        if (Settings.getSetting('hideOak').observableValue() == true) {
+            document.querySelector("#oakItemsContainer").style.display = 'none';
+        } else {
+            document.querySelector("#oakItemsContainer").removeAttribute("style");
+        }
+        if (Settings.getSetting('gideBItem').observableValue() == true) {
+            document.querySelector("#battleItemContainer").style.display = 'none';
+        } else {
+            document.querySelector("#battleItemContainer").removeAttribute("style");
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -877,17 +875,15 @@ function a6menu(){
         missingShinies();
         missingLoot();
 
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('gideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
+        if (Settings.getSetting('hideOak').observableValue() == true) {
+            document.querySelector("#oakItemsContainer").style.display = 'none';
+        } else {
+            document.querySelector("#oakItemsContainer").removeAttribute("style");
+        }
+        if (Settings.getSetting('gideBItem').observableValue() == true) {
+            document.querySelector("#battleItemContainer").style.display = 'none';
+        } else {
+            document.querySelector("#battleItemContainer").removeAttribute("style");
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -4133,7 +4129,7 @@ async function ballBot() {
                         ShopHandler.showShop(LavenderTownShop);
                         ShopHandler.shopObservable().items;
                         if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                            ShopHandler.shopObservable().items[1].buy(purAmount);
                         }
                     }
                 }
@@ -4141,8 +4137,8 @@ async function ballBot() {
                     if (MapHelper.accessToTown('Fuchsia City') == true) {
                         ShopHandler.showShop(FuchsiaCityShop);
                         ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
+                            ShopHandler.shopObservable().items[2].buy(purAmount);
                         }
                     }
                 }
