@@ -318,6 +318,8 @@ window.addEventListener("load", function() {
             }
         }, 3000);
     }, 3000);
+
+    setTimeout(setupShinyRequirements, 3000);
 });
 
 function main(){
@@ -4178,5 +4180,86 @@ async function ballBot() {
                     }
                 }
         }
+    }
+}
+
+function setupShinyRequirements() {
+    function replaceRequirements(requirements) {
+        for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
+            switch (requirements[reqIdx]?.constructor.name) {
+                case "MultiRequirement":
+                case "OneFromManyRequirement":
+                    replaceRequirements(requirements[reqIdx].requirements);
+                    break;
+                case "RouteKillRequirement":
+                    Object.defineProperty(
+                        requirements[reqIdx],
+                        "availablePkm",
+                        {
+                            get: function () {
+                                return RouteHelper.getAvailablePokemonList(
+                                    this.route,
+                                    this.region,
+                                    true
+                                );
+                            },
+                        }
+                    );
+                    Object.defineProperty(
+                        requirements[reqIdx],
+                        "requiredValue",
+                        {
+                            get: function () {
+                                return this.availablePkm.length;
+                            },
+                        }
+                    );
+                    Object.assign(requirements[reqIdx], {
+                        hint: function () {
+                            return `${Routes.getName(
+                                this.route,
+                                this.region
+                            )} still needs to be completed.`;
+                        },
+                        getProgress: function () {
+                            let count = 0;
+                            for (let i = 0; i < this.availablePkm.length; i++) {
+                                if (
+                                    App.game.party.alreadyCaughtPokemon(
+                                        PokemonHelper.getPokemonByName(
+                                            this.availablePkm[i]
+                                        ).id,
+                                        true
+                                    )
+                                )
+                                    count++;
+                            }
+                            return Math.min(count, this.requiredValue);
+                        },
+                    });
+                    break;
+                case "ClearDungeonRequirement":
+                    break;
+            }
+        }
+    }
+
+    if (App.game != undefined) {
+        for (
+            let regIdx = 0;
+            GameConstants.Region[regIdx] != undefined;
+            regIdx++
+        ) {
+            const routes = Routes.getRoutesByRegion(regIdx);
+            for (let routeIdx = 0; routeIdx <= routes.length; routeIdx++) {
+                replaceRequirements(routes[routeIdx]?.requirements);
+            }
+        }
+
+        for (let town of Object.values(TownList)) {
+            replaceRequirements(town?.requirements);
+        }
+    } else {
+        setTimeout(setupShinyRequirements, 100);
     }
 }
