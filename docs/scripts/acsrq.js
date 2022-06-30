@@ -839,15 +839,17 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        if (Settings.getSetting('hideOak').observableValue() == true) {
-            document.querySelector("#oakItemsContainer").style.display = 'none';
-        } else {
-            document.querySelector("#oakItemsContainer").removeAttribute("style");
-        }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
-            document.querySelector("#battleItemContainer").style.display = 'none';
-        } else {
-            document.querySelector("#battleItemContainer").removeAttribute("style");
+        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
+            if (Settings.getSetting('hideOak').observableValue() == true) {
+                document.querySelector("#oakItemsContainer").style.display = 'none';
+            } else {
+                document.querySelector("#oakItemsContainer").removeAttribute("style");
+            }
+            if (Settings.getSetting('gideBItem').observableValue() == true) {
+                document.querySelector("#battleItemContainer").style.display = 'none';
+            } else {
+                document.querySelector("#battleItemContainer").removeAttribute("style");
+            }
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -875,15 +877,17 @@ function a6menu(){
         missingShinies();
         missingLoot();
 
-        if (Settings.getSetting('hideOak').observableValue() == true) {
-            document.querySelector("#oakItemsContainer").style.display = 'none';
-        } else {
-            document.querySelector("#oakItemsContainer").removeAttribute("style");
-        }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
-            document.querySelector("#battleItemContainer").style.display = 'none';
-        } else {
-            document.querySelector("#battleItemContainer").removeAttribute("style");
+        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
+            if (Settings.getSetting('hideOak').observableValue() == true) {
+                document.querySelector("#oakItemsContainer").style.display = 'none';
+            } else {
+                document.querySelector("#oakItemsContainer").removeAttribute("style");
+            }
+            if (Settings.getSetting('gideBItem').observableValue() == true) {
+                document.querySelector("#battleItemContainer").style.display = 'none';
+            } else {
+                document.querySelector("#battleItemContainer").removeAttribute("style");
+            }
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
