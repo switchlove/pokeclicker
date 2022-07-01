@@ -301,13 +301,16 @@ window.addEventListener("load", function() {
         if (clickEngagedG == 1){
             gymBot();
         }
-        if (clickEngagedS == 1){
-            safariBot();
-        }
         if (clickEngagedBF == 1){
             bfBot();
         }
     }, 100);
+
+    setInterval(function(){
+        if (clickEngagedS == 1){
+            safariBot();
+        }
+    }, 250);
 
     setTimeout(function(){
         setInterval(function(){
@@ -2193,23 +2196,87 @@ async function gymBot() {
 }
 
 async function safariBot() {
-    if (Safari.inProgress() == true) {
-        if (document.querySelector("#safariModal").style.display == "block") {
-            if (Safari.inBattle() != true) {
-                if (leftStep == 0) {
-                    Safari.step('left');
-                    leftStep = 1;
-                } else {
-                    Safari.step('right');
-                    leftStep = 0;
-                }
-            } else {
-                if (SafariBattle.enemy.shiny != true) {
-                    SafariBattle.run();
-                } else {
-                    SafariBattle.throwBall();
+    let bound = {x: Safari.sizeX(), y: Safari.sizeY()};
+    let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
+    let nearestGrass = {x:0, y:0, d:Infinity}
+    const walkable = [
+        0, //ground
+        10, //grass
+        11,12,13,14,21,22,23,24,15,16,17,18,19 //sand
+    ];
+
+    movementMatrix = (origin) => {
+        let queue = new Set([JSON.stringify(origin)]);
+
+        for(let p = 0; p < queue.size; p++) {
+            let {x, y} = JSON.parse([...queue][p]);
+            if (!walkable.includes(Safari.grid[y][x]))
+                continue;
+
+            let next = [
+                {x, y:y+1}, {x:x+1, y},
+                {x, y:y-1}, {x:x-1, y}
+            ].filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            for (let n = 0; n < next.length; n++)
+                queue.add(JSON.stringify(next[n]));
+
+            if (x == origin.x && y == origin.y)
+                matrix[y][x] = 0;
+            else {
+                matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
+                if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                    nearestGrass = {x, y, d: matrix[y][x]};
+            }
+        }
+    }
+    
+    if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
+        if (Safari.inBattle()) {
+            if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true))
+                SafariBattle.throwBall();
+            else
+                SafariBattle.run();
+        } else {
+            let dest = {d: Infinity}
+            movementMatrix(Safari.playerXY)
+
+            const pkm = Safari.pokemonGrid();
+            for (let i = 0; i < pkm.length; i++) {
+                const dist = matrix[pkm[i].y][pkm[i].x];
+                if (
+                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) && 
+                    dist < dest.d && dist < pkm[i].steps 
+                ) {
+                    dest = pkm[i];
+                    dest.d = dist;
                 }
             }
+            if (dest.d == Infinity)
+                dest = nearestGrass;
+
+            movementMatrix(dest);
+
+            const lastDir = Safari.lastDirection
+            switch (lastDir) {
+                case 'left': priority = 'right'; break;
+                case 'up': priority = 'down'; break;
+                case 'right': priority = 'left'; break;
+                case 'down': priority = 'up'; break;
+            }
+            const next = [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+                .map(dir => {
+                    let xy = Safari.directionToXY(dir)
+                    xy.x += Safari.playerXY.x
+                    xy.y += Safari.playerXY.y
+
+                    if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                        return null;
+                    return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+                })
+                .filter((n) => n && n.d > 0);
+
+            Safari.nextDirection = next[0].dir;
+            Safari.step(next[0].dir);
         }
     }
 }
