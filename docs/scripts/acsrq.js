@@ -357,14 +357,24 @@ function main(){
 
         var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
         phaseLink.addEventListener("click", function() {
+            if (event.shiftKey) {
+                event.preventDefault();
+            }
             document.querySelector("#phaseModal").style.display = "block";
         });
 
         var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
         phaseExport.addEventListener("click", function() {
-            if (hasExported == 0) {
-                a6export();
-                hasExported = 1;
+            if(!event.detail || event.detail == 1) {
+                if (hasExported == 0) {
+                    setTimeout(function(){
+                        a6export()
+                    }, 2000);
+                    hasExported = 1;
+                }
+                return true;
+            } else {
+                return false;
             }
         });
 
@@ -579,7 +589,7 @@ function a6menu(){
         var td1r06 = document.createElement('td');
         td1r06.style.padding = '5px';
         td1r06.style.paddingBottom = '5px';
-        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L"];//, "S+L+P", "S+L+C", "S+L+C+P"];
+        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L", "Perp. P"];//, "S+L+P", "S+L+C", "S+L+C+P"];
         var td1r06menu = document.createElement('select');
         for (const val of td1r06menuVals) {
             var td1r06submenu = document.createElement("option");
@@ -835,7 +845,6 @@ function a6menu(){
         ptModalContent.appendChild(ptModalHeader);
         ptModalContent.appendChild(ptModalBody);
         ptModalBody.appendChild(ptModalBodyC);
-        //ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
@@ -1976,7 +1985,8 @@ function removePhase(id){
 	a6phases();
 }
 
-function a6export() {
+async function a6export() {
+    hasExported = 0;
     var test_array = phases;
     var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
     var data = encodeURI('data:text/csv;charset=utf-8,' + csv);
@@ -1988,7 +1998,6 @@ function a6export() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    hasExported = 0;
 }
 
 function a6phases() {
@@ -2423,11 +2432,9 @@ async function srBot() {
                     smnNeed++;
                 }
             }
-            console.log(smnNeed);
             if (smnNeed >= 1 ) {
                 for (let x = 0; x < smnList.length; x++) {
                     if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        console.log(App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]());
                         if (App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
                             smnName = smnList[x].name;
                             ShopHandler.shopObservable().items[x].buy(1);
@@ -2663,9 +2670,26 @@ async function plantBot() {
                     if (App.game.farming.plotList[0].age >= 343800){
                         App.game.farming.harvestAll();
                     }
-                }				break;
+                }
+                break;
             case 69:
                 //Starf 65 + Lum 19 + Petaya 62
+                if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,65);
+                }
+                else if(App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age < 90000 && App.game.farming.plotList[7].age >= 86400 && App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,65);
+                }
+                else if(App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,62);
+                }
+                else if(App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,62);
+                }
                 break;
             case 70:
                 //Starf 65 + Lum 19 + Chople 40
