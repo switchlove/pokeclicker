@@ -174,6 +174,11 @@ window.addEventListener("load", function() {
         ], 'none'));
         Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
         Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
+        [
+            new SettingOption('None', 'safariOptN'),
+            new SettingOption('Shiny Check', 'safariOptSC'),
+        ], 'safariOptN'));
         /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
         [
         new SettingOption('None', 'none'),
@@ -259,6 +264,7 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
         <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
         <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
+        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
         </tbody></table>`;
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
@@ -1107,14 +1113,20 @@ async function a6settings() {
                     document.querySelector("#safariCheck").disabled = false;
                     var checkSafariClicker = document.querySelector("#safariCheck");
                     if (checkSafariClicker.checked == true){
-                        if (Safari.completed(true) != true) {
-                            safariClick(1);
-                        } else {
-                            safariClick(0);
-                            Safari.closeModal();
+                        switch(Settings.getSetting('safariOpts').observableValue()) {
+                            case "safariOptN":
+                                safariClick(1);
+                                break;
+                            case "safariOptSC":
+                                if (Safari.completed(true) != true) {
+                                    safariClick(1);
+                                } else {
+                                    Safari.closeModal();
+                                    safariClick(0);
+                                }
+                                break;
                         }
-                    }
-                    if (checkSafariClicker.checked == false) {
+                    } else {
                         safariClick(0);
                     }
                 } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
@@ -2251,8 +2263,14 @@ async function safariBot() {
                 matrix[y][x] = 0;
             else {
                 matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
-                if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
-                    nearestGrass = {x, y, d: matrix[y][x]};
+
+                if (Safari.completed(true)) {
+                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d)
+                        nearestGrass = {x, y, d: matrix[y][x]};
+                } else {
+                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                        nearestGrass = {x, y, d: matrix[y][x]};
+                }
             }
         }
     }
