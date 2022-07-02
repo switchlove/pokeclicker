@@ -1107,10 +1107,25 @@ async function a6settings() {
                     document.querySelector("#safariCheck").disabled = false;
                     var checkSafariClicker = document.querySelector("#safariCheck");
                     if (checkSafariClicker.checked == true){
-                        safariClick(1);
+                        if (Safari.completed(true) != true) {
+                            safariClick(1);
+                        } else {
+                            safariClick(0);
+                            Safari.closeModal();
+                        }
                     }
-                    if (checkSafariClicker.checked == false){
+                    if (checkSafariClicker.checked == false) {
                         safariClick(0);
+                    }
+                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
+                    safariClick(0);
+                    if (document.querySelector("#safariModal").classList.contains('show')) {
+                        Safari.payEntranceFee();
+                    } else if (App.game.gameState != 5) {
+                        App.game.gameState = 5;
+                        setTimeout(() => {
+                            Safari.openModal();
+                        }, 500)
                     }
                 } else {
                     document.querySelector("#safariCheck").disabled = true;
@@ -2244,16 +2259,19 @@ async function safariBot() {
     
     if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
         if (Safari.inBattle()) {
-            if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
-                if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25)
-                    SafariBattle.throwBait(2);
-                else
-                    SafariBattle.throwBall();
-            } else  if (!SafariBattle.busy()) {
-                SafariBattle.run();
-                setTimeout(()=> {
-                    SafariBattle.busy(false);
-                }, 1500); // anti soft lock
+            if (!SafariBattle.busy()) {
+                if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
+                    if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25) {
+                        SafariBattle.throwBait(2);
+                    } else if (Safari.balls() > 0) { //prevent balls to be negativ and lock the safari
+                        SafariBattle.throwBall();
+                    }
+                } else {
+                    SafariBattle.run();
+                    setTimeout(()=> {
+                        SafariBattle.busy(false);
+                    }, 1600); // anti soft lock
+                }
             }
         } else {
             let dest = {d: Infinity}
@@ -2284,8 +2302,8 @@ async function safariBot() {
                 return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
             }).filter((n) => n && n.d > 0);
 
-            Safari.nextDirection = next[0].dir;
-            Safari.step(next[0].dir);
+            if (next[0])
+                Safari.step(next[0].dir);
         }
     }
 }
