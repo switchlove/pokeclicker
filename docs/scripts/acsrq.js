@@ -4202,7 +4202,7 @@ async function ballBot() {
 }
 
 function setupShinyRequirements() {
-    class RouteShinyRequirements extends RouteShinyRequirements {
+    class RouteShinyRequirements extends RouteKillRequirement {
         constructor(region, route) {
             super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
         }
@@ -4217,7 +4217,7 @@ function setupShinyRequirements() {
         }
 
         isCompleted() {
-            return super.isCompleted() && DungeonRunner.dungeonCompleted(GameConstants.RegionDungeons.flat()[this.dungeonIndex], true)
+            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
         }
     }
     class ShinySafariRequirement extends Requirement {
@@ -4258,7 +4258,7 @@ function setupShinyRequirements() {
                 Object.assign(town, {
                     isUnlocked: function () {
                         return (
-                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.dungeon)]() ||
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.dungeon.name)]() ||
                             this.requirements.every(requirement => requirement.isCompleted())
                         );
                     }
@@ -4278,11 +4278,11 @@ function setupShinyRequirements() {
                     isUnlocked: function () {
                         const alreadyClearGym = (
                             this.hasGym >= 0 && 
-                            App.game.badgeCase.hasBadge(this.content[this.hasGym]?.badgeReward)
+                            App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
                         );
                         const alreadyClearDungeon = (
                             this.hasDungeon >=0 && 
-                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.content[this.hasDungeon]?.dungeon)]() 
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
                         );
                         return (
                             alreadyClearGym || alreadyClearDungeon ||
@@ -4313,21 +4313,21 @@ function setupShinyRequirements() {
                 }
             }
         }
+
+        // Split path requirements
+        // Kanto
+        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
+        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
+        Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
+        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
+        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
+        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
+        TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
+        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
+        TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
+        Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
     } else {
         setTimeout(setupShinyRequirements, 100);
     }
-
-    // Split path requirements
-    // Kanto
-    Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
-    TownList['Diglett\'s Cave'].requirements.push(new GymBadgeRequirement(BadgeEnums.Thunder)) // Fuchia city require route 18
-    Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
-    Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
-    Routes.getRoute(0,12).requirements.push(new GymBadgeRequirement(BadgeEnums.Marsh)) // route 12 require Saffron City Gym
-    Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
-    Routes.getRoute(0,16).requirements.push(new RouteShinyRequirements(0,15)) // route 16 require route 15
-    TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
-    Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
-    TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
-    Routes.getRoute(0,21).requirements.push(new GymBadgeRequirement(BadgeEnums.Volcano)) // route 12 require Cinnabar
 }
