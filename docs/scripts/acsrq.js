@@ -2244,9 +2244,12 @@ async function safariBot() {
     
     if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
         if (Safari.inBattle()) {
-            if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true))
-                SafariBattle.throwBall();
-            else
+            if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
+                if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25)
+                    SafariBattle.throwBait(2)
+                else
+                    SafariBattle.throwBall();
+            } else 
                 SafariBattle.run();
         } else {
             let dest = {d: Infinity}
