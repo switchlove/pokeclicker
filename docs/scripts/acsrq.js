@@ -2198,6 +2198,17 @@ async function gymBot() {
 async function safariBot() {
     let bound = {x: Safari.sizeX(), y: Safari.sizeY()};
     let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
+    const dirOrder = (()=> {
+        const lastDir = Safari.lastDirection
+        switch (lastDir) {
+            case 'left': priority = 'right'; break;
+            case 'up': priority = 'down'; break;
+            case 'right': priority = 'left'; break;
+            case 'down': priority = 'up'; break;
+        }
+        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+    })();
+
     let nearestGrass = {x:0, y:0, d:Infinity}
     const walkable = [
         0, //ground
@@ -2207,16 +2218,17 @@ async function safariBot() {
 
     movementMatrix = (origin) => {
         let queue = new Set([JSON.stringify(origin)]);
-
         for(let p = 0; p < queue.size; p++) {
             let {x, y} = JSON.parse([...queue][p]);
             if (!walkable.includes(Safari.grid[y][x]))
                 continue;
 
-            let next = [
-                {x, y:y+1}, {x:x+1, y},
-                {x, y:y-1}, {x:x-1, y}
-            ].filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            const next = dirOrder.map((dir) => {
+                const xy = Safari.directionToXY(dir)
+                xy.x += x
+                xy.y += y
+                return xy;
+            }).filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
             for (let n = 0; n < next.length; n++)
                 queue.add(JSON.stringify(next[n]));
 
@@ -2255,25 +2267,15 @@ async function safariBot() {
                 dest = nearestGrass;
 
             movementMatrix(dest);
+            const next = dirOrder.map(dir => {
+                const xy = Safari.directionToXY(dir)
+                xy.x += Safari.playerXY.x
+                xy.y += Safari.playerXY.y
 
-            const lastDir = Safari.lastDirection
-            switch (lastDir) {
-                case 'left': priority = 'right'; break;
-                case 'up': priority = 'down'; break;
-                case 'right': priority = 'left'; break;
-                case 'down': priority = 'up'; break;
-            }
-            const next = [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
-                .map(dir => {
-                    let xy = Safari.directionToXY(dir)
-                    xy.x += Safari.playerXY.x
-                    xy.y += Safari.playerXY.y
-
-                    if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
-                        return null;
-                    return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
-                })
-                .filter((n) => n && n.d > 0);
+                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                    return null;
+                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+            }).filter((n) => n && n.d > 0);
 
             Safari.nextDirection = next[0].dir;
             Safari.step(next[0].dir);
