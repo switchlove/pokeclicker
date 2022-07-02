@@ -178,7 +178,7 @@ window.addEventListener("load", function() {
         [
             new SettingOption('None', 'safariOptN'),
             new SettingOption('Shiny Check', 'safariOptSC'),
-        ], 'safariOptN'));
+        ], 'safariOptSC'));
         /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
         [
         new SettingOption('None', 'none'),
