@@ -2196,7 +2196,7 @@ async function gymBot() {
 }
 
 async function safariBot() {
-    let bound = {x: Safari.sizeX(), y: Safari.sizeY()};
+    let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
     let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
     const dirOrder = (()=> {
         const lastDir = Safari.lastDirection
@@ -2246,11 +2246,15 @@ async function safariBot() {
         if (Safari.inBattle()) {
             if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
                 if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25)
-                    SafariBattle.throwBait(2)
+                    SafariBattle.throwBait(2);
                 else
                     SafariBattle.throwBall();
-            } else 
+            } else  if (!SafariBattle.busy()) {
                 SafariBattle.run();
+                setTimeout(()=> {
+                    SafariBattle.busy(false);
+                }, 1500); // anti soft lock
+            }
         } else {
             let dest = {d: Infinity}
             movementMatrix(Safari.playerXY)
@@ -2271,9 +2275,9 @@ async function safariBot() {
 
             movementMatrix(dest);
             const next = dirOrder.map(dir => {
-                const xy = Safari.directionToXY(dir)
-                xy.x += Safari.playerXY.x
-                xy.y += Safari.playerXY.y
+                const xy = Safari.directionToXY(dir);
+                xy.x += Safari.playerXY.x;
+                xy.y += Safari.playerXY.y;
 
                 if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
                     return null;
