@@ -174,6 +174,11 @@ window.addEventListener("load", function() {
         ], 'none'));
         Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
         Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
+        [
+            new SettingOption('None', 'safariOptN'),
+            new SettingOption('Shiny Check', 'safariOptSC'),
+        ], 'safariOptSC'));
         /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
         [
         new SettingOption('None', 'none'),
@@ -259,6 +264,7 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
         <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
         <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
+        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
         </tbody></table>`;
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
@@ -301,13 +307,16 @@ window.addEventListener("load", function() {
         if (clickEngagedG == 1){
             gymBot();
         }
-        if (clickEngagedS == 1){
-            safariBot();
-        }
         if (clickEngagedBF == 1){
             bfBot();
         }
     }, 100);
+
+    setInterval(function(){
+        if (clickEngagedS == 1){
+            safariBot();
+        }
+    }, 250);
 
     setTimeout(function(){
         setInterval(function(){
@@ -1106,10 +1115,31 @@ async function a6settings() {
                     document.querySelector("#safariCheck").disabled = false;
                     var checkSafariClicker = document.querySelector("#safariCheck");
                     if (checkSafariClicker.checked == true){
-                        safariClick(1);
-                    }
-                    if (checkSafariClicker.checked == false){
+                        switch(Settings.getSetting('safariOpts').observableValue()) {
+                            case "safariOptN":
+                                safariClick(1);
+                                break;
+                            case "safariOptSC":
+                                if (Safari.completed(true) != true) {
+                                    safariClick(1);
+                                } else {
+                                    Safari.closeModal();
+                                    safariClick(0);
+                                }
+                                break;
+                        }
+                    } else {
                         safariClick(0);
+                    }
+                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
+                    safariClick(0);
+                    if (document.querySelector("#safariModal").classList.contains('show')) {
+                        Safari.payEntranceFee();
+                    } else if (App.game.gameState != 5) {
+                        App.game.gameState = 5;
+                        setTimeout(() => {
+                            Safari.openModal();
+                        }, 500)
                     }
                 } else {
                     document.querySelector("#safariCheck").disabled = true;
@@ -2195,23 +2225,105 @@ async function gymBot() {
 }
 
 async function safariBot() {
-    if (Safari.inProgress() == true) {
-        if (document.querySelector("#safariModal").style.display == "block") {
-            if (Safari.inBattle() != true) {
-                if (leftStep == 0) {
-                    Safari.step('left');
-                    leftStep = 1;
+    let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
+    let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
+    const dirOrder = (()=> {
+        const lastDir = Safari.lastDirection
+        switch (lastDir) {
+            case 'left': priority = 'right'; break;
+            case 'up': priority = 'down'; break;
+            case 'right': priority = 'left'; break;
+            case 'down': priority = 'up'; break;
+        }
+        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+    })();
+
+    let nearestGrass = {x:0, y:0, d:Infinity}
+    const walkable = [
+        0, //ground
+        10, //grass
+        11,12,13,14,21,22,23,24,15,16,17,18,19 //sand
+    ];
+
+    movementMatrix = (origin) => {
+        let queue = new Set([JSON.stringify(origin)]);
+        for(let p = 0; p < queue.size; p++) {
+            let {x, y} = JSON.parse([...queue][p]);
+            if (!walkable.includes(Safari.grid[y][x]))
+                continue;
+
+            const next = dirOrder.map((dir) => {
+                const xy = Safari.directionToXY(dir)
+                xy.x += x
+                xy.y += y
+                return xy;
+            }).filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            for (let n = 0; n < next.length; n++)
+                queue.add(JSON.stringify(next[n]));
+
+            if (x == origin.x && y == origin.y)
+                matrix[y][x] = 0;
+            else {
+                matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
+
+                if (Safari.completed(true)) {
+                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d)
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 } else {
-                    Safari.step('right');
-                    leftStep = 0;
-                }
-            } else {
-                if (SafariBattle.enemy.shiny != true) {
-                    SafariBattle.run();
-                } else {
-                    SafariBattle.throwBall();
+                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 }
             }
+        }
+    }
+    
+    if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
+        if (Safari.inBattle()) {
+            if (!SafariBattle.busy()) {
+                if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
+                    if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25) {
+                        SafariBattle.throwBait(2);
+                    } else if (Safari.balls() > 0) { //prevent balls to be negativ and lock the safari
+                        SafariBattle.throwBall();
+                    }
+                } else {
+                    SafariBattle.run();
+                    setTimeout(()=> {
+                        SafariBattle.busy(false);
+                    }, 1600); // anti soft lock
+                }
+            }
+        } else {
+            let dest = {d: Infinity}
+            movementMatrix(Safari.playerXY)
+
+            const pkm = Safari.pokemonGrid();
+            for (let i = 0; i < pkm.length; i++) {
+                const dist = matrix[pkm[i].y][pkm[i].x];
+                if (
+                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) && 
+                    dist < dest.d && dist < pkm[i].steps 
+                ) {
+                    dest = pkm[i];
+                    dest.d = dist;
+                }
+            }
+            if (dest.d == Infinity)
+                dest = nearestGrass;
+
+            movementMatrix(dest);
+            const next = dirOrder.map(dir => {
+                const xy = Safari.directionToXY(dir);
+                xy.x += Safari.playerXY.x;
+                xy.y += Safari.playerXY.y;
+
+                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                    return null;
+                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+            }).filter((n) => n && n.d > 0);
+
+            if (next[0])
+                Safari.step(next[0].dir);
         }
     }
 }
