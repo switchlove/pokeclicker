@@ -4202,6 +4202,38 @@ async function ballBot() {
 }
 
 function setupShinyRequirements() {
+    class RouteShinyRequirements extends RouteKillRequirement {
+        constructor(region, route) {
+            super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
+        }
+    }
+    class ShinyDungeonRequirement extends ClearDungeonRequirement {
+        constructor(dungeonIndex) {
+            super(1, dungeonIndex);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
+        }
+    }
+    class ShinySafariRequirement extends Requirement {
+        constructor() {
+            super(0, 2);
+        }
+
+        isCompleted() {
+            return Safari.completed(true)
+        }
+
+        hint() {
+            return 'Safari needs to be completed.'
+        }
+    }
+
     function replaceRequirements(requirements) {
         for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
             switch (requirements[reqIdx]?.constructor.name) {
@@ -4210,70 +4242,10 @@ function setupShinyRequirements() {
                     replaceRequirements(requirements[reqIdx].requirements);
                     break;
                 case "RouteKillRequirement":
-                    Object.defineProperty(requirements[reqIdx], "availablePkm", {
-                        get: function () {
-                            return RouteHelper.getAvailablePokemonList(this.route, this.region, true);
-                        },
-                    });
-                    Object.defineProperty(requirements[reqIdx], "requiredValue", {
-                        get: function () {
-                            return this.availablePkm.length;
-                        },
-                    });
-                    Object.assign(requirements[reqIdx], {
-                        hint: function () {
-                            return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${Routes.getName(this.route, this.region)}.`;
-                        },
-                        getProgress: function () {
-                            let count = 0;
-                            for (let i = 0; i < this.availablePkm.length; i++) {
-                                if (
-                                    App.game.party.alreadyCaughtPokemon(
-                                        PokemonHelper.getPokemonByName(
-                                            this.availablePkm[i]
-                                        ).id,
-                                        true
-                                    )
-                                )
-                                    count++;
-                            }
-                            return Math.min(count, this.requiredValue);
-                        },
-                    });
+                    requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
                     break;
                 case "ClearDungeonRequirement":
-                    Object.defineProperty(requirements[reqIdx], "availablePkm", {
-                        get: function () {
-                            return Object.values(dungeonList)[this.dungeonIndex]?.allAvailablePokemon();
-                        }
-                    });
-                    if (requirements[reqIdx].availablePkm?.length > 0) {
-                        Object.defineProperty(requirements[reqIdx], "requiredValue", {
-                            get: function () {
-                                return this.availablePkm.length;
-                            },
-                        });
-                        Object.assign(requirements[reqIdx], {
-                            hint: function () {
-                                return `You are missing ${this.requiredValue - this.getProgress()} shiny in ${GameConstants.RegionDungeons.flat()[this.dungeonIndex]}.`;
-                            },
-                            getProgress: function () {
-                                let count = 0;
-                                for (let i = 0; i < this.availablePkm.length; i++) {
-                                    if (
-                                        App.game.party.alreadyCaughtPokemon(
-                                            PokemonHelper.getPokemonByName(
-                                                this.availablePkm[i]
-                                            ).id,
-                                            true
-                                        )
-                                    )
-                                        count++;
-                                }
-                                return Math.min(count, this.requiredValue);
-                            },
-                        });
-                    }
+                    requirements[reqIdx] = new ShinyDungeonRequirement(requirements[reqIdx].dungeonIndex);
                     break;
             }
         }
@@ -4286,7 +4258,7 @@ function setupShinyRequirements() {
                 Object.assign(town, {
                     isUnlocked: function () {
                         return (
-                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.dungeon)]() ||
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.dungeon.name)]() ||
                             this.requirements.every(requirement => requirement.isCompleted())
                         );
                     }
@@ -4306,11 +4278,11 @@ function setupShinyRequirements() {
                     isUnlocked: function () {
                         const alreadyClearGym = (
                             this.hasGym >= 0 && 
-                            App.game.badgeCase.hasBadge(this.content[this.hasGym]?.badgeReward)
+                            App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
                         );
                         const alreadyClearDungeon = (
                             this.hasDungeon >=0 && 
-                            App.game.statistics.dungeonsCleared[Object.values(dungeonList).indexOf(this.content[this.hasDungeon]?.dungeon)]() 
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
                         );
                         return (
                             alreadyClearGym || alreadyClearDungeon ||
@@ -4341,6 +4313,20 @@ function setupShinyRequirements() {
                 }
             }
         }
+
+        // Split path requirements
+        // Kanto
+        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
+        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
+        Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
+        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
+        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
+        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
+        TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
+        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
+        TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
+        Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
     } else {
         setTimeout(setupShinyRequirements, 100);
     }
