@@ -56,8 +56,8 @@ window.addEventListener("load", function() {
         Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
         Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
         Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
-        //Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		//Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
+        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
 
         Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
         Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -174,6 +174,11 @@ window.addEventListener("load", function() {
         ], 'none'));
         Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
         Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
+        [
+            new SettingOption('None', 'safariOptN'),
+            new SettingOption('Shiny Check', 'safariOptSC'),
+        ], 'safariOptSC'));
         /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
         [
         new SettingOption('None', 'none'),
@@ -215,13 +220,11 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+        <tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
 		</tbody></table>
         </tbody></table>`;
         tabContent.appendChild(a6Tab1El);
-/*
-<tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-<tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
-*/
 
         const a6Tab2 = document.createElement('li');
         a6Tab2.className = 'nav-item';
@@ -261,6 +264,7 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
         <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
         <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
+        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
         </tbody></table>`;
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
@@ -303,13 +307,16 @@ window.addEventListener("load", function() {
         if (clickEngagedG == 1){
             gymBot();
         }
-        if (clickEngagedS == 1){
-            safariBot();
-        }
         if (clickEngagedBF == 1){
             bfBot();
         }
     }, 100);
+
+    setInterval(function(){
+        if (clickEngagedS == 1){
+            safariBot();
+        }
+    }, 250);
 
     setTimeout(function(){
         setInterval(function(){
@@ -318,6 +325,8 @@ window.addEventListener("load", function() {
             }
         }, 3000);
     }, 3000);
+
+    setTimeout(setupShinyRequirements, 3000);
 });
 
 function main(){
@@ -325,7 +334,7 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
-        //a6phases();
+        a6phases();
 
         var srCheckboxL = document.querySelector("#srCheck");
         srCheckboxL.addEventListener('change', function() {
@@ -357,23 +366,33 @@ function main(){
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
 
-/*        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
+        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
         phaseLink.addEventListener("click", function() {
+            if (event.shiftKey) {
+                event.preventDefault();
+            }
             document.querySelector("#phaseModal").style.display = "block";
         });
 
         var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
         phaseExport.addEventListener("click", function() {
-            if (hasExported == 0) {
-                a6export();
-                hasExported = 1;
+            if(!event.detail || event.detail == 1) {
+                if (hasExported == 0) {
+                    setTimeout(function(){
+                        a6export()
+                    }, 2000);
+                    hasExported = 1;
+                }
+                return true;
+            } else {
+                return false;
             }
         });
 
         var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
         phaseClose.addEventListener("click", function() {
             document.querySelector("#phaseModal").style.display = "none";
-        });*/
+        });
 
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
@@ -443,16 +462,6 @@ function a6save() {
     localSettings = ['','','',''];
     settingKey = "a6csrq-settings";
 
-    /*
-    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
-        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-    } else {
-        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
-    }
-    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-    */
-
     if ( localStorage.getItem(settingKey) == null ) {
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
     } else {
@@ -463,6 +472,15 @@ function a6save() {
         localSettings = localSettings.splice(9,1)[0];
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
     }
+
+    phases = [];
+    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    } else {
+        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
+    }
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 
     saveLoaded = 1;
 }
@@ -582,7 +600,7 @@ function a6menu(){
         var td1r06 = document.createElement('td');
         td1r06.style.padding = '5px';
         td1r06.style.paddingBottom = '5px';
-        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L"];//, "S+L+P", "S+L+C", "S+L+C+P"];
+        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L", "Perp. P"];//, "S+L+P", "S+L+C", "S+L+C+P"];
         var td1r06menu = document.createElement('select');
         for (const val of td1r06menuVals) {
             var td1r06submenu = document.createElement("option");
@@ -794,7 +812,7 @@ function a6menu(){
         sFootTbl.appendChild(fbdy);
         sFoot.appendChild(sFootTbl);
 
-        /*var ptModal = document.createElement('div');
+        var ptModal = document.createElement('div');
         ptModal.className = 'modal noselect show';
         ptModal.id = 'phaseModal';
         ptModal.tabindex = -1;
@@ -838,9 +856,8 @@ function a6menu(){
         ptModalContent.appendChild(ptModalHeader);
         ptModalContent.appendChild(ptModalBody);
         ptModalBody.appendChild(ptModalBodyC);
-        //ptModalBodyC.appendChild(document.createTextNode('Just a WIP field currently'));
         ptModalContent.appendChild(ptModalFooter);
-        ptModalFooter.appendChild(ptModalFooterB);*/
+        ptModalFooter.appendChild(ptModalFooterB);
 
         if (Settings.getSetting('hideOak').observableValue() == true) {
             document.querySelector("#oakItemsContainer").style.display = 'none';
@@ -988,7 +1005,6 @@ async function a6settings() {
 
     if (Settings.getSetting('botOptions') != null) {
         if (Settings.getSetting('botOptions').observableValue() == true) {
-            // New town content
             var townContent = player.town().content;
 
             //Breeding Bot
@@ -1099,10 +1115,31 @@ async function a6settings() {
                     document.querySelector("#safariCheck").disabled = false;
                     var checkSafariClicker = document.querySelector("#safariCheck");
                     if (checkSafariClicker.checked == true){
-                        safariClick(1);
-                    }
-                    if (checkSafariClicker.checked == false){
+                        switch(Settings.getSetting('safariOpts').observableValue()) {
+                            case "safariOptN":
+                                safariClick(1);
+                                break;
+                            case "safariOptSC":
+                                if (Safari.completed(true) != true) {
+                                    safariClick(1);
+                                } else {
+                                    Safari.closeModal();
+                                    safariClick(0);
+                                }
+                                break;
+                        }
+                    } else {
                         safariClick(0);
+                    }
+                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
+                    safariClick(0);
+                    if (document.querySelector("#safariModal").classList.contains('show')) {
+                        Safari.payEntranceFee();
+                    } else if (App.game.gameState != 5) {
+                        App.game.gameState = 5;
+                        setTimeout(() => {
+                            Safari.openModal();
+                        }, 500)
                     }
                 } else {
                     document.querySelector("#safariCheck").disabled = true;
@@ -1351,21 +1388,28 @@ async function missingShinies() {
             //Dungeon Poke
             if (player.town().dungeon != undefined && player.route() == 0) {
                 var neededS = '';
-                var missS = player.town().dungeon.pokemonList;
-                missS = missS.concat(player.town().dungeon.bossPokemonList);
-                var missC = [];
-                for (let x = 0; x < missS.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-                        missC.push(missS[x])
+                var missTemp = [];
+                var missDP = player.town().dungeon.pokemonList;
+                var missDBP = player.town().dungeon.bossPokemonList;
+                var missDBPa = player.town().dungeon.bossEncounterList;
+                for (let x = 0; x < missDP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                        missTemp.push(missDP[x])
                     }
                 }
-                missS = missS.filter( ( el ) => !missC.includes( el ) );
-                if ( missS.length == 0) {
+                for (let x = 0; x < missDBP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                        if ( missDBPa[x].lock != true ) {
+                            missTemp.push(missDBP[x])
+                        }
+                    }
+                }
+                if ( missTemp.length == 0) {
                     neededS = 'N/A';
-                } else if ( missS.length == 1) {
-                    neededS = missS[0];
-                } else if (missS.length > 1) {
-                    neededS = missS.join(', ');
+                } else if ( missTemp.length == 1) {
+                    neededS = missTemp[0];
+                } else if (missTemp.length > 1) {
+                    neededS = missTemp.join(', ');
                 }
                 document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
@@ -1373,7 +1417,7 @@ async function missingShinies() {
                 var lootL = player.town().dungeon.itemList;
                 for (let x = 0; x < lootL.length; x++) {
                     if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootA.push(lootL[x].loot);
+                        lootA.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
                     }
                 }
                 var lootC = [];
@@ -1383,11 +1427,11 @@ async function missingShinies() {
                     }
                 }
                 lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
-                if (missS.length >= 1 && lootA.length >= 1) {
-                    missS = missS.concat(lootA);
-                    missS = missS.sort().join(', ');
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-                } else if (missS.length == 0) {
+                if (missTemp.length >= 1 && lootA.length >= 1) {
+                    missTemp = missTemp.concat(lootA);
+                    missTemp = missTemp.sort().join(', ');
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
+                } else if (missTemp.length == 0) {
                     if ( lootA.length == 0) {
                         lootA = 'N/A';
                     } else if ( lootA.length == 1) {
@@ -1395,7 +1439,7 @@ async function missingShinies() {
                     } else if (lootA.length > 1) {
                         lootA = lootA.sort().join(', ');
                     }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = lootA;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootA;
                 }
             }
             //Shop Poke
@@ -1650,6 +1694,7 @@ async function phaseCounter(arg) {
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
+
                     }
                 } else {
 					if (isCurrentShiny == 1) {
@@ -1675,7 +1720,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1787,7 +1832,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1855,7 +1900,7 @@ async function phaseCounter(arg) {
 						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 						hasRun = 0;
-						//a6phases();
+						a6phases();
 					}
 				}
             }
@@ -1972,7 +2017,8 @@ function removePhase(id){
 	a6phases();
 }
 
-function a6export() {
+async function a6export() {
+    hasExported = 0;
     var test_array = phases;
     var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
     var data = encodeURI('data:text/csv;charset=utf-8,' + csv);
@@ -1984,7 +2030,6 @@ function a6export() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    hasExported = 0;
 }
 
 function a6phases() {
@@ -2153,8 +2198,9 @@ async function gymBot() {
                 }
             }
         } else if (gymsFound > 1) {
-            if (townContent[gymAtX].isUnlocked() == true) {
-                switch (Settings.getSetting('gymE4Opts').observableValue()) {
+            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
+            if (townContent[pickE4 - 1].isUnlocked() == true) {
+                switch (pickE4) {
                     case "1":
                         GymRunner.startGym(townContent[0]);
                         break;
@@ -2179,23 +2225,105 @@ async function gymBot() {
 }
 
 async function safariBot() {
-    if (Safari.inProgress() == true) {
-        if (document.querySelector("#safariModal").style.display == "block") {
-            if (Safari.inBattle() != true) {
-                if (leftStep == 0) {
-                    Safari.step('left');
-                    leftStep = 1;
+    let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
+    let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
+    const dirOrder = (()=> {
+        const lastDir = Safari.lastDirection
+        switch (lastDir) {
+            case 'left': priority = 'right'; break;
+            case 'up': priority = 'down'; break;
+            case 'right': priority = 'left'; break;
+            case 'down': priority = 'up'; break;
+        }
+        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+    })();
+
+    let nearestGrass = {x:0, y:0, d:Infinity}
+    const walkable = [
+        0, //ground
+        10, //grass
+        11,12,13,14,21,22,23,24,15,16,17,18,19 //sand
+    ];
+
+    movementMatrix = (origin) => {
+        let queue = new Set([JSON.stringify(origin)]);
+        for(let p = 0; p < queue.size; p++) {
+            let {x, y} = JSON.parse([...queue][p]);
+            if (!walkable.includes(Safari.grid[y][x]))
+                continue;
+
+            const next = dirOrder.map((dir) => {
+                const xy = Safari.directionToXY(dir)
+                xy.x += x
+                xy.y += y
+                return xy;
+            }).filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            for (let n = 0; n < next.length; n++)
+                queue.add(JSON.stringify(next[n]));
+
+            if (x == origin.x && y == origin.y)
+                matrix[y][x] = 0;
+            else {
+                matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
+
+                if (Safari.completed(true)) {
+                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d)
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 } else {
-                    Safari.step('right');
-                    leftStep = 0;
-                }
-            } else {
-                if (SafariBattle.enemy.shiny != true) {
-                    SafariBattle.run();
-                } else {
-                    SafariBattle.throwBall();
+                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 }
             }
+        }
+    }
+
+    if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
+        if (Safari.inBattle()) {
+            if (!SafariBattle.busy()) {
+                if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
+                    if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25) {
+                        SafariBattle.throwBait(2);
+                    } else if (Safari.balls() > 0) { //prevent balls to be negativ and lock the safari
+                        SafariBattle.throwBall();
+                    }
+                } else {
+                    SafariBattle.run();
+                    setTimeout(()=> {
+                        SafariBattle.busy(false);
+                    }, 1600); // anti soft lock
+                }
+            }
+        } else {
+            let dest = {d: Infinity}
+            movementMatrix(Safari.playerXY)
+
+            const pkm = Safari.pokemonGrid();
+            for (let i = 0; i < pkm.length; i++) {
+                const dist = matrix[pkm[i].y][pkm[i].x];
+                if (
+                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) &&
+                    dist < dest.d && dist < pkm[i].steps
+                ) {
+                    dest = pkm[i];
+                    dest.d = dist;
+                }
+            }
+            if (dest.d == Infinity)
+                dest = nearestGrass;
+
+            movementMatrix(dest);
+            const next = dirOrder.map(dir => {
+                const xy = Safari.directionToXY(dir);
+                xy.x += Safari.playerXY.x;
+                xy.y += Safari.playerXY.y;
+
+                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                    return null;
+                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+            }).filter((n) => n && n.d > 0);
+
+            if (next[0])
+                Safari.step(next[0].dir);
         }
     }
 }
@@ -2421,7 +2549,7 @@ async function srBot() {
             if (smnNeed >= 1 ) {
                 for (let x = 0; x < smnList.length; x++) {
                     if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        if (App.game.wallet.currencies[smnList[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
+                        if (App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
                             smnName = smnList[x].name;
                             ShopHandler.shopObservable().items[x].buy(1);
                             smnUsed = 1;
@@ -2455,50 +2583,45 @@ async function srBot() {
         case "egg":
             if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
                 document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[3];
-                BreedingController.filter.search(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
+                BreedingFilters.search.value(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
             }
             if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
                 localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
                 localStorage.setItem(settingKey, JSON.stringify(localSettings));
             }
+            PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() == 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() == 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                //Check based on searchbox
                 if(localSettings[3] == ""){
-                    if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
                 else{
-                    if (BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
@@ -2661,9 +2784,26 @@ async function plantBot() {
                     if (App.game.farming.plotList[0].age >= 343800){
                         App.game.farming.harvestAll();
                     }
-                }				break;
+                }
+                break;
             case 69:
                 //Starf 65 + Lum 19 + Petaya 62
+                if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,65);
+                }
+                else if(App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age < 90000 && App.game.farming.plotList[7].age >= 86400 && App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,65);
+                }
+                else if(App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,62);
+                }
+                else if(App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,62);
+                }
                 break;
             case 70:
                 //Starf 65 + Lum 19 + Chople 40
@@ -3992,35 +4132,29 @@ async function autoBreed() {
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                //Check based on searchbox
-                if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() >= 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() >= 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
@@ -4136,7 +4270,7 @@ async function ballBot() {
                         ShopHandler.showShop(LavenderTownShop);
                         ShopHandler.shopObservable().items;
                         if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                            ShopHandler.shopObservable().items[1].buy(purAmount);
                         }
                     }
                 }
@@ -4144,8 +4278,8 @@ async function ballBot() {
                     if (MapHelper.accessToTown('Fuchsia City') == true) {
                         ShopHandler.showShop(FuchsiaCityShop);
                         ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
+                            ShopHandler.shopObservable().items[2].buy(purAmount);
                         }
                     }
                 }
@@ -4176,5 +4310,136 @@ async function ballBot() {
                     }
                 }
         }
+    }
+}
+
+function setupShinyRequirements() {
+    class RouteShinyRequirements extends RouteKillRequirement {
+        constructor(region, route) {
+            super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
+        }
+    }
+    class ShinyDungeonRequirement extends ClearDungeonRequirement {
+        constructor(dungeonIndex) {
+            super(1, dungeonIndex);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
+        }
+    }
+    class ShinySafariRequirement extends Requirement {
+        constructor() {
+            super(0, 2);
+        }
+
+        isCompleted() {
+            return Safari.completed(true)
+        }
+
+        hint() {
+            return 'Safari needs to be completed.'
+        }
+    }
+
+    function replaceRequirements(requirements) {
+        for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
+            switch (requirements[reqIdx]?.constructor.name) {
+                case "MultiRequirement":
+                case "OneFromManyRequirement":
+                    replaceRequirements(requirements[reqIdx].requirements);
+                    break;
+                case "RouteKillRequirement":
+                    requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
+                    break;
+                case "ClearDungeonRequirement":
+                    requirements[reqIdx] = new ShinyDungeonRequirement(requirements[reqIdx].dungeonIndex);
+                    break;
+            }
+        }
+    }
+
+    if (App.game != undefined) {
+        for (let town of Object.values(TownList)) {
+            replaceRequirements(town?.requirements);
+            if (town.constructor.name === "DungeonTown") {
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        return (
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.dungeon.name)]() ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            } else {
+                town.hasGym = -1;
+                town.hasDungeon = -1;
+
+                for (let i = 0; i < town.content.length; i++ ) {
+                    if (town.content[i]?.constructor.name === "Gym")
+                        town.hasGym = i;
+                    if (town.content[i]?.constructor.name === "MoveToDungeon")
+                        town.hasDungeon = i;
+                }
+
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        const alreadyClearGym = (
+                            this.hasGym >= 0 &&
+                            App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
+                        );
+                        const alreadyClearDungeon = (
+                            this.hasDungeon >=0 &&
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
+                        );
+                        return (
+                            alreadyClearGym || alreadyClearDungeon ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            }
+        }
+
+        for (
+            let regIdx = 0;
+            GameConstants.Region[regIdx] != undefined;
+            regIdx++
+        ) {
+            const routes = Routes.getRoutesByRegion(regIdx);
+            for (let routeIdx = 0; routeIdx <= routes.length; routeIdx++) {
+                if (routes[routeIdx]) {
+                    replaceRequirements(routes[routeIdx]?.requirements);
+                    Object.assign(routes[routeIdx], {
+                        isUnlocked: function () {
+                            return (
+                                App.game.statistics.routeKills[this.region][this.number]() ||
+                                this.requirements.every(requirement => requirement.isCompleted())
+                            );
+                        }
+                    });
+                }
+            }
+        }
+
+        // Split path requirements
+        // Kanto
+        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
+        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
+        Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
+        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
+        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
+        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
+        TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
+        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
+        TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
+        Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
+    } else {
+        setTimeout(setupShinyRequirements, 100);
     }
 }
