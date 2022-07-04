@@ -4345,6 +4345,31 @@ function setupShinyRequirements() {
             return 'Safari needs to be completed.'
         }
     }
+    class CaughtIndicatingRequirement extends Requirement {
+        constructor(item) {
+            super(0, 2);
+            this.item = item
+        }
+
+        isCompleted() {
+            return this.item.getCaughtStatus() == CaughtStatus.CaughtShiny
+        }
+
+        hint() {
+            return `${this.item.name} needs to be completed.`
+        }
+    }
+    class ShinyShopRequirement extends MultiRequirement {
+        constructor(shop) {
+            let items = shop.items.filter(i => i instanceof CaughtIndicatingItem);
+            super(items.map(i => new CaughtIndicatingRequirement(i)));
+            this.shop = shop;
+        }
+
+        hint() {
+            return `${ this.shop.name || this.shop.parent.name } needs to be completed.`
+        }
+    }
 
     function replaceRequirements(requirements) {
         for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
@@ -4428,6 +4453,7 @@ function setupShinyRequirements() {
     // Split path requirements
     // Kanto
     Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+    TownList['Mt. Moon'].requirements.push(new ShinyShopRequirement(Route3Shop))
     Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
     Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
     Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
