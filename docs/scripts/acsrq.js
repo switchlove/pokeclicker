@@ -4454,14 +4454,47 @@ function setupShinyRequirements() {
     // Kanto
     Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
     TownList['Mt. Moon'].requirements.push(new ShinyShopRequirement(Route3Shop))
+    Routes.getRoute(0,24).requirements.push(new GymBadgeRequirement(BadgeEnums.Cascade));
+    Routes.getRoute(0,6).requirements.push(
+        new CaughtIndicatingRequirement(ItemList.Mystery_egg),
+        new CaughtIndicatingRequirement(ItemList.Water_stone))
+    TownList['Diglett\'s Cave'].requirements.push(new CaughtIndicatingRequirement(ItemList.Thunder_stone))
     Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
     Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
-    Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
+    TownList['Saffron City'].requirements.push(
+        new ShinyShopRequirement(CeladonCityShop),
+        new CaughtIndicatingRequirement(ItemList.Water_stone),
+        new CaughtIndicatingRequirement(ItemList.Thunder_stone))
+    TownList['Pokémon Tower'].requirements.push(
+        new CaughtIndicatingRequirement(ItemList.Leaf_stone),
+        new CaughtIndicatingRequirement(ItemList.Moon_stone))
+    Routes.getRoute(0,13).requirements.push(
+        new CaughtIndicatingRequirement(ItemList.Water_stone),
+        new RouteShinyRequirements(0,4),
+    )
+    Routes.getRoute(0,14).requirements = [new RouteShinyRequirements(0,13)]
+    Routes.getRoute(0,15).requirements = [new RouteShinyRequirements(0,14)]
     Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
     Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
     Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
-    TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
+    TownList['Fuchsia City'].requirements = [new RouteShinyRequirements(0,18)]
+    GymList['Fuchsia City'].requirements = [
+        new RouteShinyRequirements(0,18),
+        new CaughtIndicatingRequirement(ItemList.Trade_stone)
+    ]
+    TownList['Power Plant'].requirements.push(
+        new ShinySafariRequirement(),
+        new CaughtIndicatingRequirement(ItemList.Leaf_stone)
+    )
     Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
-    TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
-    Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
+    Routes.getRoute(0,20).requirements = [new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Seafoam Islands'))]
+    TownList['Cinnabar Island'].requirements = [
+        new RouteShinyRequirements(0,20),
+        new CaughtIndicatingRequirement(ItemList.Water_stone)
+    ]
+    TownList['Pokémon Mansion'].requirements = [
+        new RouteShinyRequirements(0,20),
+        new CaughtIndicatingRequirement(ItemList.Fire_stone)
+    ]
+    Routes.getRoute(0,21).requirements.push(new GymBadgeRequirement(BadgeEnums.Volcano))
 }
