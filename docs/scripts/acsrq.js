@@ -1417,7 +1417,7 @@ async function missingShinies() {
                 var lootL = player.town().dungeon.itemList;
                 for (let x = 0; x < lootL.length; x++) {
                     if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootA.push(lootL[x].loot);
+                        lootA.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
                     }
                 }
                 var lootC = [];
@@ -1430,7 +1430,7 @@ async function missingShinies() {
                 if (missTemp.length >= 1 && lootA.length >= 1) {
                     missTemp = missTemp.concat(lootA);
                     missTemp = missTemp.sort().join(', ');
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = missTemp;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
                 } else if (missTemp.length == 0) {
                     if ( lootA.length == 0) {
                         lootA = 'N/A';
@@ -1439,7 +1439,7 @@ async function missingShinies() {
                     } else if (lootA.length > 1) {
                         lootA = lootA.sort().join(', ');
                     }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = lootA;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootA;
                 }
             }
             //Shop Poke
@@ -2276,7 +2276,7 @@ async function safariBot() {
             }
         }
     }
-    
+
     if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
         if (Safari.inBattle()) {
             if (!SafariBattle.busy()) {
@@ -2301,8 +2301,8 @@ async function safariBot() {
             for (let i = 0; i < pkm.length; i++) {
                 const dist = matrix[pkm[i].y][pkm[i].x];
                 if (
-                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) && 
-                    dist < dest.d && dist < pkm[i].steps 
+                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) &&
+                    dist < dest.d && dist < pkm[i].steps
                 ) {
                     dest = pkm[i];
                     dest.d = dist;
@@ -4389,11 +4389,11 @@ function setupShinyRequirements() {
                 Object.assign(town, {
                     isUnlocked: function () {
                         const alreadyClearGym = (
-                            this.hasGym >= 0 && 
+                            this.hasGym >= 0 &&
                             App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
                         );
                         const alreadyClearDungeon = (
-                            this.hasDungeon >=0 && 
+                            this.hasDungeon >=0 &&
                             App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
                         );
                         return (
