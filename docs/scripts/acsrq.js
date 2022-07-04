@@ -4453,6 +4453,12 @@ function setupShinyRequirements() {
     // Split path requirements
     // Kanto
     Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+    Route3Shop.areaStatus = function() {
+        if (this.items.length == this.items.filter(i=> !(i instanceof CaughtIndicatingItem) || i.getCaughtStatus() == CaughtStatus.CaughtShiny).length) {
+            return areaStatus.completed;
+        }
+        return areaStatus.unlockedUnfinished;
+    };
     TownList['Mt. Moon'].requirements.push(new ShinyShopRequirement(Route3Shop))
     Routes.getRoute(0,24).requirements.push(new GymBadgeRequirement(BadgeEnums.Cascade));
     Routes.getRoute(0,6).requirements.push(
