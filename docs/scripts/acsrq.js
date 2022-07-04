@@ -4356,7 +4356,7 @@ function setupShinyRequirements() {
         }
 
         hint() {
-            return `${this.item.name} needs to be completed.`
+            return `${this.item.displayName} needs to be completed.`
         }
     }
     class ShinyShopRequirement extends MultiRequirement {
@@ -4367,7 +4367,7 @@ function setupShinyRequirements() {
         }
 
         hint() {
-            return `${ this.shop.name || this.shop.parent.name } needs to be completed.`
+            return `${ this.shop.displayName } needs to be completed.`
         }
     }
 
