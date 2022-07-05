@@ -4459,7 +4459,7 @@ function setupShinyRequirements() {
                     requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
                     break;
                 case "ClearDungeonRequirement":
-                    requirements[reqIdx] = new ShinyDungeonRequirement(requirements[reqIdx].dungeonIndex);
+                    requirements[reqIdx] = new ShinyDungeonRequirement(GameConstants.RegionDungeons.flat()[requirements[reqIdx].dungeonIndex]);
                     break;
                 case "GymBadgeRequirement":
                     requirements[reqIdx] = new _GymBadgeRequirement(requirements[reqIdx].badge);
