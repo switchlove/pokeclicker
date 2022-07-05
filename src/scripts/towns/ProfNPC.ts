@@ -13,8 +13,7 @@ class ProfNPC extends NPC {
     get dialogHTML(): string {
         const requiresCompleteDex = App.game.challenges.list.requireCompletePokedex.active();
         const nextRegionUnlocked = TownList[GameConstants.StartingTowns[this.region + 1]]?.isUnlocked() ?? false;
-        const completeDexAchievement = AchievementHandler.findByName(`${GameConstants.camelCaseToString(GameConstants.Region[this.region])} Master`);
-
+        const completeDexAchievement = AchievementHandler.findByName(`${GameConstants.camelCaseToString(GameConstants.Region[this.region])} Shiny Master`);
 
         if (!nextRegionUnlocked) {
             return `<p>Hello, new Champion, you've come a long way!</p>
@@ -32,7 +31,7 @@ class ProfNPC extends NPC {
             html += `<p>You still have ${completeDexAchievement.property.requiredValue - completeDexAchievement.getProgress()} left to catch in this region! You're almost there!</p>`;
         }
 
-        if (nextRegionUnlocked && (completeDexAchievement.isCompleted() || !requiresCompleteDex)) {
+        if (nextRegionUnlocked && (completeDexAchievement.isCompleted() || !requiresCompleteDex) && MapHelper.isRegionCleared(this.region)) {
             html += `<p>${this.nextRegionUnlockedText}</p>`;
         }
 
