@@ -4318,18 +4318,50 @@ function setupShinyRequirements() {
         constructor(region, route) {
             super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
         }
-
+        
         isCompleted() {
+            return this.isCompletedLocaly() && Routes.getRoute(this.region, this.route).requirements.every(r => r.isCompleted())
+        }
+        
+        isCompletedLocaly() {
             return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
+        }
+
+        hint() {
+            if (!this.isCompletedLocaly())
+                return super.hint()
+                
+            for (const route of Routes.getRoutesByRegion(this.region)) {
+                let hints = route.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
+                if (hints.length)
+                    return hints.join('\n')
+            }
         }
     }
     class ShinyDungeonRequirement extends ClearDungeonRequirement {
         constructor(dungeonIndex) {
             super(1, dungeonIndex);
+            this.town = TownList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]];
+            this.dungeon = dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]];
         }
 
         isCompleted() {
-            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
+            return this.isCompletedLocaly() && this.town.requirements.requirements.every(r => r.isCompleted())
+        }
+        
+        isCompletedLocaly() {
+            return super.isCompleted() && DungeonRunner.dungeonCompleted(this.dungeon, true)
+        }
+        
+        hint() {
+            if (!this.isCompletedLocaly())
+                return super.hint()
+
+            for (const route of Routes.getRoutesByRegion(this.region)) {
+                let hints = route.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
+                if (hints.length)
+                    return hints.join('\n')
+            }
         }
     }
     class ShinySafariRequirement extends Requirement {
@@ -4464,20 +4496,18 @@ function setupShinyRequirements() {
     Routes.getRoute(0,6).requirements.push(
         new CaughtIndicatingRequirement(ItemList.Mystery_egg),
         new CaughtIndicatingRequirement(ItemList.Water_stone))
-    TownList['Diglett\'s Cave'].requirements.push(new CaughtIndicatingRequirement(ItemList.Thunder_stone))
+    TownList['Diglett\'s Cave'].requirements.push(
+        new GymBadgeRequirement(BadgeEnums.Thunder),
+        new CaughtIndicatingRequirement(ItemList.Thunder_stone)
+    )
     Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
     Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
-    TownList['Saffron City'].requirements.push(
-        new ShinyShopRequirement(CeladonCityShop),
-        new CaughtIndicatingRequirement(ItemList.Water_stone),
-        new CaughtIndicatingRequirement(ItemList.Thunder_stone))
+    TownList['Saffron City'].requirements.push(new ShinyShopRequirement(CeladonCityShop))
     TownList['Pokémon Tower'].requirements.push(
         new CaughtIndicatingRequirement(ItemList.Leaf_stone),
         new CaughtIndicatingRequirement(ItemList.Moon_stone))
-    Routes.getRoute(0,13).requirements.push(
-        new CaughtIndicatingRequirement(ItemList.Water_stone),
-        new RouteShinyRequirements(0,4),
-    )
+    Routes.getRoute(0,12).requirements.push(new GymBadgeRequirement(BadgeEnums.Marsh))
+    Routes.getRoute(0,13).requirements = [new RouteShinyRequirements(0,12)]
     Routes.getRoute(0,14).requirements = [new RouteShinyRequirements(0,13)]
     Routes.getRoute(0,15).requirements = [new RouteShinyRequirements(0,14)]
     Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
@@ -4486,21 +4516,15 @@ function setupShinyRequirements() {
     TownList['Fuchsia City'].requirements = [new RouteShinyRequirements(0,18)]
     GymList['Fuchsia City'].requirements = [
         new RouteShinyRequirements(0,18),
-        new CaughtIndicatingRequirement(ItemList.Trade_stone)
-    ]
-    TownList['Power Plant'].requirements.push(
-        new ShinySafariRequirement(),
-        new CaughtIndicatingRequirement(ItemList.Leaf_stone)
-    )
+        new CaughtIndicatingRequirement(ItemList.Trade_stone)]
+    TownList['Power Plant'].requirements.push(new ShinySafariRequirement())
     Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
     Routes.getRoute(0,20).requirements = [new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Seafoam Islands'))]
-    TownList['Cinnabar Island'].requirements = [
-        new RouteShinyRequirements(0,20),
-        new CaughtIndicatingRequirement(ItemList.Water_stone)
-    ]
+    TownList['Cinnabar Island'].requirements = [new RouteShinyRequirements(0,20)]
     TownList['Pokémon Mansion'].requirements = [
         new RouteShinyRequirements(0,20),
-        new CaughtIndicatingRequirement(ItemList.Fire_stone)
-    ]
-    Routes.getRoute(0,21).requirements.push(new GymBadgeRequirement(BadgeEnums.Volcano))
+        new CaughtIndicatingRequirement(ItemList.Fire_stone)]
+    Routes.getRoute(0,21).requirements = [
+        new RouteShinyRequirements(0,20),
+        new GymBadgeRequirement(BadgeEnums.Volcano)]
 }
