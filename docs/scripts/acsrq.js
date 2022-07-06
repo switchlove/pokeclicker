@@ -1,16 +1,21 @@
-var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
+var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phases, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
 
 var bossA = 0;
 var bossB = 0;
+var catchValue = 0;
+var hasRun = 0;
+var hasExported = 0;
+var isCatching = false;
+var isCurrentShiny = 0;
 var lastCount = 0;
 var lastCounts = 0;
 var lastECount = 0;
 var lastEPoke = 0;
 var lastPoke = 0;
+var maxPhaseCount = 0;
+var moveBoss = 0;
 var mystSCount = 0;
-var stage = 0;
-var boost = 1;
-
+var started = 0;
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -51,6 +56,8 @@ window.addEventListener("load", function() {
         Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
         Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
         Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
+        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
+		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
 
         Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
         Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -167,6 +174,11 @@ window.addEventListener("load", function() {
         ], 'none'));
         Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
         Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
+        [
+            new SettingOption('None', 'safariOptN'),
+            new SettingOption('Shiny Check', 'safariOptSC'),
+        ], 'safariOptSC'));
         /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
         [
         new SettingOption('None', 'none'),
@@ -208,6 +220,9 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
+        <tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
+		</tbody></table>
         </tbody></table>`;
         tabContent.appendChild(a6Tab1El);
 
@@ -249,15 +264,20 @@ window.addEventListener("load", function() {
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
         <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
         <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
+        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
         </tbody></table>`;
         //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
         tabContent.appendChild(a6Tab2El);
-
     }, 1000);
 
     setInterval(function(){
         if (Settings.getSetting('disableSave').observableValue() == true) {
             Save.counter = 0;
+            window.onbeforeunload = [];
+        } else {
+            window.onbeforeunload = function () {
+                Save.store(player);
+            };
         }
     }, 1000);
 
@@ -287,13 +307,16 @@ window.addEventListener("load", function() {
         if (clickEngagedG == 1){
             gymBot();
         }
-        if (clickEngagedS == 1){
-            safariBot();
-        }
         if (clickEngagedBF == 1){
             bfBot();
         }
     }, 100);
+
+    setInterval(function(){
+        if (clickEngagedS == 1){
+            safariBot();
+        }
+    }, 250);
 
     setTimeout(function(){
         setInterval(function(){
@@ -302,6 +325,8 @@ window.addEventListener("load", function() {
             }
         }, 3000);
     }, 3000);
+
+    setTimeout(setupShinyRequirements, 3000);
 });
 
 function main(){
@@ -309,9 +334,70 @@ function main(){
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
+        a6phases();
+
+        var srCheckboxL = document.querySelector("#srCheck");
+        srCheckboxL.addEventListener('change', function() {
+            if (this.checked) {
+                clickEngagedSR = 1;
+                localSettings[2] = 1;
+                localStorage.setItem(settingKey, JSON.stringify(localSettings));
+            } else {
+                clickEngagedSR = 0;
+                srCount = 0;
+                localSettings[2] = 0;
+                localStorage.setItem(settingKey, JSON.stringify(localSettings));
+                localLocal[6][1] = '';
+                localLocal[6][2] = '';
+                localStorage.setItem(saveKey, JSON.stringify(localLocal));
+            }
+        });
+        if (srCheckboxL.checked) {
+            clickEngagedSR = 1;
+            localSettings[2] = 1;
+            localStorage.setItem(settingKey, JSON.stringify(localSettings));
+        } else {
+            clickEngagedSR = 0;
+            srCount = 0;
+            localSettings[2] = 0;
+            localStorage.setItem(settingKey, JSON.stringify(localSettings));
+            localLocal[6][1] = '';
+            localLocal[6][2] = '';
+            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+        }
+
+        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
+        phaseLink.addEventListener("click", function() {
+            if (event.shiftKey) {
+                event.preventDefault();
+            }
+            document.querySelector("#phaseModal").style.display = "block";
+        });
+
+        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
+        phaseExport.addEventListener("click", function() {
+            if(!event.detail || event.detail == 1) {
+                if (hasExported == 0) {
+                    setTimeout(function(){
+                        a6export()
+                    }, 2000);
+                    hasExported = 1;
+                }
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
+        phaseClose.addEventListener("click", function() {
+            document.querySelector("#phaseModal").style.display = "none";
+        });
+
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
         }
+
         setTimeout(function(){
             a6settings();
         }, 1500);
@@ -386,6 +472,15 @@ function a6save() {
         localSettings = localSettings.splice(9,1)[0];
         localStorage.setItem(settingKey, JSON.stringify(localSettings));
     }
+
+    phases = [];
+    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    } else {
+        phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));
+    }
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 
     saveLoaded = 1;
 }
@@ -505,7 +600,7 @@ function a6menu(){
         var td1r06 = document.createElement('td');
         td1r06.style.padding = '5px';
         td1r06.style.paddingBottom = '5px';
-        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L"];//, "S+L+P", "S+L+C", "S+L+C+P"];
+        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L", "Perp. P"];//, "S+L+P", "S+L+C", "S+L+C+P"];
         var td1r06menu = document.createElement('select');
         for (const val of td1r06menuVals) {
             var td1r06submenu = document.createElement("option");
@@ -542,6 +637,7 @@ function a6menu(){
         td1r2textbox.id = "phaseCount";
         td1r2textbox.style.textAlign = "center";
         var td2r2 = document.createElement('td');
+        td2r2.innerHTML = '<a href="#">Phase</a>';
 
         var tr3 = document.createElement('tr');
         tr3.id = 'lastEncounterPoke';
@@ -609,7 +705,7 @@ function a6menu(){
         td1r07.appendChild(td1r07menu);
         td2r07.appendChild(document.createTextNode('Mutate Bot'));
         td1r2.appendChild(td1r2textbox);
-        td2r2.appendChild(document.createTextNode('Phase'));
+        //td2r2.appendChild(document.createTextNode('Phase'));
         td1r3.appendChild(document.createTextNode(''));
         td2r3.appendChild(document.createTextNode('Last Shiny'));
         td1r4.appendChild(document.createTextNode(''));
@@ -715,6 +811,53 @@ function a6menu(){
         fbdy.appendChild(fr01);
         sFootTbl.appendChild(fbdy);
         sFoot.appendChild(sFootTbl);
+
+        var ptModal = document.createElement('div');
+        ptModal.className = 'modal noselect show';
+        ptModal.id = 'phaseModal';
+        ptModal.tabindex = -1;
+        ptModal.style = "z-index: 1040; display: block; padding-right: 6.9968px;";
+        ptModal.style.display = "none";
+        ptModal.ariaModal = true;
+        ptModal.setAttribute("role", "dialog");
+
+        var ptModalScroll = document.createElement('div');
+        ptModalScroll.className = 'modal-dialog modal-dialog-scrollable modal-lg';
+        ptModalScroll.setAttribute("role", "document");
+
+        var ptModalContent = document.createElement('div');
+        ptModalContent.className = 'modal-content';
+
+        var ptModalHeader = document.createElement('div');
+        ptModalHeader.className = 'modal-header';
+        ptModalHeader.setAttribute("role", "document");
+        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><button class="btn btn-secondary" type="button" data-toggle="collapse" style="margin-left: 25px;">Export</button>`;
+
+        var ptModalBody = document.createElement('div');
+        ptModalBody.className = 'modal-body';
+        ptModalBody.setAttribute("role", "document");
+
+        var ptModalBodyC = document.createElement('div');
+        ptModalBodyC.className = 'mainPhase';
+        ptModalBodyC.innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable"><tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr></table>`;
+
+        var ptModalFooter = document.createElement('div');
+        ptModalFooter.className = 'modal-footer';
+
+        var ptModalFooterB = document.createElement('button');
+        ptModalFooterB.className = 'btn btn-primary';
+        ptModalFooterB.dataset.dismiss = 'modal';
+        ptModalFooterB.textContent = 'Close';
+
+
+        document.body.appendChild(ptModal);
+        ptModal.appendChild(ptModalScroll);
+        ptModalScroll.appendChild(ptModalContent);
+        ptModalContent.appendChild(ptModalHeader);
+        ptModalContent.appendChild(ptModalBody);
+        ptModalBody.appendChild(ptModalBodyC);
+        ptModalContent.appendChild(ptModalFooter);
+        ptModalFooter.appendChild(ptModalFooterB);
 
         if (Settings.getSetting('hideOak').observableValue() == true) {
             document.querySelector("#oakItemsContainer").style.display = 'none';
@@ -862,6 +1005,8 @@ async function a6settings() {
 
     if (Settings.getSetting('botOptions') != null) {
         if (Settings.getSetting('botOptions').observableValue() == true) {
+            var townContent = player.town().content;
+
             //Breeding Bot
             if (App.game.breeding.canAccess() == true && App.game.party.hasMaxLevelPokemon()) {
                 document.querySelector("#breedingBot").removeAttribute("style");
@@ -939,10 +1084,12 @@ async function a6settings() {
             }
 
             //Gym Bot
+            var gymFound = 0;
             document.querySelector("#gymBot").removeAttribute("style");
             if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) == -1 ) {
-                if ( player.town().gym != undefined ) {
-                    if ( player.town().gym.town == player.town().name ) {
+                for (let x = 0; x < townContent.length; x++) {
+                    if (townContent[x].leaderName != undefined) {
+                        gymFound = 1;
                         document.querySelector("#gymCheck").disabled = false;
                         var checkGymClicker = document.querySelector("#gymCheck");
                         if (checkGymClicker.checked == true){
@@ -951,25 +1098,14 @@ async function a6settings() {
                         if (checkGymClicker.checked == false){
                             gymClick(0);
                         }
+                    } else {
+                        if (gymFound != 1) {
+                            document.querySelector("#gymCheck").disabled = true;
+                            document.querySelector("#gymCheck").checked = false;
+                            gymClick(0);
+                        }
                     }
-                } else if (player.town().gymList != undefined) {
-                    document.querySelector("#gymCheck").disabled = false;
-                    var checkGymClicker = document.querySelector("#gymCheck");
-                    if (checkGymClicker.checked == true){
-                        gymClick(1);
-                    }
-                    if (checkGymClicker.checked == false){
-                        gymClick(0);
-                    }
-                } else {
-                    document.querySelector("#gymCheck").disabled = true;
-                    document.querySelector("#gymCheck").checked = false;
-                    gymClick(0);
                 }
-            } else {
-                document.querySelector("#gymCheck").disabled = true;
-                document.querySelector("#gymCheck").checked = false;
-                gymClick(0);
             }
 
             //Safari Bot
@@ -979,10 +1115,31 @@ async function a6settings() {
                     document.querySelector("#safariCheck").disabled = false;
                     var checkSafariClicker = document.querySelector("#safariCheck");
                     if (checkSafariClicker.checked == true){
-                        safariClick(1);
-                    }
-                    if (checkSafariClicker.checked == false){
+                        switch(Settings.getSetting('safariOpts').observableValue()) {
+                            case "safariOptN":
+                                safariClick(1);
+                                break;
+                            case "safariOptSC":
+                                if (Safari.completed(true) != true) {
+                                    safariClick(1);
+                                } else {
+                                    Safari.closeModal();
+                                    safariClick(0);
+                                }
+                                break;
+                        }
+                    } else {
                         safariClick(0);
+                    }
+                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
+                    safariClick(0);
+                    if (document.querySelector("#safariModal").classList.contains('show')) {
+                        Safari.payEntranceFee();
+                    } else if (App.game.gameState != 5) {
+                        App.game.gameState = 5;
+                        setTimeout(() => {
+                            Safari.openModal();
+                        }, 500)
                     }
                 } else {
                     document.querySelector("#safariCheck").disabled = true;
@@ -1015,31 +1172,12 @@ async function a6settings() {
             }
 
             //SR Bot
-            if (App.game.breeding.canAccess() == true) {
+            if (App.game.statistics.routeKills['kanto'][3]() >= 10) {
                 document.querySelector("#srBot").removeAttribute("style");
                 document.querySelector("#srCheck").disabled = false;
-                var checkSrClicker = document.querySelector("#srCheck");
-                if (checkSrClicker.checked == true){
-                    srClick(1);
-                    localSettings[2] = 1;
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                }
-                if (checkSrClicker.checked == false){
-                    srClick(0);
-                    srCount = 0;
-                    localSettings[2] = 0;
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                    localLocal[6][1] = '';
-                    localLocal[6][2] = '';
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                }
             } else {
                 document.querySelector("#srCheck").disabled = true;
                 document.querySelector("#srCheck").checked = false;
-                srClick(0);
-                srCount = 0;
-                localSettings[2] = 0;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
             }
 
             //Farm Bots
@@ -1155,14 +1293,6 @@ function bfClick(x) {
     }
 }
 
-function srClick(x) {
-    if (x == 1){
-        clickEngagedSR = 1;
-    } else if (x == 0){
-        clickEngagedSR = 0;
-    }
-}
-
 function uniqueCheck() {
     var uniqC = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region).map(p => Math.floor(p.id))).size;
     var uniqT = PokemonHelper.calcUniquePokemonsByRegion(player.region);
@@ -1257,29 +1387,37 @@ async function missingShinies() {
             }
             //Dungeon Poke
             if (player.town().dungeon != undefined && player.route() == 0) {
-                var missS = player.town().dungeon.pokemonList;
-                missS = missS.concat(player.town().dungeon.bossPokemonList);
-                var missC = [];
-                for (let x = 0; x < missS.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-                        missC.push(missS[x])
+                var neededS = '';
+                var missTemp = [];
+                var missDP = player.town().dungeon.pokemonList;
+                var missDBP = player.town().dungeon.bossPokemonList;
+                var missDBPa = player.town().dungeon.bossEncounterList;
+                for (let x = 0; x < missDP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                        missTemp.push(missDP[x])
                     }
                 }
-                missS = missS.filter( ( el ) => !missC.includes( el ) );
-                if ( missS.length == 0) {
-                    missS = 'N/A';
-                } else if ( missS.length == 1) {
-                    missS = missS[0];
-                } else if (missS.length > 1) {
-                    missS = missS.join(', ');
+                for (let x = 0; x < missDBP.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                        if ( missDBPa[x].lock != true ) {
+                            missTemp.push(missDBP[x])
+                        }
+                    }
                 }
-                document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
+                if ( missTemp.length == 0) {
+                    neededS = 'N/A';
+                } else if ( missTemp.length == 1) {
+                    neededS = missTemp[0];
+                } else if (missTemp.length > 1) {
+                    neededS = missTemp.join(', ');
+                }
+                document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
                 var lootA = [];
                 var lootL = player.town().dungeon.itemList;
                 for (let x = 0; x < lootL.length; x++) {
                     if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootA.push(lootL[x].loot);
+                        lootA.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
                     }
                 }
                 var lootC = [];
@@ -1289,11 +1427,11 @@ async function missingShinies() {
                     }
                 }
                 lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
-                if (missS.length >= 1 && lootA.length >= 1) {
-                    missS = missS.concat(lootA);
-                    missS = missS.sort().join(', ');
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-                } else if (missS.length == 0) {
+                if (missTemp.length >= 1 && lootA.length >= 1) {
+                    missTemp = missTemp.concat(lootA);
+                    missTemp = missTemp.sort().join(', ');
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
+                } else if (missTemp.length == 0) {
                     if ( lootA.length == 0) {
                         lootA = 'N/A';
                     } else if ( lootA.length == 1) {
@@ -1301,7 +1439,7 @@ async function missingShinies() {
                     } else if (lootA.length > 1) {
                         lootA = lootA.sort().join(', ');
                     }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = lootA;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootA;
                 }
             }
             //Shop Poke
@@ -1348,6 +1486,17 @@ async function missingShinies() {
 }
 
 async function areaClears() {
+    var townContent = player.town().content;
+    var gymsFound = 0;
+    var gymAtX = 0;
+
+    for (let x = 0; x < townContent.length; x++) {
+        if (townContent[x].leaderName != null ) {
+            gymsFound++;
+            gymAtX = x;
+        }
+    }
+
     if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
         clears = 0;
         if (Safari.inProgress() != false) {
@@ -1377,31 +1526,35 @@ async function areaClears() {
         lastArea = player.town().dungeon.name;
         lastRegion = player.region;
         await phaseCounter(2);
-    } else if (player.town().gym != undefined) {
-        clears = App.game.statistics.gymsDefeated[GameConstants.getGymIndex(player.town().name)]().toLocaleString('en-US');
-        if (lastArea != player.town().gym.leaderName || lastRegion != player.region) {
-            lastPoke = 0;
-            localLocal[4][0] = 0;
-            localLocal[4][1] = '';
-            localLocal[3] = 0;
-            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+    } else if (App.game.gameState == 6) {
+        if (gymsFound == 1) {
+            clears = townContent[gymAtX].clears()
+            if (lastArea != townContent[gymAtX].leaderName || lastRegion != player.region) {
+                lastPoke = 0;
+                localLocal[4][0] = 0;
+                localLocal[4][1] = '';
+                localLocal[3] = 0;
+                localStorage.setItem(saveKey, JSON.stringify(localLocal));
+            }
+            lastArea = townContent[gymAtX].leaderName;
+            lastRegion = player.region;
+            await phaseCounter(4);
+        } else if (gymsFound > 1) {
+            clears = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].clears()
+            if (lastArea != townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName || lastRegion != player.region) {
+                lastPoke = 0;
+                localLocal[4][0] = 0;
+                localLocal[4][1] = '';
+                localLocal[3] = 0;
+                localStorage.setItem(saveKey, JSON.stringify(localLocal));
+            }
+            lastArea = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName;
+            lastRegion = player.region;
+            await phaseCounter(5);
+        } else {
+            clears = 0;
         }
-        lastArea = player.town().gym.leaderName;
-        lastRegion = player.region;
-        await phaseCounter(4);
-    } else if (player.town().gymList != undefined) {
-        clears = App.game.statistics.gymsDefeated[GameConstants.getGymIndex(player.town().gymList[Settings.getSetting('gymE4Opts').observableValue() - 1].town)]()
-        if (lastArea != player.town().gymList[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName || lastRegion != player.region) {
-            lastPoke = 0;
-            localLocal[4][0] = 0;
-            localLocal[4][1] = '';
-            localLocal[3] = 0;
-            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-        }
-        lastArea = player.town().gymList[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName;
-        lastRegion = player.region;
-        await phaseCounter(5);
-    } else if (player.town().gym == undefined) {
+    } else {
         clears = 0;
     }
     document.querySelector("#areaClears > td:nth-child(1)").innerHTML = clears;
@@ -1412,6 +1565,14 @@ async function phaseCounter(arg) {
 
     if (localStorage.getItem(saveKey) != null) {
         localLocal[3] = JSON.parse(localStorage.getItem(saveKey))[3];
+    }
+
+    var gymFound = 0;
+    var townC = player.town().content;
+    for (let x = 0; x < townC.length; x++) {
+        if (townC[x].constructor.name == 'Gym') {
+            gymFound++;
+        }
     }
 
     if (phaseVal == '' || phaseVal == null || phaseVal == undefined){
@@ -1451,9 +1612,7 @@ async function phaseCounter(arg) {
                     phaseVal = localLocal[1][cArea];
                 }
             }
-        } else if (player.town().gym != null ) {
-            phaseVal = 0;
-        } else if (player.town().gymList != undefined) {
+        } else if (gymFound >= 1) {
             phaseVal = 0;
         }
     } else if (document.querySelector("#phaseCount").value != phaseVal) {
@@ -1521,6 +1680,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     } else if ( lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -1533,8 +1693,36 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
+
                     }
-                }
+                } else {
+					if (isCurrentShiny == 1) {
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+						for (var x = 0; x < 3; x++) {
+							var phaseLog = phaseLogs[x];
+							if(phaseLog.type.label == "ESCAPED") {
+								catchStatus = "Failed";
+								break;
+							} else if (phaseLog.type.label == "CAUGHT") {
+								catchStatus = "Captured";
+								break;
+							}
+						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						a6phases();
+					}
+				}
             }
             break;
         case 2: //dungeons
@@ -1558,7 +1746,7 @@ async function phaseCounter(arg) {
                             lastPokeType = 'B: ';
                             localLocal[4][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
-                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
+                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[4][1] = lastPokeType;
                         } else {
@@ -1572,6 +1760,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     } else if ( lastPoke == DungeonBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -1579,7 +1768,7 @@ async function phaseCounter(arg) {
                             lastPokeType = 'B: ';
                             localLocal[4][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
-                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
+                            App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[4][1] = lastPokeType;
                         } else {
@@ -1593,8 +1782,59 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     }
-                }
+                } else {
+					if (isCurrentShiny == 1) {
+						var encounterType = "";
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+						phaseLoop:
+						for (var x = 0; x < 3; x++) {
+							var phaseLog = phaseLogs[x];
+							if (phaseLog.type.label == "SHINY" && lastPokeType == 'B: ') {
+								if (phaseLog.description.includes("trainer")) {
+									catchStatus = "Boss Trainer";
+									encounterType = "Boss"
+									break phaseLoop;
+								} else {
+									if (phaseLogs[x-1].type.label == "CAUGHT") {
+										catchStatus = "Boss Captured";
+										encounterType = "Boss";
+										break phaseLoop;
+									} else if (phaseLogs[x-1].type.label == "ESCAPED") {
+										catchStatus = "Boss Failed";
+										encounterType = "Boss";
+										break phaseLoop;
+									}
+								}
+							} else if (phaseLog.type.label == "SHINY" && lastPokeType == 'T: ') {
+								catchStatus = "Trainer";
+								encounterType = "Trainer";
+								break phaseLoop;
+							} else if(phaseLog.type.label == "CAUGHT" && lastPokeType == 'W: ') {
+								catchStatus = "Captured";
+								encounterType = "Wild";
+								break phaseLoop;
+							} else if(phaseLog.type.label == "ESCAPED" && lastPokeType == 'W: ') {
+								catchStatus = "Failed";
+								encounterType = "Wild";
+								break phaseLoop;
+							}
+						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, player.town().dungeon.name, encounterType, App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						a6phases();
+					}
+				}
             }
             break;
         case 3: //safari
@@ -1621,6 +1861,7 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[5] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     } else if ( lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]() ) {
                         break;
                     } else {
@@ -1633,8 +1874,35 @@ async function phaseCounter(arg) {
                         localLocal[3] = 0;
                         localLocal[5] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
+						isCurrentShiny = 1;
                     }
-                }
+                } else {
+					if (isCurrentShiny == 1) {
+						var catchStatus = "";
+						phaseLogs = App.game.logbook.logs();
+						for (var x = 0; x < 3; x++) {
+							var phaseLog = phaseLogs[x];
+							if (phaseLog.type.label == "ESCAPED") {
+								catchStatus = "Failed";
+								break;
+							} else if (phaseLog.type.label == "CAUGHT") {
+								catchStatus = "Captured";
+								break;
+							}
+						}
+                        if (catchStatus == "") {
+                            catchStatus = "No Attempt";
+                        }
+						catchValue = 0;
+						isCurrentShiny = 0;
+						newPhase = [phaseVal, "Safari Zone", "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, "N/A"];
+						phases.push(newPhase);
+						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+						hasRun = 0;
+						a6phases();
+					}
+				}
             }
             break;
         case 4: //gym
@@ -1725,7 +1993,6 @@ async function phaseCounter(arg) {
                 }
             }
     }
-
     document.querySelector("#phaseCount").value = phaseVal;
 
     if (localLocal[3].toLocaleString('en-US') == '') {
@@ -1734,19 +2001,78 @@ async function phaseCounter(arg) {
         document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[3].toLocaleString('en-US');
     }
     localStorage.setItem(saveKey, JSON.stringify(localLocal));
+}
 
-    /*
-    if (localLocal[3].toLocaleString('en-US') == '') {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = 0;
-    } else {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[3].toLocaleString('en-US');
+function removePhase(id){
+	var newArray = [];
+	for(var x = 0; x < phases.length; x++){
+		if(x !== id){
+			newArray.push(phases[x]);
+		}
+	}
+	phases = newArray;
+	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+	hasRun = 0;
+	a6phases();
+}
+
+async function a6export() {
+    hasExported = 0;
+    var test_array = phases;
+    var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
+    var data = encodeURI('data:text/csv;charset=utf-8,' + csv);
+
+    const link = document.createElement('a');
+    link.setAttribute('href', data);
+    link.setAttribute('download', 'phases.csv');
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function a6phases() {
+    if (Settings.getSetting('trackPhases').observableValue() == true) {
+        var newArray = [];
+    	var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
+    	if (phaseCountDifference > 0) {
+    		for (var phase = 0; phase < phases.length; phase++) {
+    			if (phaseCountDifference > 0) {
+    				phaseCountDifference--;
+    			} else {
+    				newArray.push(phases[phase]);
+    			}
+    		}
+    		phases = newArray;
+    	}
+    	if (hasRun == 0) {
+    		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
+    		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
+    		</table>`;
+    		for(var x = 0; x < phases.length; x++){
+    			var tablePhase = document.createElement('tr');
+    			var phaseId = "phase" + x;
+    			tablePhaseQuery = "<tr><td>" + phases[x][0] + "</td>" + "<td>" + phases[x][1] + "</td>" + "<td>" + phases[x][2] + "</td>" + "<td>" + phases[x][3] + "</td>" + "<td>" + phases[x][4] + "</td>" + "<td>" + phases[x][5] + "</td>" + "<td>" + "<button type=\"button\" class=\"btn btn-primary\" onclick=\"removePhase(" + x + ")\">Remove</button>" + "</td></tr>";
+    			tablePhase.innerHTML = tablePhaseQuery;
+    			tablePhase.style.display = "none";
+    			phaseTable.append(tablePhase);
+    			var childNumber = x + 2;
+    			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
+    				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
+    				document.querySelector(displayQuery).removeAttribute("style");
+    				hasRun = 1;
+    			}
+    		}
+    	}
+    	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
     }
-    localStorage.setItem(saveKey, JSON.stringify(localLocal));*/
 }
 
 async function dungeonBot() {
     if (App.game.gameState == 6) {
         stage = 0;
+        started = 0;
         chestOpened = 0;
         if (App.game.wallet.currencies[GameConstants.Currency.dungeonToken]() >= DungeonRunner.dungeon.tokenCost) {
             DungeonRunner.initializeDungeon(player.town().dungeon);
@@ -1763,11 +2089,16 @@ async function dungeonBot() {
         }
         var pX = DungeonRunner.map.playerPosition().x;
         var pY = DungeonRunner.map.playerPosition().y;
-
         if ( Settings.getSetting('botRush').observableValue() == true) {
             if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(DungeonRunner.dungeon.name)]() >= 200) {
                 if (Math.abs(DungeonRunner.map.playerPosition().y - bossA) <= 1) {
                     if (pX == bossB) {
+                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
+                        await DungeonRunner.handleClick();
+                    }
+                }
+                if (Math.abs(DungeonRunner.map.playerPosition().x - bossB) <= 1) {
+                    if (pY == bossA) {
                         await DungeonRunner.map.moveToCoordinates(bossB,bossA);
                         await DungeonRunner.handleClick();
                     }
@@ -1785,842 +2116,214 @@ async function dungeonBot() {
                 }
             }
         }
-
-        var dSize = player.region;
         var dClears = App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]();
+        var dSize = player.region;
 
-        if (dClears < 10) {
-            dSize = player.region;
-        } else if (dClears < 100) {
-            dSize = player.region - 1;
-        } else if (dClears < 1000) {
-            dSize = player.region - 2;
-        } else if (dClears < 10000) {
-            dSize = player.region - 3;
-        } else if (dClears < 100000) {
-            dSize = player.region - 4;
+        if (started == 0){
+            moveBoss = 0;
+            if (dClears < 10) {
+                dSize = player.region;
+                dMax = 4 + player.region;
+            } else if (dClears < 100) {
+                dSize = player.region - 1;
+                dMax = 4 + player.region - 1;
+            } else if (dClears < 1000) {
+                dSize = player.region - 2;
+                dMax = 4 + player.region - 2;
+            } else if (dClears < 10000) {
+                dSize = player.region - 3;
+                dMax = 4 + player.region - 3;
+            } else if (dClears < 100000) {
+                dSize = player.region - 4;
+                dMax = 4 + player.region - 4;
+            } else {
+                dSize = player.region - 5;
+                dMax = 4 + player.region - 5;
+            }
+            if (dSize < 0) {
+                dSize = 0;
+            }
+            if (dMax < 4) {
+                dMax = 4;
+            }
+            dMaxY = dMax;
+            if (pY == dMax) {
+                DungeonRunner.map.moveLeft();
+                if (pX == 0 && pY == dMax) {
+                    started = 1;
+                }
+            }
         } else {
-            dSize = player.region - 5;
-        }
-
-        if (dSize < 0) {
-            dSize = 0;
-        }
-
-        // 5x5 to 11x11
-
-        switch (dSize) {
-            case 0:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        stage = 1;
-                    }
+            if (moveBoss == 1) {
+                if (pX == bossB && pY == bossA) {
+                    await DungeonRunner.handleClick();
                 }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 4 && pY == 3) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 4 && pY == 1) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 4 && pY == 0) {
-                        stage = 6
-                    }
-                }
-                if ( stage == 6 ) {
+            } else {
+                DungeonRunner.map.moveRight();
+                if (pX == dMax && pY == dMaxY) {
+                    await DungeonRunner.map.moveToCoordinates(0,dMaxY);
+                    await DungeonRunner.map.moveUp();
+                    dMaxY = dMaxY - 1;
+                } else if (pX == dMax && pY == 0) {
                     await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
+                    moveBoss = 1;
                 }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 7;
-                }
-                break;
-            case 1:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 4) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 2) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 5 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 5 && pY == 0) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 8;
-                }
-                break;
-            case 2:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 6) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 5) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 3) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 6 && pY == 1) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 6 && pY == 0) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 9;
-                }
-                break;
-            case 3:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 6) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 5) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 4) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 2) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 7 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 7 && pY == 0) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 10;
-                }
-                break;
-            case 4:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 8) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 7) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 6) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 5) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 3) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 8 && pY == 1) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 8 && pY == 0) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 11;
-                }
-                break;
-            case 5:
-                console.log('Case 5!');
-                if ( stage == 0 ) {
-                    stage = 0;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move left! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 9) {
-                        stage = 1;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 1 ) {
-                    stage = 1;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move right! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveRight();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 9 && pY == 9) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 8) {
-                        stage = 2;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 2 ) {
-                    stage = 2;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move left! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 7) {
-                        stage = 3;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 3 ) {
-                    stage = 3;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('Move right! Stage: ' + stage);
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    await DungeonRunner.map.moveRight();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 9 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 6) {
-                        stage = 4;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 4 ) {
-                    stage = 4;
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    console.log('[PRE] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    console.log('Move left! Stage: ' + stage);
-                    await DungeonRunner.map.moveLeft();
-                    console.log('[NOW] X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    if (pX == 0 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 5) {
-                        stage = 5;
-                        console.log('Stage up! Now stage: ' + stage + ' X: ' + DungeonRunner.map.playerPosition().x + ' Y: ' + DungeonRunner.map.playerPosition().y);
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 4) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 3) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 2) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 1) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveRight();
-                    if (pX == 9 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 9 && pY == 0) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    await DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 0) {
-                        stage = 11;
-                    }
-                }
-                if ( stage == 11 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 12;
-                }
-            case 6:
-                if ( stage == 0 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 10) {
-                        stage = 1;
-                    }
-                }
-                if ( stage == 1 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 10) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 9) {
-                        stage = 2;
-                    }
-                }
-                if ( stage == 2 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 9) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 8) {
-                        stage = 3;
-                    }
-                }
-                if ( stage == 3 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 8) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 7) {
-                        stage = 4;
-                    }
-                }
-                if ( stage == 4 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 7) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 6) {
-                        stage = 5;
-                    }
-                }
-                if ( stage == 5 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 6) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 5) {
-                        stage = 6;
-                    }
-                }
-                if ( stage == 6 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 5) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 4) {
-                        stage = 7;
-                    }
-                }
-                if ( stage == 7 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 4) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 3) {
-                        stage = 8;
-                    }
-                }
-                if ( stage == 8 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 3) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 2) {
-                        stage = 9;
-                    }
-                }
-                if ( stage == 9 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 2) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 10 && pY == 1) {
-                        stage = 10;
-                    }
-                }
-                if ( stage == 10 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveLeft();
-                    if (pX == 0 && pY == 1) {
-                        await DungeonRunner.map.moveUp();
-                    }
-                    if (pX == 0 && pY == 0) {
-                        stage = 11;
-                    }
-                }
-                if ( stage == 11 ) {
-                    pX = DungeonRunner.map.playerPosition().x;
-                    pY = DungeonRunner.map.playerPosition().y;
-                    DungeonRunner.map.moveRight();
-                    if (pX == 10 && pY == 0) {
-                        stage = 12;
-                    }
-                }
-                if ( stage == 12 ) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    if (pX == bossB && pY == bossA) {
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (DungeonRunner.fightingBoss() == true) {
-                    stage = 13;
-                }
-
+            }
         }
     }
 }
 
 async function gymBot() {
     if (App.game.gameState == 6) {
-        if (player.town().gym != null ) {
-            switch(Settings.getSetting('gymOpts').observableValue()) {
-                case "gymOptC":
-                    if (App.game.statistics.gymsDefeated[GameConstants.getGymIndex(player.town().name)]() <= Number(Settings.getSetting('maxClears').observableValue())) {
-                        GymRunner.startGym(player.town().gym);
-                    }
-                    break;
-                case "gymOptN":
-                    GymRunner.startGym(player.town().gym);
+        var gymsFound = 0;
+        var gymAtX = 0;
+        var townContent = player.town().content;
+        for (let x = 0; x < townContent.length; x++) {
+            if (townContent[x].leaderName != null ) {
+                gymsFound++;
+                gymAtX = x;
             }
-        } else if (player.town().gymList != undefined) {
-            switch (Settings.getSetting('gymE4Opts').observableValue()) {
-                case "1":
-                    GymRunner.startGym(player.town().gymList[0]);
-                    break;
-                case "2":
-                    GymRunner.startGym(player.town().gymList[1]);
-                    break;
-                case "3":
-                    GymRunner.startGym(player.town().gymList[2]);
-                    break;
-                case "4":
-                    GymRunner.startGym(player.town().gymList[3]);
-                    break;
-                case "5":
-                    GymRunner.startGym(player.town().gymList[4]);
-                    break;
-                default:
-                    GymRunner.startGym(player.town().gymList[0]);
+        }
+
+        if (gymsFound == 1) {
+            if (townContent[gymAtX].isUnlocked() == true) {
+                switch(Settings.getSetting('gymOpts').observableValue()) {
+                    case "gymOptC":
+                        if (townContent[gymAtX].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
+                            GymRunner.startGym(townContent[gymAtX]);
+                        }
+                        break;
+                    case "gymOptN":
+                        GymRunner.startGym(townContent[gymAtX]);
+                }
+            }
+        } else if (gymsFound > 1) {
+            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
+            if (townContent[pickE4 - 1].isUnlocked() == true) {
+                switch (pickE4) {
+                    case "1":
+                        GymRunner.startGym(townContent[0]);
+                        break;
+                    case "2":
+                        GymRunner.startGym(townContent[1]);
+                        break;
+                    case "3":
+                        GymRunner.startGym(townContent[2]);
+                        break;
+                    case "4":
+                        GymRunner.startGym(townContent[3]);
+                        break;
+                    case "5":
+                        GymRunner.startGym(townContent[4]);
+                        break;
+                    default:
+                        GymRunner.startGym(townContent[0]);
+                }
             }
         }
     }
 }
 
 async function safariBot() {
-    if (Safari.inProgress() == true) {
-        if (document.querySelector("#safariModal").style.display == "block") {
-            if (Safari.inBattle() != true) {
-                if (leftStep == 0) {
-                    Safari.step('left');
-                    leftStep = 1;
+    let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
+    let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
+    const dirOrder = (()=> {
+        const lastDir = Safari.lastDirection
+        switch (lastDir) {
+            case 'left': priority = 'right'; break;
+            case 'up': priority = 'down'; break;
+            case 'right': priority = 'left'; break;
+            case 'down': priority = 'up'; break;
+        }
+        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+    })();
+
+    let nearestGrass = {x:0, y:0, d:Infinity}
+    const walkable = [
+        0, //ground
+        10, //grass
+        11,12,13,14,21,22,23,24,15,16,17,18,19 //sand
+    ];
+
+    movementMatrix = (origin) => {
+        let queue = new Set([JSON.stringify(origin)]);
+        for(let p = 0; p < queue.size; p++) {
+            let {x, y} = JSON.parse([...queue][p]);
+            if (!walkable.includes(Safari.grid[y][x]))
+                continue;
+
+            const next = dirOrder.map((dir) => {
+                const xy = Safari.directionToXY(dir)
+                xy.x += x
+                xy.y += y
+                return xy;
+            }).filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            for (let n = 0; n < next.length; n++)
+                queue.add(JSON.stringify(next[n]));
+
+            if (x == origin.x && y == origin.y)
+                matrix[y][x] = 0;
+            else {
+                matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
+
+                if (Safari.completed(true)) {
+                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d)
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 } else {
-                    Safari.step('right');
-                    leftStep = 0;
-                }
-            } else {
-                if (SafariBattle.enemy.shiny != true) {
-                    SafariBattle.run();
-                } else {
-                    SafariBattle.throwBall();
+                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                        nearestGrass = {x, y, d: matrix[y][x]};
                 }
             }
+        }
+    }
+
+    if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
+        if (Safari.inBattle()) {
+            if (!SafariBattle.busy()) {
+                if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
+                    if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25) {
+                        SafariBattle.throwBait(2);
+                    } else if (Safari.balls() > 0) { //prevent balls to be negativ and lock the safari
+                        SafariBattle.throwBall();
+                    }
+                } else {
+                    SafariBattle.run();
+                    setTimeout(()=> {
+                        SafariBattle.busy(false);
+                    }, 1600); // anti soft lock
+                }
+            }
+        } else {
+            let dest = {d: Infinity}
+            movementMatrix(Safari.playerXY)
+
+            const pkm = Safari.pokemonGrid();
+            for (let i = 0; i < pkm.length; i++) {
+                const dist = matrix[pkm[i].y][pkm[i].x];
+                if (
+                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) &&
+                    dist < dest.d && dist < pkm[i].steps
+                ) {
+                    dest = pkm[i];
+                    dest.d = dist;
+                }
+            }
+            if (dest.d == Infinity)
+                dest = nearestGrass;
+
+            movementMatrix(dest);
+            const next = dirOrder.map(dir => {
+                const xy = Safari.directionToXY(dir);
+                xy.x += Safari.playerXY.x;
+                xy.y += Safari.playerXY.y;
+
+                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                    return null;
+                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+            }).filter((n) => n && n.d > 0);
+
+            if (next[0])
+                Safari.step(next[0].dir);
         }
     }
 }
@@ -2628,7 +2331,6 @@ async function safariBot() {
 async function bfBot() {
     if (App.game.gameState == 8) {
         switch(Settings.getSetting('bfOpts').observableValue()) {
-            // BattleFrontierRunner.battleQuit();
             case "bfOptL":
                 if (BattleFrontierRunner.started() == true) {
                     if (BattleFrontierRunner.stage() >= Number(Settings.getSetting('maxLvl').observableValue())) {
@@ -2668,7 +2370,7 @@ async function srBot() {
         case "mys":
             if (ItemList.Mystery_egg.getCaughtStatus() != 2 ) {
                 if (localLocal[6][1] == '') {
-                    if (App.game.breeding.eggList[0]().type == -1) {
+                    if (App.game.breeding.eggList[0]().type == -1 && player.itemList["Mystery_egg"]() > 0) {
                         ItemList['Mystery_egg'].use();
                         if(App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true) == true) {
                             console.log( 'Already have - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
@@ -2826,102 +2528,100 @@ async function srBot() {
             }
             break;
         case "poke":
-            if (player.town().shops != null || player.town().shops.length >= 1) {
-                if (player.town().name == 'Pastoria City') {
-                    var sSName = eval(PastoriaShop);
-                } else {
-                    var sSName = eval(player.town().name.replace(/\s/g, '') + 'Shop');
-                }
-                ShopHandler.showShop(sSName);
-                var smnList = ShopHandler.shopObservable().items;
-                var smnNeed = 0;
-                for (let x = 0; x < smnList.length; x++) {
-                    if ( smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        smnNeed++;
-                    }
-                }
-                if (smnNeed >= 1 ) {
-                    for (let x = 0; x < smnList.length; x++) {
-                        if ( App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                            if (App.game.wallet.currencies[1]() >= ShopHandler.shopObservable().items[x].price()) {
-                                smnName = smnList[x].name;
-                                ShopHandler.shopObservable().items[x].buy(1);
-                                smnUsed = 1;
-                                break;
-                            }
+            var shopA = player.town().content;
+            for (let x = 0; x < shopA.length; x++) {
+                if (shopA[x].constructor.name == 'Shop') {
+                    for (let y = 0; y < shopA[x].items.length; y++) {
+                        if (shopA[x].items[y].constructor.name == 'PokemonItem') {
+                            var sSName = shopA[x];
                         }
                     }
                 }
-                if (smnUsed == 1) {
-                    if (App.game.party.alreadyCaughtPokemonByName(smnName, true) != true) {
-                        srCount++;
-                        localLocal[6][2] = srCount;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        console.log( '[FAILED] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                        location.reload();
-                    } else {
-                        smnNeed = smnNeed - 1;
-                        console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                        localLocal[6][1] = '';
-                        localLocal[6][2] = 0;
-                        localSettings[2] = 0;
-                        srCount = 0;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                        smnUsed = 0;
-                        smnName = '';
-                        Save.store(player);
+            }
+            ShopHandler.showShop(sSName);
+            var smnList = ShopHandler.shopObservable().items;
+            var smnNeed = 0;
+            for (let x = 0; x < smnList.length; x++) {
+                if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                    smnNeed++;
+                }
+            }
+            if (smnNeed >= 1 ) {
+                for (let x = 0; x < smnList.length; x++) {
+                    if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
+                        if (App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
+                            smnName = smnList[x].name;
+                            ShopHandler.shopObservable().items[x].buy(1);
+                            smnUsed = 1;
+                            break;
+                        }
                     }
+                }
+            }
+            if (smnUsed == 1) {
+                if (App.game.party.alreadyCaughtPokemonByName(smnName, true) != true) {
+                    srCount++;
+                    localLocal[6][2] = srCount;
+                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
+                    console.log( '[FAILED] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
+                    location.reload();
+                } else {
+                    smnNeed = smnNeed - 1;
+                    console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
+                    localLocal[6][1] = '';
+                    localLocal[6][2] = 0;
+                    localSettings[2] = 0;
+                    srCount = 0;
+                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
+                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
+                    smnUsed = 0;
+                    smnName = '';
+                    Save.store(player);
                 }
             }
             break;
         case "egg":
             if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
                 document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[3];
-                BreedingController.filter.search(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
+                BreedingFilters.search.value(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
             }
             if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
                 localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
                 localStorage.setItem(settingKey, JSON.stringify(localSettings));
             }
+            PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() == 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() == 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                //Check based on searchbox
                 if(localSettings[3] == ""){
-                    if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
                 else{
-                    if (BreedingController.filter.search().test(partyPokemon.name)) {
+                    if (BreedingFilters.search.value().test(partyPokemon.name)) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
@@ -3084,9 +2784,26 @@ async function plantBot() {
                     if (App.game.farming.plotList[0].age >= 343800){
                         App.game.farming.harvestAll();
                     }
-                }				break;
+                }
+                break;
             case 69:
                 //Starf 65 + Lum 19 + Petaya 62
+                if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,65);
+                }
+                else if(App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age < 90000 && App.game.farming.plotList[7].age >= 86400 && App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,65);
+                }
+                else if(App.game.farming.plotList[17].age >= 340000){
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,62);
+                }
+                else if(App.game.farming.plotList[7].age >= 340000){
+                    App.game.farming.harvest(17);
+                    App.game.farming.plant(17,62);
+                }
                 break;
             case 70:
                 //Starf 65 + Lum 19 + Chople 40
@@ -4415,35 +4132,29 @@ async function autoBreed() {
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                // Only breedable Pokemon
                 if (partyPokemon.breeding || partyPokemon.level < 100) {
                     return false;
                 }
-                //Check based on searchbox
-                if (!BreedingController.filter.search().test(partyPokemon.name)) {
+                if (!BreedingFilters.search.value().test(partyPokemon.name)) {
                     return false;
                 }
-                // Check based on category
-                if (BreedingController.filter.category() >= 0) {
-                    if (partyPokemon.category !== BreedingController.filter.category()) {
+                if (BreedingFilters.category.value() >= 0) {
+                    if (partyPokemon.category !== BreedingFilters.category.value()) {
                         return false;
                     }
                 }
-                // Check based on shiny status
-                if (BreedingController.filter.shinyStatus() >= 0) {
-                    if (+partyPokemon.shiny !== BreedingController.filter.shinyStatus()) {
+                if (BreedingFilters.shinyStatus.value() >= 0) {
+                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
                         return false;
                     }
                 }
-                // Check based on native region
-                if (BreedingController.filter.region() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingController.filter.region()) {
+                if (BreedingFilters.region.value() > -2) {
+                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
                         return false;
                     }
                 }
-                // Check if either of the types match
-                const type1 = BreedingController.filter.type1() > -2 ? BreedingController.filter.type1() : null;
-                const type2 = BreedingController.filter.type2() > -2 ? BreedingController.filter.type2() : null;
+                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
+                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
                 if (type1 !== null || type2 !== null) {
                     const { type: types } = pokemonMap[partyPokemon.name];
                     if ([type1, type2].includes(PokemonType.None)) {
@@ -4559,7 +4270,7 @@ async function ballBot() {
                         ShopHandler.showShop(LavenderTownShop);
                         ShopHandler.shopObservable().items;
                         if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                            ShopHandler.shopObservable().items[1].buy(purAmount);
                         }
                     }
                 }
@@ -4567,8 +4278,8 @@ async function ballBot() {
                     if (MapHelper.accessToTown('Fuchsia City') == true) {
                         ShopHandler.showShop(FuchsiaCityShop);
                         ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
+                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
+                            ShopHandler.shopObservable().items[2].buy(purAmount);
                         }
                     }
                 }
@@ -4599,5 +4310,136 @@ async function ballBot() {
                     }
                 }
         }
+    }
+}
+
+function setupShinyRequirements() {
+    class RouteShinyRequirements extends RouteKillRequirement {
+        constructor(region, route) {
+            super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
+        }
+    }
+    class ShinyDungeonRequirement extends ClearDungeonRequirement {
+        constructor(dungeonIndex) {
+            super(1, dungeonIndex);
+        }
+
+        isCompleted() {
+            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
+        }
+    }
+    class ShinySafariRequirement extends Requirement {
+        constructor() {
+            super(0, 2);
+        }
+
+        isCompleted() {
+            return Safari.completed(true)
+        }
+
+        hint() {
+            return 'Safari needs to be completed.'
+        }
+    }
+
+    function replaceRequirements(requirements) {
+        for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
+            switch (requirements[reqIdx]?.constructor.name) {
+                case "MultiRequirement":
+                case "OneFromManyRequirement":
+                    replaceRequirements(requirements[reqIdx].requirements);
+                    break;
+                case "RouteKillRequirement":
+                    requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
+                    break;
+                case "ClearDungeonRequirement":
+                    requirements[reqIdx] = new ShinyDungeonRequirement(requirements[reqIdx].dungeonIndex);
+                    break;
+            }
+        }
+    }
+
+    if (App.game != undefined) {
+        for (let town of Object.values(TownList)) {
+            replaceRequirements(town?.requirements);
+            if (town.constructor.name === "DungeonTown") {
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        return (
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.dungeon.name)]() ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            } else {
+                town.hasGym = -1;
+                town.hasDungeon = -1;
+
+                for (let i = 0; i < town.content.length; i++ ) {
+                    if (town.content[i]?.constructor.name === "Gym")
+                        town.hasGym = i;
+                    if (town.content[i]?.constructor.name === "MoveToDungeon")
+                        town.hasDungeon = i;
+                }
+
+                Object.assign(town, {
+                    isUnlocked: function () {
+                        const alreadyClearGym = (
+                            this.hasGym >= 0 &&
+                            App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
+                        );
+                        const alreadyClearDungeon = (
+                            this.hasDungeon >=0 &&
+                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
+                        );
+                        return (
+                            alreadyClearGym || alreadyClearDungeon ||
+                            this.requirements.every(requirement => requirement.isCompleted())
+                        );
+                    }
+                });
+            }
+        }
+
+        for (
+            let regIdx = 0;
+            GameConstants.Region[regIdx] != undefined;
+            regIdx++
+        ) {
+            const routes = Routes.getRoutesByRegion(regIdx);
+            for (let routeIdx = 0; routeIdx <= routes.length; routeIdx++) {
+                if (routes[routeIdx]) {
+                    replaceRequirements(routes[routeIdx]?.requirements);
+                    Object.assign(routes[routeIdx], {
+                        isUnlocked: function () {
+                            return (
+                                App.game.statistics.routeKills[this.region][this.number]() ||
+                                this.requirements.every(requirement => requirement.isCompleted())
+                            );
+                        }
+                    });
+                }
+            }
+        }
+
+        // Split path requirements
+        // Kanto
+        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
+        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
+        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
+        Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
+        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
+        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
+        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
+        TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
+        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
+        TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
+        Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
+    } else {
+        setTimeout(setupShinyRequirements, 100);
     }
 }
