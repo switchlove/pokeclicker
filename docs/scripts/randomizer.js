@@ -1,7 +1,14 @@
 //Test
 var hasRan = 0;
+// Save real Battle.generateNewEnemy function
+let oldBattle = Battle.generateNewEnemy;
 
 window.addEventListener("load", function() {
+	// prevent from encountering pokemon until the randomizing is finished
+	Battle.generateNewEnemy = function () {
+		this.enemyPokemon(PokemonFactory.generateWildPokemon(-1, -1));
+	}
+
     setTimeout(function(){
         rando();
 
@@ -26,6 +33,10 @@ function makeRandom(){
     declareRandomizer();
     RandomizeEncounters();
 	setFunctions();
+
+	// re-enable Battle.generateNewEnemy
+	Battle.generateNewEnemy = oldBattle;
+	Battle.generateNewEnemy();
 }
 function RandomizeEncounters(){
 	currentRoute = player.route();
