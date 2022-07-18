@@ -2,8 +2,11 @@
 var hasRan = 0;
 // Save real Battle.generateNewEnemy function
 let oldBattle = Battle.generateNewEnemy;
+let oldEvent = SpecialEvents.prototype.initialize;
 
 window.addEventListener("load", function() {
+	// disable event to be sure there are not randomized
+	SpecialEvents.prototype.initialize = function() {}
 	// prevent from encountering pokemon until the randomizing is finished
 	Battle.generateNewEnemy = function () {
 		this.enemyPokemon(PokemonFactory.generateWildPokemon(-1, -1));
@@ -34,6 +37,9 @@ function makeRandom(){
     RandomizeEncounters();
 	setFunctions();
 
+	// re-enable Event
+	SpecialEvents.prototype.initialize = oldEvent;
+	App.game.specialEvents.initialize();
 	// re-enable Battle.generateNewEnemy
 	Battle.generateNewEnemy = oldBattle;
 	Battle.generateNewEnemy();
