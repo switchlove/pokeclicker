@@ -221,19 +221,7 @@ class MapHelper {
         const nextStartingTownUnlocked = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]?.isUnlocked() ?? false;
         const fullDex = AchievementHandler.findByName(`${GameConstants.camelCaseToString(GameConstants.Region[player.highestRegion()])} Master`).isCompleted();
 
-        return nextStartingTownUnlocked && (fullDex || !challengeActive) && MapHelper.isRegionCleared(player.highestRegion());
-    }
-
-    public static isRegionCleared(region: GameConstants.Region) {
-        let check = App.game.party.caughtPokemon.every(pokemon => pokemon.shiny);
-
-        for (let i = 0; check && i <= region; i++) {
-            check = check && Routes.getRoutesByRegion(i).every(r => RouteHelper.routeCompleted(r.number, i, false));
-            check = check && GameConstants.RegionDungeons[i].every(n => DungeonRunner.dungeonCompleted(dungeonList[n], false));
-            check = check && RoamingPokemonList.list[i].every(p => App.game.party.alreadyCaughtPokemonByName(p.pokemon.name));
-        }
-
-        return check;
+        return nextStartingTownUnlocked && (fullDex || !challengeActive);
     }
 
     public static travelToNextRegion() {
