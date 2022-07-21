@@ -4495,7 +4495,9 @@ function setupShinyRequirements() {
             }
 
             isCompleted() {
-                return this.isCompletedLocaly() && this.deepScan(this.gym.parent.requirements) && this.deepScan(this.gym.requirements)
+                return this.isCompletedLocaly() 
+                    && (this.gym.parent.region != player.region || this.deepScan(this.gym.parent.requirements)) 
+                    && this.deepScan(this.gym.requirements)
             }
             
             isCompletedLocaly() {
