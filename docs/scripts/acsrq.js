@@ -4624,7 +4624,7 @@ function setupShinyRequirements() {
         TownList['Fuchsia City'].requirements = [new RouteShinyRequirements(0,18)]
         GymList['Fuchsia City'].requirements = [
             new RouteShinyRequirements(0,18),
-            new CaughtIndicatingRequirement(ItemList.Trade_stone)]
+            new CaughtIndicatingRequirement(ItemList.Linking_cord)]
         TownList['Power Plant'].requirements.push(new ShinySafariRequirement())
         Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement('Power Plant'))
         Routes.getRoute(0,20).requirements = [new ShinyDungeonRequirement('Seafoam Islands')]
