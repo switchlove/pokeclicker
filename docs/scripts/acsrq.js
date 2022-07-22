@@ -4632,10 +4632,14 @@ function setupShinyRequirements() {
         TownList['Pokémon Mansion'].requirements = [
             new RouteShinyRequirements(0,20),
             new CaughtIndicatingRequirement(ItemList.Fire_stone)]
-        Routes.getRoute(0,21).requirements = [
-            new RouteShinyRequirements(0,20),
-            new GymBadgeRequirement(BadgeEnums.Volcano)]
         GymList['Viridian City'].requirements.push(new RouteShinyRequirements(0,21))
+        // Sevii island    
+        Routes.getRoute(0,26).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 0)]
+        Routes.getRoute(0,27).requirements = [new RouteShinyRequirements(0,26)]
+        TownList['Two Island'].requirements = [new ShinyDungeonRequirement('Mt. Ember Summit')]
+        Routes.getRoute(0,28).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 1)]
+        TownList['Three Island'].requirements = [new RouteShinyRequirements(0,28)]
+        Routes.getRoute(0,21).requirements = [new QuestLineCompletedRequirement('Bill\'s Errand')]S
     //#endregion
     //#region Johto
         TownList['Cherrygrove City'].requirements = [new RouteShinyRequirements(1,46)]
@@ -4691,3 +4695,4 @@ function setupShinyRequirements() {
         Routes.getRoute(1,28).requirements.push(new RouteShinyRequirements(1,26))
     //#endregion
 }
+S
