@@ -127,7 +127,7 @@ window.addEventListener("load", function() {
             new SettingOption('Soothe Bell', 'Soothe_bell'),
             new SettingOption('Sun Stone', 'Sun_stone'),
             new SettingOption('Thunder Stone', 'Thunder_stone'),
-            new SettingOption('Trade Stone', 'Trade_stone'),
+            new SettingOption('Linking Cord', 'Linking_cord'),
             new SettingOption('Upgrade', 'Upgrade'),
             new SettingOption('Water Stone', 'Water_stone'),
             new SettingOption('Whipped Dream', 'Whipped_dream'),
@@ -1317,7 +1317,7 @@ function uniqueCheckEvent() {
 }
 
 function boostedRoute() {
-    document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.getIncreasedChanceRouteByRegion(player.region)().routeName;
+    document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
 }
 
 function lastPokeEncounter() {
@@ -1414,32 +1414,41 @@ async function missingShinies() {
                 document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
                 var lootA = [];
-                var lootL = player.town().dungeon.itemList;
-                for (let x = 0; x < lootL.length; x++) {
+                var lootR = [];
+                //var lootL = player.town().dungeon.itemList;
+                var lootIC = player.town().dungeon.lootTable.common
+                var lootIE = player.town().dungeon.lootTable.epic
+                var lootIL = player.town().dungeon.lootTable.mythic
+
+                lootA.concat(lootIC);
+                lootA.concat(lootIE);
+                lootA.concat(lootIL);
+
+                for (let x = 0; x < lootA.length; x++) {
                     if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootA.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
+                        lootR.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
                     }
                 }
                 var lootC = [];
-                for (let x = 0; x < lootA.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(lootA[x], true) == true) {
-                        lootC.push(lootA[x])
+                for (let x = 0; x < lootR.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(lootR[x], true) == true) {
+                        lootC.push(lootR[x])
                     }
                 }
-                lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
-                if (missTemp.length >= 1 && lootA.length >= 1) {
-                    missTemp = missTemp.concat(lootA);
+                lootR = lootR.filter( ( el ) => !lootC.includes( el ) );
+                if (missTemp.length >= 1 && lootR.length >= 1) {
+                    missTemp = missTemp.concat(lootR);
                     missTemp = missTemp.sort().join(', ');
                     document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
                 } else if (missTemp.length == 0) {
-                    if ( lootA.length == 0) {
-                        lootA = 'N/A';
-                    } else if ( lootA.length == 1) {
-                        lootA = lootA[0];
-                    } else if (lootA.length > 1) {
-                        lootA = lootA.sort().join(', ');
+                    if ( lootR.length == 0) {
+                        lootR = 'N/A';
+                    } else if ( lootR.length == 1) {
+                        lootR = lootR[0];
+                    } else if (lootR.length > 1) {
+                        lootR = lootR.sort().join(', ');
                     }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootA;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootR;
                 }
             }
             //Shop Poke
