@@ -130,24 +130,24 @@
             <img style="width:100%" src="assets/images/pokeclickerlogo.png">
         </div>
         <div class="col-12 d-flex align-items-center justify-content-center my-3 flex-column flex-md-row">
-            <a class="mb-1 mr-md-1" href="https://discord.gg/a6DFe4p" target="_blank">
-                <img alt="Join our Discord!" src="https://img.shields.io/discord/450412847017754644?color=7289DA&label=Discord&logo=discord&logoColor=7289DA&style=for-the-badge">
+            <a href="https://discord.gg/eRBzdU9tVk">
+                <img alt="Join our Discord!" src="https://img.shields.io/discord/867017886399725599?color=7289DA&label=Discord&logo=discord&logoColor=7289DA&style=for-the-badge">
             </a>
-            <a class="mb-1 mr-md-1" href="https://github.com/pokeclicker/pokeclicker" target="_blank">
-                <img alt="Visit our GitHub!" src="https://img.shields.io/github/package-json/v/pokeclicker/pokeclicker/master?label=GitHub&logo=github&style=for-the-badge">
+            <a href="https://github.com/switchlove/pokeclicker">
+                <img alt="Visit our GitHub!" src="https://img.shields.io/github/package-json/v/switchlove/pokeclicker/acsrq-beta?label=GitHub&logo=github&style=for-the-badge">
             </a>
-            <a class="mb-1 mr-md-1" href="https://pokeclicker.miraheze.org/wiki/Home_Page" target="_blank">
-                <img alt="Check out the Wiki!" src="https://img.shields.io/badge/wiki-link-blue?logo=wikimedia-commons&style=for-the-badge">
+            <a href="https://bit.ly/acsrq-leaderboard">
+                <img alt="Checkout the Leaderboard!" src="https://img.shields.io/badge/leaderboard-link-blue?logo=googlesheets&style=for-the-badge">
             </a>
         </div>
         <div class="save-container justify-content-center container row"></div>
-        
+
         <div class="new-import-buttons justify-content-center container row">
             <label class="btn btn-success col-md-4 col-xs-12 mx-1" onclick="Save.key = Rand.string(6); document.querySelector('#saveSelector').remove(); App.start();">New Save</label>
             <label for="import-save" class="btn btn-warning col-md-4 col-xs-12 mx-1" onclick="Save.key = Rand.string(6);">Import Save</label>
         </div>
     </div>
-    
+
     <div class="dropdown-menu py-0" id="saveSelectorContextMenu">
         <a class="dropdown-item" href="#">Action</a>
         <a class="dropdown-item" href="#">Another action</a>
@@ -640,7 +640,7 @@
 <div id="game" class="container loading" data-bind="css: {'container': Settings.getSetting('gameDisplayStyle').observableValue() === 'standard3', 'container-fluid': Settings.getSetting('gameDisplayStyle').observableValue() !== 'standard3'}">
     <div class="row justify-content-center">
         <!--The id title is needed for a default marker for money animation to display when not in a wild battle where the playerMoney span is not visible-->
-        <h1 id="gameTitle">PokéClicker</h1>
+        <h1 id="gameTitle">ACSRQ Beta</h1>
     </div>
     <div class="row justify-content-lg-center" style="text-align: center">
 
@@ -696,7 +696,7 @@
     </div>
 
     <script type="text/html" id="selectedPokeballDisplayTemplate">
-        <img class="pokeball-small clickable pokeball-selected" 
+        <img class="pokeball-small clickable pokeball-selected"
             data-bind="attr: {src: 'assets/images/pokeball/' + GameConstants.Pokeball[$data.value] + '.svg'}, click: function() {App.game.pokeballs.selectedSelection($data.field); App.game.pokeballs.selectedTitle($data.title); $('#pokeballSelectorModal').modal('show')}"/>
     </script>
 
@@ -1223,7 +1223,7 @@
 
 
                     <!-- Gym Battles -->
-                    
+
 <div class="row justify-content-center no-gutters" data-bind="if: App.game.gameState === GameConstants.GameState.gym">
     <div class="col no-gutters clickable" data-bind="click: function() {GymBattle.clickAttack()}" style="height: 220px; display: block;">
         <h2 class="pageItemTitle" style="display: block;">
@@ -1287,7 +1287,7 @@
 
 
                     <!-- One Time Battles -->
-                    
+
 <div class="row justify-content-center no-gutters" data-bind="if: App.game.gameState === GameConstants.GameState.temporaryBattle">
     <div class="col no-gutters clickable" data-bind="click: function() {TemporaryBattleBattle.clickAttack()}" style="height: 220px; display: block;">
         <h2 class="pageItemTitle" style="display: block;">
@@ -1343,7 +1343,7 @@
 
 
                     <!-- Battle Frontier Battles -->
-                    
+
 <div class="row justify-content-center no-gutters" data-bind="if: App.game.gameState == GameConstants.GameState.battleFrontier">
     <div class="col no-gutters" data-bind="if: BattleFrontierBattle.enemyPokemon" style="height: 220px; display: block;">
         <h2 class="pageItemTitle" style="display: block;">
@@ -1589,7 +1589,7 @@
             <!-- /ko -->
 
             <!-- Battle Frontier Information Container  -->
-            
+
 <!-- ko if: App.game.gameState === GameConstants.GameState.battleFrontier -->
 <div id="battleFrontierInformation" class="card sortable-disabled border-secondary mb-3 battle-frontier no-select">
     <div class="card-header p-0">
@@ -1704,7 +1704,7 @@
                         <div class='col-12'>
                             <i>NOTE: These colors can be customized in the settings menu</i>
                         </div>
-                    </div>" 
+                    </div>"
                     data-placement="bottom">ⓘ</button>
                     <button class='btn btn-sm' style="position: absolute; right: 0px; top: 0px; width: auto; height: 41px;"
                     data-bind='style: { background: Weather.color() },
@@ -1755,7 +1755,7 @@
         <!-- ------ -->
 
         <!--Route 1-->
-        
+
 
 <g
 
@@ -1783,13 +1783,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(1, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -1817,12 +1817,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(2, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 2 extension-->
-        
+
 
 <g
 
@@ -1839,7 +1839,7 @@
 
 
         <!--Route 3-->
-        
+
 
 <g
 
@@ -1865,13 +1865,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(3, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 4-->
-        
+
 
 <g
 
@@ -1897,13 +1897,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(4, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 5-->
-        
+
 
 <g
 
@@ -1931,13 +1931,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(5, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 6-->
-        
+
 
 <g
 
@@ -1965,13 +1965,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(6, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 7-->
-        
+
 
 <g
 
@@ -1997,13 +1997,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(7, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 8-->
-        
+
 
 <g
 
@@ -2029,13 +2029,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(8, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 9-->
-        
+
 
 <g
 
@@ -2061,12 +2061,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(9, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 9 extension-->
-        
+
 
 <g
 
@@ -2083,7 +2083,7 @@
 
 
         <!--Route 10-->
-        
+
 
 <g
 
@@ -2099,7 +2099,7 @@
 </g>
 
         <!--Route 10 extension-->
-        
+
 
 <g
 
@@ -2127,12 +2127,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(10, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 10 extension-->
-        
+
 
 <g
 
@@ -2149,7 +2149,7 @@
 
 
         <!--Route 11-->
-        
+
 
 <g
 
@@ -2175,12 +2175,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(11, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 11 extension-->
-        
+
 
 <g
 
@@ -2196,7 +2196,7 @@
 </g>
 
         <!--Route 11 extension-->
-        
+
 
 <g
 
@@ -2213,7 +2213,7 @@
 
 
         <!--Route 12-->
-        
+
 
 <g
 
@@ -2241,13 +2241,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(12, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 13-->
-        
+
 
 <g
 
@@ -2275,13 +2275,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(13, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 14-->
-        
+
 
 <g
 
@@ -2307,13 +2307,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(14, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 15-->
-        
+
 
 <g
 
@@ -2339,12 +2339,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(15, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 15 extension-->
-        
+
 
 <g
 
@@ -2361,7 +2361,7 @@
 
 
         <!--Route 16-->
-        
+
 
 <g
 
@@ -2387,13 +2387,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(16, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 17-->
-        
+
 
 <g
 
@@ -2421,13 +2421,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(17, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 18-->
-        
+
 
 <g
 
@@ -2453,13 +2453,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(18, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 19-->
-        
+
 
 <g
 
@@ -2485,12 +2485,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(19, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 19 extension-->
-        
+
 
 <g
 
@@ -2507,7 +2507,7 @@
 
 
         <!--Route 20-->
-        
+
 
 <g
 
@@ -2533,13 +2533,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(20, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 21-->
-        
+
 
 <g
 
@@ -2567,13 +2567,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(21, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 22-->
-        
+
 
 <g
 
@@ -2599,13 +2599,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(22, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 23-->
-        
+
 
 <g
 
@@ -2633,13 +2633,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(23, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 24-->
-        
+
 
 <g
 
@@ -2667,13 +2667,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(24, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 25-->
-        
+
 
 <g
 
@@ -2699,7 +2699,7 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(25, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
@@ -2709,7 +2709,7 @@
         <!-- ----- -->
 
         <!--Pallet Town-->
-        
+
 
 <rect class="city"
     data-town="Pallet Town"
@@ -2720,7 +2720,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Pallet Town')},
         attr: { class: MapHelper.calculateTownCssClass('Pallet Town') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -2736,7 +2736,7 @@
 
 
         <!--Viridian City-->
-        
+
 
 <rect class="city"
     data-town="Viridian City"
@@ -2760,7 +2760,7 @@
 
 
         <!--Viridian City extension-->
-        
+
 
 <rect class="city"
     data-town="Viridian City"
@@ -2777,7 +2777,7 @@
 
 
         <!--Pewter City-->
-        
+
 
 <rect class="city"
     data-town="Pewter City"
@@ -2801,7 +2801,7 @@
 
 
         <!--Pewter City extension-->
-        
+
 
 <rect class="city"
     data-town="Pewter City"
@@ -2818,7 +2818,7 @@
 
 
         <!--Cerulean City-->
-        
+
 
 <rect class="city"
     data-town="Cerulean City"
@@ -2843,7 +2843,7 @@
 
 
         <!--Vermilion City-->
-        
+
 
 <rect class="city"
     data-town="Vermilion City"
@@ -2868,7 +2868,7 @@
 
 
         <!--Lavender Town-->
-        
+
 
 <rect class="city"
     data-town="Lavender Town"
@@ -2893,7 +2893,7 @@
 
 
         <!--Celadon City-->
-        
+
 
 <rect class="city"
     data-town="Celadon City"
@@ -2917,7 +2917,7 @@
 
 
         <!--Celadon City extension-->
-        
+
 
 <rect class="city"
     data-town="Celadon City"
@@ -2933,7 +2933,7 @@
 
 
         <!--Celadon City extension-->
-        
+
 
 <rect class="city"
     data-town="Celadon City"
@@ -2950,7 +2950,7 @@
 
 
         <!--Saffron City-->
-        
+
 
 <rect class="city"
     data-town="Saffron City"
@@ -2974,7 +2974,7 @@
 
 
         <!--Saffron City extension-->
-        
+
 
 <rect class="city"
     data-town="Saffron City"
@@ -2990,7 +2990,7 @@
 
 
         <!--Saffron City extension-->
-        
+
 
 <rect class="city"
     data-town="Saffron City"
@@ -3007,7 +3007,7 @@
 
 
         <!--Fuchsia City-->
-        
+
 
 <rect class="city"
     data-town="Fuchsia City"
@@ -3032,7 +3032,7 @@
 
 
         <!--Cinnabar Island-->
-        
+
 
 <rect class="city"
     data-town="Cinnabar Island"
@@ -3056,7 +3056,7 @@
 
 
         <!--Cinnabar Island extension-->
-        
+
 
 <rect class="city"
     data-town="Cinnabar Island"
@@ -3072,7 +3072,7 @@
 
 
         <!--Cinnabar Island extension-->
-        
+
 
 <rect class="city"
     data-town="Cinnabar Island"
@@ -3089,7 +3089,7 @@
 
 
         <!--Indigo Plateau Kanto-->
-        
+
 
 <rect class="city"
     data-town="Indigo Plateau Kanto"
@@ -3118,7 +3118,7 @@
         <!-- -------- -->
 
         <!--Viridian Forest-->
-        
+
 
 
     <rect class="city"
@@ -3143,7 +3143,7 @@
 
 
         <!--Mt. Moon-->
-        
+
 
 
     <rect class="city"
@@ -3167,7 +3167,7 @@
 
 
         <!--Mt. Moon extension-->
-        
+
 
 
     <rect class="city"
@@ -3184,7 +3184,7 @@
 
 
         <!--Diglett's Cave Pewter-->
-        
+
 
 
     <rect class="city"
@@ -3208,7 +3208,7 @@
 
 
         <!--Diglett's Cave Vermilion-->
-        
+
 
 
     <rect class="city"
@@ -3233,7 +3233,7 @@
 
 
         <!--Rock Tunnel-->
-        
+
 
 
     <rect class="city"
@@ -3258,7 +3258,7 @@
 
 
         <!--Rocket Game Corner-->
-        
+
 
 
     <rect class="city"
@@ -3283,7 +3283,7 @@
 
 
         <!--Pokémon Tower-->
-        
+
 
 
     <rect class="city"
@@ -3308,7 +3308,7 @@
 
 
         <!--Power Plant-->
-        
+
 
 
     <rect class="city"
@@ -3332,7 +3332,7 @@
 
 
         <!--Power Plant extension-->
-        
+
 
 
     <rect class="city"
@@ -3349,7 +3349,7 @@
 
 
         <!--Silph Co.-->
-        
+
 
 
     <rect class="city"
@@ -3373,7 +3373,7 @@
 
 
         <!--Silph Co. extenstion-->
-        
+
 
 
     <rect class="city"
@@ -3390,7 +3390,7 @@
 
 
         <!--Seafoam Islands-->
-        
+
 
 
     <rect class="city"
@@ -3414,7 +3414,7 @@
 
 
         <!--Seafoam Islands extension-->
-        
+
 
 
     <rect class="city"
@@ -3431,7 +3431,7 @@
 
 
         <!--Pokémon Mansion-->
-        
+
 
 
     <rect class="city"
@@ -3456,7 +3456,7 @@
 
 
         <!--Victory Road-->
-        
+
 
 
     <rect class="city"
@@ -3481,7 +3481,7 @@
 
 
         <!--Cerulean Cave-->
-        
+
 
 
     <rect class="city"
@@ -3509,10 +3509,10 @@
         <!-- PLACES OF INTEREST -->
         <!-- ------------------ -->
 
-        
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="1104"
     y="208"
     height="56"
@@ -3520,10 +3520,10 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-        
+
 
 <rect class="city"
-    data-town="Safari Zone" 
+    data-town="Safari Zone"
     x="752"
     y="624"
     height="80"
@@ -3531,10 +3531,10 @@
     data-bind="click:function(){Safari.openModal()}, attr: { class: Safari.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-        
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="1328"
     y="480"
     height="64"
@@ -3542,10 +3542,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-        
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="1152"
     y="640"
     height="48"
@@ -3553,10 +3553,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="976"
     y="560"
     height="32"
@@ -3564,7 +3564,7 @@
     data-bind="click:function(){MapHelper.openShipModal()}, attr:{ class: player.highestRegion() &gt;= 1 ? &#39;completed&#39; : &#39;locked&#39;}">
 </rect>
 
-        
+
 
 <image href="assets/images/ship.png" xlink:href="assets/images/ship.png"
     x="928"
@@ -3589,7 +3589,7 @@
 </image>
 
 
-        
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="432"
@@ -3614,7 +3614,7 @@
 </image>
 
 
-        
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="432"
@@ -3639,7 +3639,7 @@
 </image>
 
 
-        
+
 
 <image href="assets/images/map/transparent.png" xlink:href="assets/images/map/transparent.png"
     x="640"
@@ -3664,7 +3664,7 @@
 </image>
 
 
-        
+
 
 <image href="assets/images/map/professor_oak.png" xlink:href="assets/images/map/professor_oak.png"
     x="432"
@@ -3689,7 +3689,7 @@
 </image>
 
 
-        
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="288"
@@ -3726,7 +3726,7 @@
         <!-- ------ -->
 
         <!--Treasure Beach-->
-        
+
 
 <g
 
@@ -3754,13 +3754,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(26, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Kindle Road-->
-        
+
 
 <g
 
@@ -3788,13 +3788,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(27, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Cape Brink-->
-        
+
 
 <g
 
@@ -3822,13 +3822,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(28, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Bond Bridge-->
-        
+
 
 <g
 
@@ -3854,7 +3854,7 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(29, 0),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
@@ -3864,7 +3864,7 @@
         <!-- ----- -->
 
         <!--One Island-->
-        
+
 
 <rect class="city"
     data-town="One Island"
@@ -3889,7 +3889,7 @@
 
 
         <!--Mt. Ember-->
-        
+
 
 <rect class="city"
     data-town="Mt. Ember"
@@ -3914,7 +3914,7 @@
 
 
         <!--Two Island-->
-        
+
 
 <rect class="city"
     data-town="Two Island"
@@ -3939,7 +3939,7 @@
 
 
         <!--Three Island-->
-        
+
 
 <rect class="city"
     data-town="Three Island"
@@ -3968,7 +3968,7 @@
         <!-- -------- -->
 
         <!--Mt. Ember Summit-->
-        
+
 
 
 
@@ -3983,7 +3983,7 @@
 
 
         <!--Berry Forest-->
-        
+
 
 
     <rect class="city"
@@ -4007,7 +4007,7 @@
 
 
         <!--Berry Forest extension-->
-        
+
 
 
     <rect class="city"
@@ -4023,7 +4023,7 @@
 
 
         <!--Berry Forest extension-->
-        
+
 
 
     <rect class="city"
@@ -4044,10 +4044,10 @@
         <!-- ------------------ -->
 
         <!--Dock-->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="64"
     y="496"
     height="32"
@@ -4069,7 +4069,7 @@
     <!-- ------ -->
 
     <!--Route 27-->
-    
+
 
 <g
 
@@ -4095,13 +4095,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(27, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 26-->
-    
+
 
 <g
 
@@ -4129,13 +4129,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(26, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 28-->
-    
+
 
 <g
 
@@ -4161,13 +4161,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(28, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 29-->
-    
+
 
 <g
 
@@ -4193,13 +4193,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(29, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 30-->
-    
+
 
 <g
 
@@ -4227,13 +4227,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(30, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 31-->
-    
+
 
 <g
 
@@ -4259,13 +4259,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(31, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 32-->
-    
+
 
 <g
 
@@ -4293,12 +4293,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(32, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 32-->
-     
+
 
 <g
 
@@ -4316,7 +4316,7 @@
 </g>
 
       <!--Extra bit of Route 32-->
-      
+
 
 <g
 
@@ -4335,7 +4335,7 @@
 
 
     <!--Route 33-->
-    
+
 
 <g
 
@@ -4361,13 +4361,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(33, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 34-->
-    
+
 
 <g
 
@@ -4395,12 +4395,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(34, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 34-->
-     
+
 
 <g
 
@@ -4418,7 +4418,7 @@
 </g>
 
       <!--Extra bit of Route 34-->
-      
+
 
 <g
 
@@ -4437,7 +4437,7 @@
 
 
     <!--Route 35-->
-    
+
 
 <g
 
@@ -4465,13 +4465,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(35, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 36-->
-    
+
 
 <g
 
@@ -4497,13 +4497,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(36, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 37-->
-    
+
 
 <g
 
@@ -4531,13 +4531,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(37, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 38-->
-    
+
 
 <g
 
@@ -4563,13 +4563,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(38, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 39-->
-    
+
 
 <g
 
@@ -4597,13 +4597,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(39, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 40-->
-    
+
 
 <g
 
@@ -4631,13 +4631,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(40, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 41-->
-    
+
 
 <g
 
@@ -4665,12 +4665,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(41, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 41-->
-     
+
 
 <g
 
@@ -4688,7 +4688,7 @@
 </g>
 
     <!--Extra bit of Route 41-->
-    
+
 
 <g
 
@@ -4705,7 +4705,7 @@
 
 
     <!--Route 42-->
-    
+
 
 <g
 
@@ -4731,12 +4731,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(42, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 42-->
-     
+
 
 <g
 
@@ -4752,7 +4752,7 @@
 </g>
 
      <!--Extra bit of Route 42-->
-     
+
 
 <g
 
@@ -4769,7 +4769,7 @@
 
 
     <!--Route 43-->
-    
+
 
 <g
 
@@ -4797,13 +4797,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(43, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 44-->
-    
+
 
 <g
 
@@ -4829,12 +4829,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(44, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 44-->
-     
+
 
 <g
 
@@ -4851,7 +4851,7 @@
 
 
     <!--Route 45-->
-    
+
 
 <g
 
@@ -4879,12 +4879,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(45, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Extra bit of Route 45-->
-    
+
 
 <g
 
@@ -4902,7 +4902,7 @@
 </g>
 
     <!--Extra bit of Route 45-->
-   
+
 
 <g
 
@@ -4921,7 +4921,7 @@
 
 
     <!--Route 46-->
-    
+
 
 <g
 
@@ -4949,12 +4949,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(46, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Extra bit of Route 46-->
-    
+
 
 <g
 
@@ -4970,7 +4970,7 @@
 </g>
 
     <!--Extra bit of Route 46-->
-    
+
 
 <g
 
@@ -4989,7 +4989,7 @@
 
 
      <!--Route 47-->
-    
+
 
 <g
 
@@ -5017,13 +5017,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(47, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 48-->
-    
+
 
 <g
 
@@ -5051,7 +5051,7 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(48, 1),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
@@ -5064,7 +5064,7 @@
     <!-- ----- -->
 
     <!--New Bark Town-->
-    
+
 
 <rect class="city"
     data-town="New Bark Town"
@@ -5075,7 +5075,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('New Bark Town')},
         attr: { class: MapHelper.calculateTownCssClass('New Bark Town') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -5091,7 +5091,7 @@
 
 
     <!--Cherrygrove City-->
-    
+
 
 <rect class="city"
     data-town="Cherrygrove City"
@@ -5116,7 +5116,7 @@
 
 
     <!--Violet City-->
-    
+
 
 <rect class="city"
     data-town="Violet City"
@@ -5141,7 +5141,7 @@
 
 
     <!--Azalea Town-->
-    
+
 
 <rect class="city"
     data-town="Azalea Town"
@@ -5166,7 +5166,7 @@
 
 
     <!--Goldenrod City-->
-    
+
 
 <rect class="city"
     data-town="Goldenrod City"
@@ -5191,7 +5191,7 @@
 
 
     <!--Goldenrod City Extension-->
-    
+
 
 <rect class="city"
     data-town="Goldenrod City"
@@ -5208,7 +5208,7 @@
 
 
     <!--Goldenrod City Extension-->
-    
+
 
 <rect class="city"
     data-town="Goldenrod City"
@@ -5225,7 +5225,7 @@
 
 
     <!--Goldenrod City Extension-->
-    
+
 
 <rect class="city"
     data-town="Goldenrod City"
@@ -5242,7 +5242,7 @@
 
 
     <!--Ecruteak City-->
-    
+
 
 <rect class="city"
     data-town="Ecruteak City"
@@ -5267,7 +5267,7 @@
 
 
     <!--Olivine City-->
-    
+
 
 <rect class="city"
     data-town="Olivine City"
@@ -5291,7 +5291,7 @@
 
 
      <!--Olivine City Extension-->
-     
+
 
 <rect class="city"
     data-town="Olivine City"
@@ -5308,7 +5308,7 @@
 
 
     <!--Cianwood City-->
-    
+
 
 <rect class="city"
     data-town="Cianwood City"
@@ -5333,7 +5333,7 @@
 
 
     <!--Mahogany Town-->
-    
+
 
 <rect class="city"
     data-town="Mahogany Town"
@@ -5358,7 +5358,7 @@
 
 
     <!--Blackthorn City-->
-    
+
 
 <rect class="city"
     data-town="Blackthorn City"
@@ -5383,7 +5383,7 @@
 
 
     <!--Indigo Plateau 2.0-->
-    
+
 
 <rect class="city"
     data-town="Indigo Plateau Johto"
@@ -5408,7 +5408,7 @@
 
 
     <!--Indigo Plateau 2.0 Extension-->
-    
+
 
 <rect class="city"
     data-town="Indigo Plateau Johto"
@@ -5432,7 +5432,7 @@
     <!-- -------- -->
 
     <!--Sprout Tower-->
-    
+
 
 
     <rect class="city"
@@ -5456,7 +5456,7 @@
 
 
     <!--Sprout Tower Extension-->
-    
+
 
 
     <rect class="city"
@@ -5473,7 +5473,7 @@
 
 
     <!--Ruins of Alph-->
-    
+
 
 
     <rect class="city"
@@ -5498,7 +5498,7 @@
 
 
     <!--Union Cave-->
-    
+
 
 
     <rect class="city"
@@ -5523,7 +5523,7 @@
 
 
     <!--Slowpoke Well-->
-    
+
 
 
     <rect class="city"
@@ -5548,7 +5548,7 @@
 
 
     <!--Ilex Forest-->
-    
+
 
 
     <rect class="city"
@@ -5573,7 +5573,7 @@
 
 
     <!--Burned Tower-->
-    
+
 
 
     <rect class="city"
@@ -5597,7 +5597,7 @@
 
 
      <!--Burned Tower Extension-->
-     
+
 
 
     <rect class="city"
@@ -5614,7 +5614,7 @@
 
 
     <!--Tin Tower-->
-    
+
 
 
     <rect class="city"
@@ -5638,7 +5638,7 @@
 
 
      <!--Tin Tower Extension-->
-     
+
 
 
     <rect class="city"
@@ -5655,7 +5655,7 @@
 
 
     <!--Whirl Islands-->
-    
+
 
 
     <rect class="city"
@@ -5680,7 +5680,7 @@
 
 
     <!--Mt. Mortar-->
-    
+
 
 
     <rect class="city"
@@ -5704,7 +5704,7 @@
 
 
      <!--Mt. Mortar Extension-->
-     
+
 
 
     <rect class="city"
@@ -5721,7 +5721,7 @@
 
 
     <!--Team Rocket's Hideout-->
-    
+
 
 
 
@@ -5736,7 +5736,7 @@
 
 
     <!--Radio Tower-->
-    
+
 
 
     <rect class="city"
@@ -5761,7 +5761,7 @@
 
 
     <!--Radio Tower Extension-->
-    
+
 
 
     <rect class="city"
@@ -5778,7 +5778,7 @@
 
 
     <!--Ice Path-->
-    
+
 
 
     <rect class="city"
@@ -5802,7 +5802,7 @@
 
 
      <!--Ice Path Extension-->
-     
+
 
 
     <rect class="city"
@@ -5819,7 +5819,7 @@
 
 
     <!--Dark Cave-->
-    
+
 
 
     <rect class="city"
@@ -5843,7 +5843,7 @@
 
 
      <!--Dark Cave Extension-->
-     
+
 
 
     <rect class="city"
@@ -5859,7 +5859,7 @@
 
 
      <!--Dark Cave Extension-->
-     
+
 
 
     <rect class="city"
@@ -5884,7 +5884,7 @@
 
 
     <!--Victory Road Johto-->
-    
+
 
 
     <rect class="city"
@@ -5909,7 +5909,7 @@
 
 
     <!--Mt. Silver-->
-    
+
 
 
     <rect class="city"
@@ -5933,7 +5933,7 @@
 
 
      <!--Mt. Silver Extension-->
-     
+
 
 
     <rect class="city"
@@ -5956,10 +5956,10 @@
     <!-- PLACES OF INTEREST -->
     <!-- ------------------ -->
 
-    
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="240"
     y="368"
     height="64"
@@ -5967,10 +5967,10 @@
     data-bind="click:function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Olivine City&#39;) }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="624"
     y="464"
     height="64"
@@ -5978,10 +5978,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="576"
     y="224"
     height="48"
@@ -5989,10 +5989,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="448"
     y="608"
     height="64"
@@ -6000,7 +6000,7 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="1184"
@@ -6025,7 +6025,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="1184"
@@ -6050,7 +6050,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="0"
@@ -6088,7 +6088,7 @@
     <!-- ------ -->
 
     <!--Route 101-->
-    
+
 
 <g
 
@@ -6114,13 +6114,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(101, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 102-->
-    
+
 
 <g
 
@@ -6146,13 +6146,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(102, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 103-->
-    
+
 
 <g
 
@@ -6178,13 +6178,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(103, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 104-->
-    
+
 
 <g
 
@@ -6212,12 +6212,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(104, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 104 extension-->
-    
+
 
 <g
 
@@ -6234,7 +6234,7 @@
 
 
     <!--Route 105-->
-    
+
 
 <g
 
@@ -6262,13 +6262,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(105, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 106-->
-    
+
 
 <g
 
@@ -6294,13 +6294,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(106, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 107-->
-    
+
 
 <g
 
@@ -6326,13 +6326,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(107, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 108-->
-    
+
 
 <g
 
@@ -6358,13 +6358,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(108, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 109-->
-    
+
 
 <g
 
@@ -6392,13 +6392,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(109, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 110-->
-    
+
 
 <g
 
@@ -6426,13 +6426,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(110, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 111-->
-    
+
 
 <g
 
@@ -6460,13 +6460,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(111, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 112-->
-    
+
 
 <g
 
@@ -6492,13 +6492,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(112, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 113-->
-    
+
 
 <g
 
@@ -6524,13 +6524,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(113, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 114-->
-    
+
 
 <g
 
@@ -6558,12 +6558,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(114, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 114 extension-->
-    
+
 
 <g
 
@@ -6580,7 +6580,7 @@
 
 
     <!--Route 115-->
-    
+
 
 <g
 
@@ -6608,12 +6608,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(115, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 115 extension-->
-    
+
 
 <g
 
@@ -6630,7 +6630,7 @@
 
 
     <!--Route 116-->
-    
+
 
 <g
 
@@ -6656,12 +6656,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(116, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 116 extension-->
-    
+
 
 <g
 
@@ -6678,7 +6678,7 @@
 
 
     <!--Route 117-->
-    
+
 
 <g
 
@@ -6704,13 +6704,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(117, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 118-->
-    
+
 
 <g
 
@@ -6736,13 +6736,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(118, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 119-->
-    
+
 
 <g
 
@@ -6770,13 +6770,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(119, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 120-->
-    
+
 
 <g
 
@@ -6804,13 +6804,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(120, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 121-->
-    
+
 
 <g
 
@@ -6836,13 +6836,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(121, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 122-->
-    
+
 
 <g
 
@@ -6870,12 +6870,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(122, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 122 extension-->
-    
+
 
 <g
 
@@ -6891,7 +6891,7 @@
 </g>
 
     <!--Route 122 extension-->
-    
+
 
 <g
 
@@ -6908,7 +6908,7 @@
 
 
     <!--Route 123-->
-    
+
 
 <g
 
@@ -6934,13 +6934,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(123, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 124-->
-    
+
 
 <g
 
@@ -6966,12 +6966,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(124, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 124 extension-->
-    
+
 
 <g
 
@@ -6987,7 +6987,7 @@
 </g>
 
     <!--Route 124 extension-->
-    
+
 
 <g
 
@@ -7004,7 +7004,7 @@
 
 
     <!--Route 125-->
-    
+
 
 <g
 
@@ -7030,12 +7030,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(125, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 125 extension-->
-    
+
 
 <g
 
@@ -7051,7 +7051,7 @@
 </g>
 
     <!--Route 125 extension-->
-    
+
 
 <g
 
@@ -7067,7 +7067,7 @@
 </g>
 
     <!--Route 125 extension-->
-    
+
 
 <g
 
@@ -7083,7 +7083,7 @@
 </g>
 
     <!--Route 125 extension-->
-    
+
 
 <g
 
@@ -7100,7 +7100,7 @@
 
 
     <!--Route 126-->
-    
+
 
 <g
 
@@ -7126,12 +7126,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(126, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 126 extension-->
-    
+
 
 <g
 
@@ -7147,7 +7147,7 @@
 </g>
 
     <!--Route 126 extension-->
-    
+
 
 <g
 
@@ -7163,7 +7163,7 @@
 </g>
 
     <!--Route 126 extension-->
-    
+
 
 <g
 
@@ -7179,7 +7179,7 @@
 </g>
 
     <!--Route 126 extension-->
-    
+
 
 <g
 
@@ -7196,7 +7196,7 @@
 
 
     <!--Route 127-->
-    
+
 
 <g
 
@@ -7222,12 +7222,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(127, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 127 extension-->
-    
+
 
 <g
 
@@ -7243,7 +7243,7 @@
 </g>
 
     <!--Route 127 extension-->
-    
+
 
 <g
 
@@ -7259,7 +7259,7 @@
 </g>
 
     <!--Route 127 extension-->
-    
+
 
 <g
 
@@ -7275,7 +7275,7 @@
 </g>
 
     <!--Route 127 extension-->
-    
+
 
 <g
 
@@ -7292,7 +7292,7 @@
 
 
     <!--Route 128-->
-    
+
 
 <g
 
@@ -7318,13 +7318,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(128, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 129-->
-    
+
 
 <g
 
@@ -7350,13 +7350,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(129, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 130-->
-    
+
 
 <g
 
@@ -7382,13 +7382,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(130, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 131-->
-    
+
 
 <g
 
@@ -7414,13 +7414,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(131, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 132-->
-    
+
 
 <g
 
@@ -7446,13 +7446,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(132, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 133-->
-    
+
 
 <g
 
@@ -7478,13 +7478,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(133, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 134-->
-    
+
 
 <g
 
@@ -7510,7 +7510,7 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(134, 2),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
@@ -7520,7 +7520,7 @@
     <!-- ----- -->
 
     <!--Littleroot Town-->
-    
+
 
 <rect class="city"
     data-town="Littleroot Town"
@@ -7531,7 +7531,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Littleroot Town')},
         attr: { class: MapHelper.calculateTownCssClass('Littleroot Town') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -7547,7 +7547,7 @@
 
 
     <!--Oldale Town-->
-    
+
 
 <rect class="city"
     data-town="Oldale Town"
@@ -7572,7 +7572,7 @@
 
 
     <!--Petalburg City-->
-    
+
 
 <rect class="city"
     data-town="Petalburg City"
@@ -7597,7 +7597,7 @@
 
 
     <!--Rustboro City-->
-    
+
 
 <rect class="city"
     data-town="Rustboro City"
@@ -7622,7 +7622,7 @@
 
 
     <!--Dewford Town-->
-    
+
 
 <rect class="city"
     data-town="Dewford Town"
@@ -7647,7 +7647,7 @@
 
 
     <!--Slateport City-->
-    
+
 
 <rect class="city"
     data-town="Slateport City"
@@ -7672,7 +7672,7 @@
 
 
     <!--Mauville City-->
-    
+
 
 <rect class="city"
     data-town="Mauville City"
@@ -7696,7 +7696,7 @@
 
 
     <!--Mauville City extension-->
-    
+
 
 <rect class="city"
     data-town="Mauville City"
@@ -7713,7 +7713,7 @@
 
 
     <!--Verdanturf Town-->
-    
+
 
 <rect class="city"
     data-town="Verdanturf Town"
@@ -7738,7 +7738,7 @@
 
 
     <!--Mt. Chimney-->
-    
+
 
 <rect class="city"
     data-town="Mt. Chimney"
@@ -7762,7 +7762,7 @@
 
 
     <!--Mt. Chimney extension-->
-    
+
 
 <rect class="city"
     data-town="Mt. Chimney"
@@ -7779,7 +7779,7 @@
 
 
     <!--Fallarbor Town-->
-    
+
 
 <rect class="city"
     data-town="Fallarbor Town"
@@ -7804,7 +7804,7 @@
 
 
     <!--Lavaridge Town-->
-    
+
 
 <rect class="city"
     data-town="Lavaridge Town"
@@ -7829,7 +7829,7 @@
 
 
     <!--Fortree City-->
-    
+
 
 <rect class="city"
     data-town="Fortree City"
@@ -7854,7 +7854,7 @@
 
 
     <!--Lilycove City-->
-    
+
 
 <rect class="city"
     data-town="Lilycove City"
@@ -7878,7 +7878,7 @@
 
 
     <!--Lilycove City extension-->
-    
+
 
 <rect class="city"
     data-town="Lilycove City"
@@ -7895,7 +7895,7 @@
 
 
     <!--Mossdeep City-->
-    
+
 
 <rect class="city"
     data-town="Mossdeep City"
@@ -7919,7 +7919,7 @@
 
 
     <!--Mossdeep City extension-->
-    
+
 
 <rect class="city"
     data-town="Mossdeep City"
@@ -7936,7 +7936,7 @@
 
 
     <!--Sootopolis City-->
-    
+
 
 <rect class="city"
     data-town="Sootopolis City"
@@ -7961,7 +7961,7 @@
 
 
     <!--Pacifidlog Town-->
-    
+
 
 <rect class="city"
     data-town="Pacifidlog Town"
@@ -7986,7 +7986,7 @@
 
 
     <!--Ever Grande City-->
-    
+
 
 <rect class="city"
     data-town="Ever Grande City"
@@ -8011,7 +8011,7 @@
 
 
     <!--Pokémon League Hoenn-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Hoenn"
@@ -8035,7 +8035,7 @@
 
 
     <!--Pokémon League Hoenn extension-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Hoenn"
@@ -8052,7 +8052,7 @@
 
 
     <!--Battle Frontier-->
-    
+
 
 <rect class="city"
     data-town="Battle Frontier"
@@ -8076,7 +8076,7 @@
 
 
     <!--Battle Frontier extension-->
-    
+
 
 <rect class="city"
     data-town="Battle Frontier"
@@ -8097,7 +8097,7 @@
     <!-- -------- -->
 
     <!--Petalburg Woods-->
-    
+
 
 
     <rect class="city"
@@ -8122,7 +8122,7 @@
 
 
     <!--Rusturf Tunnel-->
-    
+
 
 
     <rect class="city"
@@ -8147,7 +8147,7 @@
 
 
     <!--Granite Cave-->
-    
+
 
 
     <rect class="city"
@@ -8172,7 +8172,7 @@
 
 
     <!--Fiery Path-->
-    
+
 
 
 
@@ -8187,7 +8187,7 @@
 
 
     <!--Mt. Chimney Crater-->
-    
+
 
 
 
@@ -8202,7 +8202,7 @@
 
 
     <!--Jagged Pass-->
-    
+
 
 
 
@@ -8217,7 +8217,7 @@
 
 
     <!--Magma Hideout-->
-    
+
 
 
 
@@ -8232,7 +8232,7 @@
 
 
     <!--New Mauville-->
-    
+
 
 
     <rect class="city"
@@ -8257,7 +8257,7 @@
 
 
     <!--Meteor Falls-->
-    
+
 
 
     <rect class="city"
@@ -8282,7 +8282,7 @@
 
 
     <!--Weather Institute-->
-    
+
 
 
     <rect class="city"
@@ -8307,7 +8307,7 @@
 
 
     <!--Mt. Pyre-->
-    
+
 
 
     <rect class="city"
@@ -8331,7 +8331,7 @@
 
 
     <!--Mt. Pyre extension-->
-    
+
 
 
     <rect class="city"
@@ -8348,7 +8348,7 @@
 
 
     <!--Aqua Hideout-->
-    
+
 
 
     <rect class="city"
@@ -8372,7 +8372,7 @@
 
 
     <!--Aqua Hideout extension-->
-    
+
 
 
     <rect class="city"
@@ -8389,7 +8389,7 @@
 
 
     <!--Shoal Cave-->
-    
+
 
 
     <rect class="city"
@@ -8414,7 +8414,7 @@
 
 
     <!--Seafloor Cavern-->
-    
+
 
 
     <rect class="city"
@@ -8439,7 +8439,7 @@
 
 
     <!--Sky Pillar-->
-    
+
 
 
     <rect class="city"
@@ -8464,7 +8464,7 @@
 
 
     <!--Cave of Origin-->
-    
+
 
 
     <rect class="city"
@@ -8489,7 +8489,7 @@
 
 
     <!--Hoenn Victory Road-->
-    
+
 
 
     <rect class="city"
@@ -8513,7 +8513,7 @@
 
 
     <!--Hoenn Victory Road extension-->
-    
+
 
 
     <rect class="city"
@@ -8530,7 +8530,7 @@
 
 
     <!--Sealed Chamber-->
-    
+
 
 
     <rect class="city"
@@ -8561,10 +8561,10 @@
     <!-- PLACES OF INTEREST -->
     <!-- ------------------ -->
 
-    
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="528"
     y="720"
     height="32"
@@ -8572,10 +8572,10 @@
     data-bind="click:function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Slateport City&#39;) }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="512"
     y="208"
     height="64"
@@ -8583,10 +8583,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="736"
     y="336"
     height="48"
@@ -8594,10 +8594,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="288"
     y="432"
     height="64"
@@ -8605,7 +8605,7 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="304"
@@ -8630,7 +8630,7 @@
 </image>
 
 
-    
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="304"
@@ -8655,7 +8655,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="800"
@@ -8693,7 +8693,7 @@
     <!-- ------ -->
 
     <!--Route 201-->
-    
+
 
 <g
 
@@ -8719,13 +8719,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(201, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 202-->
-    
+
 
 <g
 
@@ -8753,13 +8753,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(202, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 203-->
-    
+
 
 <g
 
@@ -8785,13 +8785,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(203, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 204-->
-    
+
 
 <g
 
@@ -8819,12 +8819,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(204, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 204 Extension-->
-    
+
 
 <g
 
@@ -8841,7 +8841,7 @@
 
 
     <!--Route 205-->
-    
+
 
 <g
 
@@ -8867,12 +8867,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(205, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 205 Extension-->
-    
+
 
 <g
 
@@ -8888,7 +8888,7 @@
 </g>
 
     <!--Route 205 Extension-->
-    
+
 
 <g
 
@@ -8905,7 +8905,7 @@
 
 
     <!--Route 206-->
-    
+
 
 <g
 
@@ -8933,12 +8933,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(206, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 206 Extension-->
-    
+
 
 <g
 
@@ -8957,7 +8957,7 @@
 
 
     <!--Route 207-->
-    
+
 
 <g
 
@@ -8983,13 +8983,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(207, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 208-->
-    
+
 
 <g
 
@@ -9015,13 +9015,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(208, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 208 extra-->
-    
+
 
 <g
 
@@ -9038,7 +9038,7 @@
 
 
     <!--Route 209-->
-    
+
 
 <g
 
@@ -9066,13 +9066,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(209, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 209 extra bit-->
-    
+
 
 <g
 
@@ -9089,7 +9089,7 @@
 
 
     <!--Route 209 extra 1-->
-    
+
 
 <g
 
@@ -9106,7 +9106,7 @@
 
 
     <!--Route 210 extra-->
-    
+
 
 <g
 
@@ -9125,7 +9125,7 @@
 
 
     <!--Route 210-->
-    
+
 
 <g
 
@@ -9151,13 +9151,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(210, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 211-->
-    
+
 
 <g
 
@@ -9183,13 +9183,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(211, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 211 extra-->
-    
+
 
 <g
 
@@ -9206,7 +9206,7 @@
 
 
     <!--Route 212-->
-    
+
 
 <g
 
@@ -9232,13 +9232,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(212, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 212 extra-->
-    
+
 
 <g
 
@@ -9255,7 +9255,7 @@
 
 
     <!--Route 213-->
-    
+
 
 <g
 
@@ -9281,13 +9281,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(213, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 214-->
-    
+
 
 <g
 
@@ -9315,13 +9315,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(214, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 215-->
-    
+
 
 <g
 
@@ -9347,13 +9347,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(215, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 216-->
-    
+
 
 <g
 
@@ -9379,13 +9379,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(216, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 216 extra-->
-    
+
 
 <g
 
@@ -9402,7 +9402,7 @@
 
 
     <!--Route 217-->
-    
+
 
 <g
 
@@ -9430,13 +9430,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(217, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 217 extra-->
-    
+
 
 <g
 
@@ -9453,7 +9453,7 @@
 
 
     <!--Route 217 extra-->
-    
+
 
 <g
 
@@ -9470,7 +9470,7 @@
 
 
     <!--Route 218-->
-    
+
 
 <g
 
@@ -9496,13 +9496,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(218, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 219-->
-    
+
 
 <g
 
@@ -9530,13 +9530,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(219, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 220-->
-    
+
 
 <g
 
@@ -9562,13 +9562,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(220, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 221-->
-    
+
 
 <g
 
@@ -9594,13 +9594,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(221, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 222-->
-    
+
 
 <g
 
@@ -9626,13 +9626,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(222, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 223-->
-    
+
 
 <g
 
@@ -9660,13 +9660,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(223, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 224-->
-    
+
 
 <g
 
@@ -9694,12 +9694,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(224, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 224 Extension-->
-    
+
 
 <g
 
@@ -9717,7 +9717,7 @@
 </g>
 
     <!--Route 224 Extension (Flower Path)-->
-    
+
 
 <g
 
@@ -9736,7 +9736,7 @@
 
 
     <!--Route 225-->
-    
+
 
 <g
 
@@ -9764,12 +9764,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(225, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 225 extra-->
-    
+
 
 <g
 
@@ -9788,7 +9788,7 @@
 
 
     <!--Route 226-->
-    
+
 
 <g
 
@@ -9814,13 +9814,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(226, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 227-->
-    
+
 
 <g
 
@@ -9848,13 +9848,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(227, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 228-->
-    
+
 
 <g
 
@@ -9882,13 +9882,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(228, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 229-->
-    
+
 
 <g
 
@@ -9914,13 +9914,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(229, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 230-->
-    
+
 
 <g
 
@@ -9946,7 +9946,7 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(230, 3),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
@@ -9956,7 +9956,7 @@
     <!-- ----- -->
 
     <!--Twinleaf Town-->
-    
+
 
 <rect class="city"
     data-town="Twinleaf Town"
@@ -9967,7 +9967,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Twinleaf Town')},
         attr: { class: MapHelper.calculateTownCssClass('Twinleaf Town') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -9983,7 +9983,7 @@
 
 
     <!--Sandgem Town-->
-    
+
 
 <rect class="city"
     data-town="Sandgem Town"
@@ -10008,7 +10008,7 @@
 
 
     <!--Canalave City-->
-    
+
 
 <rect class="city"
     data-town="Canalave City"
@@ -10033,7 +10033,7 @@
 
 
     <!--Jubilife City-->
-    
+
 
 <rect class="city"
     data-town="Jubilife City"
@@ -10057,7 +10057,7 @@
 
 
     <!--Jubilife City extra-->
-    
+
 
 <rect class="city"
     data-town="Jubilife City"
@@ -10074,7 +10074,7 @@
 
 
     <!--Oreburgh City-->
-    
+
 
 <rect class="city"
     data-town="Oreburgh City"
@@ -10099,7 +10099,7 @@
 
 
     <!--Floaroma Town-->
-    
+
 
 <rect class="city"
     data-town="Floaroma Town"
@@ -10124,7 +10124,7 @@
 
 
     <!--Eterna City-->
-    
+
 
 <rect class="city"
     data-town="Eterna City"
@@ -10149,7 +10149,7 @@
 
 
     <!--Team Galactic Eterna Building-->
-    
+
 
 
 
@@ -10165,7 +10165,7 @@
 
 
     <!--Mt. Coronet-->
-    
+
 
 
     <rect class="city"
@@ -10190,7 +10190,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10207,7 +10207,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10224,7 +10224,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10241,7 +10241,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10258,7 +10258,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10275,7 +10275,7 @@
 
 
     <!--Mt. Coronet Extension-->
-    
+
 
 
     <rect class="city"
@@ -10292,7 +10292,7 @@
 
 
     <!--Hearthome City-->
-    
+
 
 <rect class="city"
     data-town="Hearthome City"
@@ -10317,7 +10317,7 @@
 
 
     <!--Hearthome City extra-->
-    
+
 
 <rect class="city"
     data-town="Hearthome City"
@@ -10334,7 +10334,7 @@
 
 
     <!--Celestic Town-->
-    
+
 
 <rect class="city"
     data-town="Celestic Town"
@@ -10359,7 +10359,7 @@
 
 
     <!--Veilstone City-->
-    
+
 
 <rect class="city"
     data-town="Veilstone City"
@@ -10384,7 +10384,7 @@
 
 
     <!--Veilstone City extra-->
-    
+
 
 <rect class="city"
     data-town="Veilstone City"
@@ -10401,7 +10401,7 @@
 
 
     <!--Solaceon Town-->
-    
+
 
 <rect class="city"
     data-town="Solaceon Town"
@@ -10426,7 +10426,7 @@
 
 
     <!--Pastoria City-->
-    
+
 
 <rect class="city"
     data-town="Pastoria City"
@@ -10451,7 +10451,7 @@
 
 
     <!--Sunyshore City-->
-    
+
 
 <rect class="city"
     data-town="Sunyshore City"
@@ -10476,7 +10476,7 @@
 
 
     <!--Sunyshore City extra-->
-    
+
 
 <rect class="city"
     data-town="Sunyshore City"
@@ -10493,7 +10493,7 @@
 
 
     <!--Snowpoint City-->
-    
+
 
 <rect class="city"
     data-town="Snowpoint City"
@@ -10518,7 +10518,7 @@
 
 
     <!--Fight Area-->
-    
+
 
 <rect class="city"
     data-town="Fight Area"
@@ -10543,7 +10543,7 @@
 
 
     <!--Survival Area-->
-    
+
 
 <rect class="city"
     data-town="Survival Area"
@@ -10568,7 +10568,7 @@
 
 
     <!--Resort Area-->
-    
+
 
 <rect class="city"
     data-town="Resort Area"
@@ -10593,7 +10593,7 @@
 
 
     <!--Pal Park-->
-    
+
 
 <rect class="city"
     data-town="Pal Park"
@@ -10618,7 +10618,7 @@
 
 
     <!--Pokémon League Sinnoh-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Sinnoh"
@@ -10643,7 +10643,7 @@
 
 
     <!--Pokémon League Sinnoh Extension-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Sinnoh"
@@ -10664,7 +10664,7 @@
     <!-- -------- -->
 
     <!--Lake Verity-->
-    
+
 
 
     <rect class="city"
@@ -10689,7 +10689,7 @@
 
 
     <!--Valley Windworks-->
-    
+
 
 
     <rect class="city"
@@ -10714,7 +10714,7 @@
 
 
     <!--Eterna Forest-->
-    
+
 
 
     <rect class="city"
@@ -10739,7 +10739,7 @@
 
 
     <!--Old Chateau-->
-    
+
 
 
     <rect class="city"
@@ -10764,7 +10764,7 @@
 
 
     <!--Oreburgh Gate-->
-    
+
 
 
     <rect class="city"
@@ -10789,7 +10789,7 @@
 
 
     <!--Wayward Cave-->
-    
+
 
 
     <rect class="city"
@@ -10815,7 +10815,7 @@
 
 
     <!--Mt. Coronet South-->
-    
+
 
 
 
@@ -10830,7 +10830,7 @@
 
 
     <!--Mt. Coronet North-->
-    
+
 
 
 
@@ -10845,7 +10845,7 @@
 
 
     <!--Spear Pillar-->
-    
+
 
 
 
@@ -10860,7 +10860,7 @@
 
 
     <!--Hall of Origin-->
-    
+
 
 
 
@@ -10875,7 +10875,7 @@
 
 
     <!--Solaceon Ruins-->
-    
+
 
 
     <rect class="city"
@@ -10899,7 +10899,7 @@
 
 
     <!--Lake Valor-->
-    
+
 
 
     <rect class="city"
@@ -10924,7 +10924,7 @@
 
 
     <!--Lake Acuity-->
-    
+
 
 
     <rect class="city"
@@ -10949,7 +10949,7 @@
 
 
     <!--Snowpoint Temple-->
-    
+
 
 
     <rect class="city"
@@ -10974,7 +10974,7 @@
 
 
     <!--Team Galactic HQ-->
-    
+
 
 
 
@@ -10989,7 +10989,7 @@
 
 
     <!--Fullmoon Island-->
-    
+
 
 
     <rect class="city"
@@ -11014,7 +11014,7 @@
 
 
     <!--Newmoon Island-->
-    
+
 
 
     <rect class="city"
@@ -11039,7 +11039,7 @@
 
 
     <!--Iron Island-->
-    
+
 
 
     <rect class="city"
@@ -11064,7 +11064,7 @@
 
 
     <!--Flower Paradise-->
-    
+
 
 
     <rect class="city"
@@ -11089,7 +11089,7 @@
 
 
     <!--Stark Mountain-->
-    
+
 
 
     <rect class="city"
@@ -11114,7 +11114,7 @@
 
 
     <!--Victory Road Sinnoh-->
-    
+
 
 
     <rect class="city"
@@ -11139,7 +11139,7 @@
 
 
     <!--Sendoff Spring-->
-    
+
 
 
     <rect class="city"
@@ -11164,7 +11164,7 @@
 
 
     <!--Sendoff Spring Extension-->
-    
+
 
 
     <rect class="city"
@@ -11184,10 +11184,10 @@
     <!-- PLACES OF INTEREST -->
     <!-- ------------------ -->
 
-    
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="96"
     y="592"
     height="64"
@@ -11195,10 +11195,10 @@
     data-bind="click: function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Canalave City&#39;) }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="912"
     y="608"
     height="64"
@@ -11206,10 +11206,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="1072"
     y="592"
     height="48"
@@ -11217,10 +11217,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="784"
     y="560"
     height="64"
@@ -11228,7 +11228,7 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <image href="assets/images/map/distortion_world.png" xlink:href="assets/images/map/distortion_world.png"
     x="624"
@@ -11253,7 +11253,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/distortion_world.png" xlink:href="assets/images/map/distortion_world.png"
     x="1184"
@@ -11278,7 +11278,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="192"
@@ -11303,7 +11303,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="192"
@@ -11328,7 +11328,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="1120"
@@ -11366,7 +11366,7 @@
     <!-- ------ -->
 
     <!--Route 1-->
-    
+
 
 <g
 
@@ -11394,13 +11394,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(1, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 2-->
-    
+
 
 <g
 
@@ -11428,13 +11428,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(2, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 3-->
-    
+
 
 <g
 
@@ -11460,13 +11460,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(3, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 4-->
-    
+
 
 <g
 
@@ -11494,12 +11494,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(4, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 4 extension-->
-    
+
 
 <g
 
@@ -11516,7 +11516,7 @@
 
 
     <!--Desert Resort-->
-    
+
 
 <g
 
@@ -11542,12 +11542,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(25, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Desert Resort extension-->
-    
+
 
 <g
 
@@ -11564,7 +11564,7 @@
 
 
     <!--Route 5-->
-    
+
 
 <g
 
@@ -11590,13 +11590,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(5, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 6-->
-    
+
 
 <g
 
@@ -11622,12 +11622,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(6, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 6 extension-->
-    
+
 
 <g
 
@@ -11644,7 +11644,7 @@
 
 
     <!--Route 7-->
-    
+
 
 <g
 
@@ -11670,12 +11670,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(7, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Route 7 extension-->
-    
+
 
 <g
 
@@ -11692,7 +11692,7 @@
 
 
     <!--Route 8-->
-    
+
 
 <g
 
@@ -11718,13 +11718,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(8, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 9-->
-    
+
 
 <g
 
@@ -11750,13 +11750,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(9, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 11-->
-    
+
 
 <g
 
@@ -11782,13 +11782,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(11, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 12-->
-    
+
 
 <g
 
@@ -11814,13 +11814,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(12, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 13-->
-    
+
 
 <g
 
@@ -11846,12 +11846,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(13, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 13 extension-->
-    
+
 
 <g
 
@@ -11867,7 +11867,7 @@
 </g>
 
     <!--Route 13 extension-->
-    
+
 
 <g
 
@@ -11883,7 +11883,7 @@
 </g>
 
     <!--Route 13 extension-->
-    
+
 
 <g
 
@@ -11899,7 +11899,7 @@
 </g>
 
     <!--Route 13 extension-->
-    
+
 
 <g
 
@@ -11916,7 +11916,7 @@
 
 
     <!--Route 14-->
-    
+
 
 <g
 
@@ -11942,12 +11942,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(14, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 14 extension-->
-    
+
 
 <g
 
@@ -11963,7 +11963,7 @@
 </g>
 
     <!--Route 14 extension-->
-    
+
 
 <g
 
@@ -11980,7 +11980,7 @@
 
 
     <!--Route 15-->
-    
+
 
 <g
 
@@ -12006,13 +12006,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(15, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 16-->
-    
+
 
 <g
 
@@ -12038,13 +12038,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(16, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 17-->
-    
+
 
 <g
 
@@ -12070,12 +12070,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(17, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 17 extension-->
-    
+
 
 <g
 
@@ -12091,7 +12091,7 @@
 </g>
 
     <!--Route 17 extension-->
-    
+
 
 <g
 
@@ -12108,7 +12108,7 @@
 
 
     <!--Route 18-->
-    
+
 
 <g
 
@@ -12134,13 +12134,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(18, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 19-->
-    
+
 
 <g
 
@@ -12168,12 +12168,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(19, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
      <!--Route 19 extension-->
-     
+
 
 <g
 
@@ -12190,7 +12190,7 @@
 
 
     <!--Route 20-->
-    
+
 
 <g
 
@@ -12216,13 +12216,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(20, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 21-->
-    
+
 
 <g
 
@@ -12250,13 +12250,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(21, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Undella Bay-->
-    
+
 
 <g
 
@@ -12282,12 +12282,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(24, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Undella Bay extension-->
-    
+
 
 <g
 
@@ -12306,7 +12306,7 @@
 
 
      <!--Route 22-->
-    
+
 
 <g
 
@@ -12332,13 +12332,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(22, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 23-->
-    
+
 
 <g
 
@@ -12364,12 +12364,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(23, 4),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 23 extension-->
-    
+
 
 <g
 
@@ -12385,7 +12385,7 @@
 </g>
 
     <!--Route 23 extension-->
-    
+
 
 <g
 
@@ -12401,7 +12401,7 @@
 </g>
 
     <!--Route 23 extension-->
-    
+
 
 <g
 
@@ -12423,7 +12423,7 @@
     <!-- ----- -->
 
     <!--Nuvema Town-->
-    
+
 
 <rect class="city"
     data-town="Nuvema Town"
@@ -12448,7 +12448,7 @@
 
 
     <!--Accumula Town-->
-    
+
 
 <rect class="city"
     data-town="Accumula Town"
@@ -12473,7 +12473,7 @@
 
 
     <!--Striaton City-->
-    
+
 
 <rect class="city"
     data-town="Striaton City"
@@ -12498,7 +12498,7 @@
 
 
     <!--Nacrene City-->
-    
+
 
 <rect class="city"
     data-town="Nacrene City"
@@ -12523,7 +12523,7 @@
 
 
     <!--Castelia City-->
-    
+
 
 <rect class="city"
     data-town="Castelia City"
@@ -12547,7 +12547,7 @@
 
 
     <!--Castelia City extension-->
-    
+
 
 <rect class="city"
     data-town="Castelia City"
@@ -12564,7 +12564,7 @@
 
 
     <!--Nimbasa City-->
-    
+
 
 <rect class="city"
     data-town="Nimbasa City"
@@ -12588,7 +12588,7 @@
 
 
     <!--Nimbasa City extension-->
-    
+
 
 <rect class="city"
     data-town="Nimbasa City"
@@ -12605,7 +12605,7 @@
 
 
     <!--Driftveil City-->
-    
+
 
 <rect class="city"
     data-town="Driftveil City"
@@ -12629,7 +12629,7 @@
 
 
     <!--Driftveil City extension-->
-    
+
 
 <rect class="city"
     data-town="Driftveil City"
@@ -12646,7 +12646,7 @@
 
 
     <!--Mistralton City-->
-    
+
 
 <rect class="city"
     data-town="Mistralton City"
@@ -12670,7 +12670,7 @@
 
 
     <!--Mistralton City extension-->
-    
+
 
 <rect class="city"
     data-town="Mistralton City"
@@ -12687,7 +12687,7 @@
 
 
     <!--Icirrus City-->
-    
+
 
 <rect class="city"
     data-town="Icirrus City"
@@ -12711,7 +12711,7 @@
 
 
     <!--Icirrus City extension-->
-    
+
 
 <rect class="city"
     data-town="Icirrus City"
@@ -12728,7 +12728,7 @@
 
 
     <!--Opelucid City-->
-    
+
 
 <rect class="city"
     data-town="Opelucid City"
@@ -12752,7 +12752,7 @@
 
 
     <!--Opelucid City extension-->
-    
+
 
 <rect class="city"
     data-town="Opelucid City"
@@ -12769,7 +12769,7 @@
 
 
     <!--Shopping Mall Nine-->
-    
+
 
 <rect class="city"
     data-town="Shopping Mall Nine"
@@ -12794,7 +12794,7 @@
 
 
     <!--Lacunosa Town-->
-    
+
 
 <rect class="city"
     data-town="Lacunosa Town"
@@ -12819,7 +12819,7 @@
 
 
     <!--Undella Town-->
-    
+
 
 <rect class="city"
     data-town="Undella Town"
@@ -12843,7 +12843,7 @@
 
 
     <!--Undella Town extension-->
-    
+
 
 <rect class="city"
     data-town="Undella Town"
@@ -12860,7 +12860,7 @@
 
 
     <!--Lentimas Town-->
-    
+
 
 <rect class="city"
     data-town="Lentimas Town"
@@ -12885,7 +12885,7 @@
 
 
     <!--Black and White Park-->
-    
+
 
 <rect class="city"
     data-town="Black and White Park"
@@ -12909,7 +12909,7 @@
 
 
     <!--Black and White Park extension-->
-    
+
 
 <rect class="city"
     data-town="Black and White Park"
@@ -12926,7 +12926,7 @@
 
 
     <!--Humilau City-->
-    
+
 
 <rect class="city"
     data-town="Humilau City"
@@ -12951,7 +12951,7 @@
 
 
     <!--Aspertia City-->
-    
+
 
 <rect class="city"
     data-town="Aspertia City"
@@ -12962,7 +12962,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Aspertia City')},
         attr: { class: MapHelper.calculateTownCssClass('Aspertia City') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -12978,7 +12978,7 @@
 
 
     <!--Floccesy Town-->
-    
+
 
 <rect class="city"
     data-town="Floccesy Town"
@@ -13003,7 +13003,7 @@
 
 
     <!--Virbank City-->
-    
+
 
 <rect class="city"
     data-town="Virbank City"
@@ -13028,7 +13028,7 @@
 
 
     <!--Anville Town-->
-    
+
 
 <rect class="city"
     data-town="Anville Town"
@@ -13053,7 +13053,7 @@
 
 
     <!--Pokémon League Unova-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Unova"
@@ -13077,7 +13077,7 @@
 
 
     <!--Pokémon League Unova extension-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Unova"
@@ -13098,7 +13098,7 @@
     <!-- -------- -->
 
     <!--P2 Laboratory-->
-    
+
 
 
     <rect class="city"
@@ -13123,7 +13123,7 @@
 
 
     <!--Seaside Cave-->
-    
+
 
 
     <rect class="city"
@@ -13148,7 +13148,7 @@
 
 
     <!--Dreamyard-->
-    
+
 
 
     <rect class="city"
@@ -13173,7 +13173,7 @@
 
 
     <!--Pinwheel Forest-->
-    
+
 
 
     <rect class="city"
@@ -13198,7 +13198,7 @@
 
 
     <!--Castelia Sewers-->
-    
+
 
 
     <rect class="city"
@@ -13223,7 +13223,7 @@
 
 
     <!--Relic Castle-->
-    
+
 
 
     <rect class="city"
@@ -13248,7 +13248,7 @@
 
 
     <!--Relic Passage-->
-    
+
 
 
     <rect class="city"
@@ -13272,7 +13272,7 @@
 
 
     <!--Relic Passage extension-->
-    
+
 
 
     <rect class="city"
@@ -13297,7 +13297,7 @@
 
 
     <!--Mistralton Cave-->
-    
+
 
 
     <rect class="city"
@@ -13322,7 +13322,7 @@
 
 
     <!--Chargestone Cave-->
-    
+
 
 
     <rect class="city"
@@ -13347,7 +13347,7 @@
 
 
     <!--Celestial Tower-->
-    
+
 
 
     <rect class="city"
@@ -13372,7 +13372,7 @@
 
 
     <!--Twist Mountain-->
-    
+
 
 
     <rect class="city"
@@ -13397,7 +13397,7 @@
 
 
     <!--Dragonspiral Tower-->
-    
+
 
 
     <rect class="city"
@@ -13422,7 +13422,7 @@
 
 
     <!--Moor of Icirrus-->
-    
+
 
 
     <rect class="city"
@@ -13447,7 +13447,7 @@
 
 
     <!--Reversal Mountain-->
-    
+
 
 
     <rect class="city"
@@ -13471,7 +13471,7 @@
 
 
     <!--Reversal Mountain extension-->
-    
+
 
 
     <rect class="city"
@@ -13488,7 +13488,7 @@
 
 
     <!--Abundant Shrine-->
-    
+
 
 
     <rect class="city"
@@ -13513,7 +13513,7 @@
 
 
     <!--Lostlorn Forest-->
-    
+
 
 
     <rect class="city"
@@ -13538,7 +13538,7 @@
 
 
     <!--Floccesy Ranch-->
-    
+
 
 
     <rect class="city"
@@ -13563,7 +13563,7 @@
 
 
     <!--Cave of Being-->
-    
+
 
 
     <rect class="city"
@@ -13588,7 +13588,7 @@
 
 
     <!--Liberty Garden-->
-    
+
 
 
     <rect class="city"
@@ -13613,7 +13613,7 @@
 
 
     <!--Giant Chasm-->
-    
+
 
 
     <rect class="city"
@@ -13638,7 +13638,7 @@
 
 
     <!--Victory Road Unova-->
-    
+
 
 
     <rect class="city"
@@ -13663,7 +13663,7 @@
 
 
     <!--Pledge Grove-->
-    
+
 
 
     <rect class="city"
@@ -13690,10 +13690,10 @@
     <!-- ------------------ -->
     <!-- PLACES OF INTEREST -->
     <!-- ------------------ -->
-    
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="816"
     y="848"
     height="112"
@@ -13702,10 +13702,10 @@
 </rect>
 
     <!--Skyarrow Bridge-->
-    
+
 
 <rect class="city"
-    data-town="Skyarrow Bridge" 
+    data-town="Skyarrow Bridge"
     x="992"
     y="640"
     height="112"
@@ -13716,10 +13716,10 @@
             }">
 </rect>
     <!--Skyarrow Bridge extension-->
-    
+
 
 <rect class="city"
-    data-town="Skyarrow Bridge" 
+    data-town="Skyarrow Bridge"
     x="1040"
     y="640"
     height="48"
@@ -13730,10 +13730,10 @@
             }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="864"
     y="576"
     height="64"
@@ -13741,10 +13741,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="336"
     y="736"
     height="48"
@@ -13752,10 +13752,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="1296"
     y="576"
     height="64"
@@ -13763,7 +13763,7 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-    
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="160"
@@ -13788,7 +13788,7 @@
 </image>
 
 
-    
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="160"
@@ -13814,7 +13814,7 @@
 
 
     <!--Plasma Frigate 1, Castelia City-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_ship.png" xlink:href="assets/images/map/plasmafrigate_ship.png"
     x="624"
@@ -13842,7 +13842,7 @@
 
 
     <!--Plasma Frigate 2, Driftveil City-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_ship.png" xlink:href="assets/images/map/plasmafrigate_ship.png"
     x="576"
@@ -13870,7 +13870,7 @@
 
 
     <!--Plasma Frigate 3, Team Plasma Assault dungeon 1-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_airship.png" xlink:href="assets/images/map/plasmafrigate_airship.png"
     x="752"
@@ -13896,7 +13896,7 @@
 
 
     <!--Plasma Frigate 4, Team Plasma Assault dungeon 2-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_airship.png" xlink:href="assets/images/map/plasmafrigate_airship.png"
     x="752"
@@ -13922,7 +13922,7 @@
 
 
     <!--Plasma Frigate 5, Plasma Frigate dungeon 1-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_ship.png" xlink:href="assets/images/map/plasmafrigate_ship.png"
     x="1520"
@@ -13948,7 +13948,7 @@
 
 
     <!--Plasma Frigate 6, Plasma Frigate dungeon 2-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_ship.png" xlink:href="assets/images/map/plasmafrigate_ship.png"
     x="1520"
@@ -13974,7 +13974,7 @@
 
 
     <!--Plasma Frigate 7, Giant Chasm-->
-    
+
 
 <image href="assets/images/map/plasmafrigate_airship.png" xlink:href="assets/images/map/plasmafrigate_airship.png"
     x="1232"
@@ -13999,7 +13999,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="128"
@@ -14037,7 +14037,7 @@
     <!-- ------ -->
 
     <!--Route 1-->
-    
+
 
 <g
 
@@ -14065,13 +14065,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(1, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 2-->
-    
+
 
 <g
 
@@ -14099,13 +14099,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(2, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 3-->
-    
+
 
 <g
 
@@ -14133,13 +14133,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(3, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 4-->
-    
+
 
 <g
 
@@ -14167,13 +14167,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(4, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 5-->
-    
+
 
 <g
 
@@ -14191,7 +14191,7 @@
 </g>
 
     <!--Route 5 extras-->
-    
+
 
 <g
 
@@ -14207,7 +14207,7 @@
 </g>
 
     <!--Route 5 extras-->
-    
+
 
 <g
 
@@ -14233,12 +14233,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(5, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 5 extras-->
-    
+
 
 <g
 
@@ -14256,7 +14256,7 @@
 </g>
 
     <!--Route 5 extras-->
-    
+
 
 <g
 
@@ -14273,7 +14273,7 @@
 
 
     <!--Route 6-->
-    
+
 
 <g
 
@@ -14299,12 +14299,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(6, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 6 extras-->
-    
+
 
 <g
 
@@ -14321,7 +14321,7 @@
 
 
     <!--Route 7-->
-    
+
 
 <g
 
@@ -14347,13 +14347,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(7, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 8-->
-    
+
 
 <g
 
@@ -14381,13 +14381,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(8, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 9-->
-    
+
 
 <g
 
@@ -14413,13 +14413,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(9, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 10-->
-    
+
 
 <g
 
@@ -14445,12 +14445,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(10, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 10 extras-->
-    
+
 
 <g
 
@@ -14467,7 +14467,7 @@
 
 
     <!--Route 11-->
-    
+
 
 <g
 
@@ -14493,13 +14493,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(11, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 12-->
-    
+
 
 <g
 
@@ -14525,13 +14525,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(12, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 13-->
-    
+
 
 <g
 
@@ -14557,12 +14557,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(13, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 13 extras-->
-    
+
 
 <g
 
@@ -14580,7 +14580,7 @@
 </g>
 
     <!--Route 13 extras-->
-    
+
 
 <g
 
@@ -14597,7 +14597,7 @@
 
 
     <!--Route 14-->
-    
+
 
 <g
 
@@ -14625,12 +14625,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(14, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 14 extras-->
-    
+
 
 <g
 
@@ -14649,7 +14649,7 @@
 
 
     <!--Route 15-->
-    
+
 
 <g
 
@@ -14665,7 +14665,7 @@
 </g>
 
     <!--Route 15 extras-->
-    
+
 
 <g
 
@@ -14693,12 +14693,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(15, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 15 extras-->
-    
+
 
 <g
 
@@ -14714,7 +14714,7 @@
 </g>
 
     <!--Route 15 extras-->
-    
+
 
 <g
 
@@ -14730,7 +14730,7 @@
 </g>
 
     <!--Route 15 extras-->
-    
+
 
 <g
 
@@ -14747,7 +14747,7 @@
 
 
     <!--Route 16-->
-    
+
 
 <g
 
@@ -14773,12 +14773,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(16, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 16 extras-->
-    
+
 
 <g
 
@@ -14796,7 +14796,7 @@
 </g>
 
     <!--Route 16 extras-->
-    
+
 
 <g
 
@@ -14813,7 +14813,7 @@
 
 
     <!--Route 17-->
-    
+
 
 <g
 
@@ -14831,7 +14831,7 @@
 </g>
 
     <!--Route 17 extras-->
-    
+
 
 <g
 
@@ -14857,13 +14857,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(17, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 18-->
-    
+
 
 <g
 
@@ -14889,12 +14889,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(18, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 18 extras-->
-    
+
 
 <g
 
@@ -14911,7 +14911,7 @@
 
 
     <!--Route 19-->
-    
+
 
 <g
 
@@ -14927,7 +14927,7 @@
 </g>
 
     <!--Route 19 extras-->
-    
+
 
 <g
 
@@ -14953,12 +14953,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(19, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 19 extras-->
-    
+
 
 <g
 
@@ -14975,7 +14975,7 @@
 
 
     <!--Route 20-->
-    
+
 
 <g
 
@@ -15003,12 +15003,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(20, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
     <!--Route 20 extras-->
-    
+
 
 <g
 
@@ -15025,7 +15025,7 @@
 
 
     <!--Route 21-->
-    
+
 
 <g
 
@@ -15051,13 +15051,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(21, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Route 22-->
-    
+
 
 <g
 
@@ -15083,13 +15083,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(22, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
     <!--Azure Bay-->
-    
+
 
 <g
 
@@ -15105,7 +15105,7 @@
 </g>
 
     <!--Azure Bay extras-->
-    
+
 
 <g
 
@@ -15131,11 +15131,11 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(23, 5),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 <!--Azure Bay extras-->
-    
+
 
 <g
 
@@ -15159,7 +15159,7 @@
     <!-- ----- -->
 
     <!--Vaniville Town-->
-    
+
 
 <rect class="city"
     data-town="Vaniville Town"
@@ -15170,7 +15170,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Vaniville Town')},
         attr: { class: MapHelper.calculateTownCssClass('Vaniville Town') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -15186,7 +15186,7 @@
 
 
     <!--Aquacorde Town-->
-    
+
 
 <rect class="city"
     data-town="Aquacorde Town"
@@ -15211,7 +15211,7 @@
 
 
     <!--Santalune City-->
-    
+
 
 <rect class="city"
     data-town="Santalune City"
@@ -15236,7 +15236,7 @@
 
 
     <!--Lumiose City-->
-    
+
 
 <rect class="city"
     data-town="Lumiose City"
@@ -15260,7 +15260,7 @@
 
 
     <!--Lumiose City extras-->
-    
+
 
 <rect class="city"
     data-town="Lumiose City"
@@ -15277,7 +15277,7 @@
 
 
     <!--Camphrier Town-->
-    
+
 
 <rect class="city"
     data-town="Camphrier Town"
@@ -15302,7 +15302,7 @@
 
 
     <!--Ambrette Town-->
-    
+
 
 <rect class="city"
     data-town="Ambrette Town"
@@ -15327,7 +15327,7 @@
 
 
     <!--Cyllage City-->
-    
+
 
 <rect class="city"
     data-town="Cyllage City"
@@ -15352,7 +15352,7 @@
 
 
     <!--Geosenge Town-->
-    
+
 
 <rect class="city"
     data-town="Geosenge Town"
@@ -15377,7 +15377,7 @@
 
 
     <!--Shalour City-->
-    
+
 
 <rect class="city"
     data-town="Shalour City"
@@ -15402,7 +15402,7 @@
 
 
     <!--Coumarine City-->
-    
+
 
 <rect class="city"
     data-town="Coumarine City"
@@ -15427,7 +15427,7 @@
 
 
     <!--Laverre City-->
-        
+
 
 <rect class="city"
     data-town="Laverre City"
@@ -15451,7 +15451,7 @@
 
 
     <!--Laverre City extras-->
-    
+
 
 <rect class="city"
     data-town="Laverre City"
@@ -15468,7 +15468,7 @@
 
 
     <!--Dendemille Town-->
-    
+
 
 <rect class="city"
     data-town="Dendemille Town"
@@ -15493,7 +15493,7 @@
 
 
     <!--Anistar City-->
-    
+
 
 <rect class="city"
     data-town="Anistar City"
@@ -15518,7 +15518,7 @@
 
 
     <!--Couriway Town-->
-    
+
 
 <rect class="city"
     data-town="Couriway Town"
@@ -15543,7 +15543,7 @@
 
 
     <!--Snowbelle City-->
-    
+
 
 <rect class="city"
     data-town="Snowbelle City"
@@ -15568,7 +15568,7 @@
 
 
     <!--Pokémon League Kalos-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Kalos"
@@ -15593,7 +15593,7 @@
 
 
     <!--Pokémon League Kalos Extension-->
-    
+
 
 <rect class="city"
     data-town="Pokémon League Kalos"
@@ -15610,7 +15610,7 @@
 
 
     <!--Kiloude City-->
-    
+
 
 <rect class="city"
     data-town="Kiloude City"
@@ -15638,7 +15638,7 @@
     <!--DUNGEONS-->
     <!-- ----- -->
 
-    
+
 
 
     <rect class="city"
@@ -15662,7 +15662,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15686,7 +15686,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15710,7 +15710,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15734,7 +15734,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15758,7 +15758,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15782,7 +15782,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15806,7 +15806,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15830,7 +15830,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15854,7 +15854,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15878,7 +15878,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15902,7 +15902,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15926,7 +15926,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15950,7 +15950,7 @@
 
 
 
-    
+
 
 
     <rect class="city"
@@ -15978,10 +15978,10 @@
     <!-- PLACES OF INTEREST -->
     <!-- ------------------ -->
 
-    
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="512"
     y="192"
     height="64"
@@ -15989,10 +15989,10 @@
     data-bind="click:function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Coumarine City&#39;) }">
 </rect>
 
-    
+
 
 <rect class="city"
-    data-town="Underground Entrance" 
+    data-town="Underground Entrance"
     x="144"
     y="336"
     height="64"
@@ -16000,10 +16000,10 @@
     data-bind="click:function(){App.game.underground.openUndergroundModal()}, attr: { class: App.game.underground.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Farm" 
+    data-town="Farm"
     x="544"
     y="592"
     height="48"
@@ -16011,10 +16011,10 @@
     data-bind="click:function(){FarmController.openFarmModal()}, attr: { class: App.game.farming.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <rect class="city"
-    data-town="Pokémon Day Care" 
+    data-town="Pokémon Day Care"
     x="464"
     y="576"
     height="64"
@@ -16022,7 +16022,7 @@
     data-bind="click:function(){BreedingController.openBreedingModal()}, attr: { class: App.game.breeding.canAccess() ? &#39;completed&#39; : &#39;locked&#39; }">
 </rect>
 
-     
+
 
 <image href="assets/images/map/blimp_empty.png" xlink:href="assets/images/map/blimp_empty.png"
     x="912"
@@ -16047,7 +16047,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/blimp_pikachu.png" xlink:href="assets/images/map/blimp_pikachu.png"
     x="912"
@@ -16072,7 +16072,7 @@
 </image>
 
 
-     
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="1232"
@@ -16112,7 +16112,7 @@
         <!-- ------ -->
 
         <!--Route 1-->
-        
+
 
 <g
 
@@ -16138,13 +16138,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(1, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16161,7 +16161,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16178,7 +16178,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16195,7 +16195,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16212,7 +16212,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16229,7 +16229,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16246,7 +16246,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16263,7 +16263,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16280,7 +16280,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16297,7 +16297,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16314,7 +16314,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16331,7 +16331,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16348,7 +16348,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16365,7 +16365,7 @@
 
 
         <!--Route 1 extension-->
-        
+
 
 <g
 
@@ -16382,7 +16382,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts-->
-        
+
 
 <g
 
@@ -16408,13 +16408,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(18, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16431,7 +16431,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16448,7 +16448,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16465,7 +16465,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16482,7 +16482,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16499,7 +16499,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16516,7 +16516,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16533,7 +16533,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16550,7 +16550,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16567,7 +16567,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16584,7 +16584,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16601,7 +16601,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16618,7 +16618,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16635,7 +16635,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16652,7 +16652,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16669,7 +16669,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16686,7 +16686,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16703,7 +16703,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16720,7 +16720,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16737,7 +16737,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16754,7 +16754,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16771,7 +16771,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16788,7 +16788,7 @@
 
 
         <!--Route 1 Hau'oli Outskirts extension-->
-        
+
 
 <g
 
@@ -16805,7 +16805,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16833,13 +16833,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(2, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16856,7 +16856,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16873,7 +16873,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16890,7 +16890,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16907,7 +16907,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16924,7 +16924,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16941,7 +16941,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16958,7 +16958,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16975,7 +16975,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -16992,7 +16992,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -17009,7 +17009,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -17026,7 +17026,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -17043,7 +17043,7 @@
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -17060,7 +17060,7 @@
 
 
         <!--Route 3-->
-        
+
 
 <g
 
@@ -17086,13 +17086,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(3, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17109,7 +17109,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17126,7 +17126,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17143,7 +17143,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17160,7 +17160,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17177,7 +17177,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17194,7 +17194,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17211,7 +17211,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17228,7 +17228,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17245,7 +17245,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17262,7 +17262,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17279,7 +17279,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17296,7 +17296,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17313,7 +17313,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17330,7 +17330,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17347,7 +17347,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17364,7 +17364,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17381,7 +17381,7 @@
 
 
         <!--Route 3 extension-->
-        
+
 
 <g
 
@@ -17398,7 +17398,7 @@
 
 
         <!--Melemele Sea-->
-        
+
 
 <g
 
@@ -17424,13 +17424,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(19, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17447,7 +17447,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17464,7 +17464,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17481,7 +17481,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17498,7 +17498,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17515,7 +17515,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17532,7 +17532,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17549,7 +17549,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17566,7 +17566,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17583,7 +17583,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17600,7 +17600,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17617,7 +17617,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17634,7 +17634,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17651,7 +17651,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17668,7 +17668,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17685,7 +17685,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17702,7 +17702,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17719,7 +17719,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17736,7 +17736,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17753,7 +17753,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17770,7 +17770,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17787,7 +17787,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17804,7 +17804,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17821,7 +17821,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17838,7 +17838,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17855,7 +17855,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17872,7 +17872,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17889,7 +17889,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17906,7 +17906,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17923,7 +17923,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17940,7 +17940,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17957,7 +17957,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17974,7 +17974,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -17991,7 +17991,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18008,7 +18008,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18025,7 +18025,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18042,7 +18042,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18059,7 +18059,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18076,7 +18076,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18094,7 +18094,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18111,7 +18111,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18128,7 +18128,7 @@
 
 
         <!--Melemele Sea extension-->
-        
+
 
 <g
 
@@ -18145,7 +18145,7 @@
 
 
         <!--Kala'e Bay-->
-        
+
 
 <g
 
@@ -18171,13 +18171,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(20, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18194,7 +18194,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18211,7 +18211,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18228,7 +18228,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18245,7 +18245,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18262,7 +18262,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18279,7 +18279,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18296,7 +18296,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18313,7 +18313,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18330,7 +18330,7 @@
 
 
         <!--Kala'e Bay extension-->
-        
+
 
 <g
 
@@ -18351,7 +18351,7 @@
         <!-- ----- -->
 
         <!--Iki Town Outskirts-->
-        
+
 
 <rect class="city"
     data-town="Iki Town Outskirts"
@@ -18362,7 +18362,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Iki Town Outskirts')},
         attr: { class: MapHelper.calculateTownCssClass('Iki Town Outskirts') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -18378,7 +18378,7 @@
 
 
         <!--Iki Town-->
-        
+
 
 <rect class="city"
     data-town="Iki Town"
@@ -18403,7 +18403,7 @@
 
 
         <!--Iki Town extension-->
-        
+
 
 <rect class="city"
     data-town="Iki Town"
@@ -18420,7 +18420,7 @@
 
 
         <!--Professor Kukui\'s Lab-->
-        
+
 
 <rect class="city"
     data-town="Professor Kukui&#39;s Lab"
@@ -18445,7 +18445,7 @@
 
 
         <!--Hau'oli City-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18470,7 +18470,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18487,7 +18487,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18504,7 +18504,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18521,7 +18521,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18538,7 +18538,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18555,7 +18555,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18572,7 +18572,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18589,7 +18589,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18606,7 +18606,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18623,7 +18623,7 @@
 
 
         <!--Hau'oli City Extension-->
-        
+
 
 <rect class="city"
     data-town="Hau&#39;oli City"
@@ -18640,7 +18640,7 @@
 
 
         <!--Melemele Woods-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18665,7 +18665,7 @@
 
 
         <!--Melemele Woods Extension-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18682,7 +18682,7 @@
 
 
         <!--Melemele Woods Extension-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18699,7 +18699,7 @@
 
 
         <!--Melemele Woods Extension-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18716,7 +18716,7 @@
 
 
         <!--Melemele Woods Extension-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18733,7 +18733,7 @@
 
 
         <!--Melemele Woods Extension-->
-        
+
 
 <rect class="city"
     data-town="Melemele Woods"
@@ -18750,7 +18750,7 @@
 
 
         <!--Roadside Motel-->
-        
+
 
 <rect class="city"
     data-town="Roadside Motel"
@@ -18779,7 +18779,7 @@
         <!-- -------- -->
 
         <!--Trainers School-->
-        
+
 
 
     <rect class="city"
@@ -18804,7 +18804,7 @@
 
 
         <!--Hau'oli Cemetery-->
-        
+
 
 
     <rect class="city"
@@ -18829,7 +18829,7 @@
 
 
         <!--Hau'oli Cemetery extension-->
-        
+
 
 
     <rect class="city"
@@ -18846,7 +18846,7 @@
 
 
         <!--Hau'oli Cemetery extension-->
-        
+
 
 
     <rect class="city"
@@ -18863,7 +18863,7 @@
 
 
         <!--Verdant Cavern-->
-        
+
 
 
 
@@ -18878,7 +18878,7 @@
 
 
         <!--Melemele Meadow-->
-        
+
 
 
 
@@ -18893,7 +18893,7 @@
 
 
         <!--Ruins of Conflict-->
-        
+
 
 
 
@@ -18908,7 +18908,7 @@
 
 
         <!--Seaward Cave-->
-        
+
 
 
     <rect class="city"
@@ -18933,7 +18933,7 @@
 
 
         <!--Seaward Cave extension-->
-        
+
 
 
     <rect class="city"
@@ -18950,7 +18950,7 @@
 
 
         <!--Seaward Cave extension-->
-        
+
 
 
     <rect class="city"
@@ -18967,7 +18967,7 @@
 
 
         <!--Ten Carat Hill-->
-        
+
 
 
     <rect class="city"
@@ -18992,7 +18992,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19009,7 +19009,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19026,7 +19026,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19043,7 +19043,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19060,7 +19060,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19077,7 +19077,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19094,7 +19094,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19111,7 +19111,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19128,7 +19128,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19146,7 +19146,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19163,7 +19163,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19180,7 +19180,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19197,7 +19197,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19215,7 +19215,7 @@
 
 
         <!--Ten Carat Hill extension-->
-        
+
 
 
     <rect class="city"
@@ -19236,10 +19236,10 @@
         <!-- ------------------ -->
 
         <!--Dock-->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="352"
     y="736"
     height="96"
@@ -19248,10 +19248,10 @@
 </rect>
 
         <!--Dock extension-->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="480"
     y="688"
     height="48"
@@ -19260,10 +19260,10 @@
 </rect>
 
         <!--Dock extension-->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="368"
     y="720"
     height="16"
@@ -19283,7 +19283,7 @@
         <!-- ------ -->
 
         <!--Route 4-->
-        
+
 
 <g
 
@@ -19309,13 +19309,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(4, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19332,7 +19332,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19349,7 +19349,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19366,7 +19366,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19383,7 +19383,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19400,7 +19400,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19417,7 +19417,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19434,7 +19434,7 @@
 
 
         <!--Route 4 Extension-->
-        
+
 
 <g
 
@@ -19451,7 +19451,7 @@
 
 
         <!--Route 5-->
-        
+
 
 <g
 
@@ -19477,13 +19477,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(5, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 5 Extension-->
-        
+
 
 <g
 
@@ -19500,7 +19500,7 @@
 
 
         <!--Route 5 Extension-->
-        
+
 
 <g
 
@@ -19517,7 +19517,7 @@
 
 
         <!--Route 6-->
-        
+
 
 <g
 
@@ -19543,13 +19543,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(6, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 6 Extension-->
-        
+
 
 <g
 
@@ -19566,7 +19566,7 @@
 
 
         <!--Route 7-->
-        
+
 
 <g
 
@@ -19592,13 +19592,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(7, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19615,7 +19615,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19632,7 +19632,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19649,7 +19649,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19666,7 +19666,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19683,7 +19683,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19700,7 +19700,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19717,7 +19717,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19734,7 +19734,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19751,7 +19751,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19768,7 +19768,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19785,7 +19785,7 @@
 
 
         <!--Route 7 Extension-->
-        
+
 
 <g
 
@@ -19802,7 +19802,7 @@
 
 
         <!--Route 8-->
-        
+
 
 <g
 
@@ -19828,13 +19828,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(8, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19851,7 +19851,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19868,7 +19868,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19885,7 +19885,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19902,7 +19902,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19919,7 +19919,7 @@
 
 
         <!--Route 9-->
-        
+
 
 <g
 
@@ -19945,13 +19945,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(9, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19968,7 +19968,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -19985,7 +19985,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -20002,7 +20002,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -20019,7 +20019,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -20036,7 +20036,7 @@
 
 
         <!--Route 8 Extension-->
-        
+
 
 <g
 
@@ -20053,7 +20053,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20070,7 +20070,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20087,7 +20087,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20104,7 +20104,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20121,7 +20121,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20138,7 +20138,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20155,7 +20155,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20172,7 +20172,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20189,7 +20189,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20206,7 +20206,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20223,7 +20223,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20240,7 +20240,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20257,7 +20257,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20274,7 +20274,7 @@
 
 
         <!--Route 9 Extension-->
-        
+
 
 <g
 
@@ -20291,7 +20291,7 @@
 
 
         <!--Akala Outskirts-->
-        
+
 
 <g
 
@@ -20317,13 +20317,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(21, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Akala Outskirts Extension---->
-        
+
 
 <g
 
@@ -20340,7 +20340,7 @@
 
 
         <!--Akala Outskirts Extension---->
-        
+
 
 <g
 
@@ -20357,7 +20357,7 @@
 
 
         <!--Akala Outskirts Extension---->
-        
+
 
 <g
 
@@ -20378,7 +20378,7 @@
         <!-- ----- -->
 
         <!--Heahea City-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20403,7 +20403,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20420,7 +20420,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20437,7 +20437,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20454,7 +20454,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20471,7 +20471,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20488,7 +20488,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20505,7 +20505,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20522,7 +20522,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20539,7 +20539,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20556,7 +20556,7 @@
 
 
         <!--Heahea City Extension-->
-        
+
 
 <rect class="city"
     data-town="Heahea City"
@@ -20573,7 +20573,7 @@
 
 
         <!--Paniola Town-->
-        
+
 
 <rect class="city"
     data-town="Paniola Town"
@@ -20598,7 +20598,7 @@
 
 
         <!--Paniola Town-->
-        
+
 
 <rect class="city"
     data-town="Paniola Town"
@@ -20615,7 +20615,7 @@
 
 
         <!--Royal Avenue-->
-        
+
 
 <rect class="city"
     data-town="Royal Avenue"
@@ -20640,7 +20640,7 @@
 
 
         <!--Royal Avenue Extension-->
-        
+
 
 <rect class="city"
     data-town="Royal Avenue"
@@ -20657,7 +20657,7 @@
 
 
         <!--Royal Avenue Extension-->
-        
+
 
 <rect class="city"
     data-town="Royal Avenue"
@@ -20674,7 +20674,7 @@
 
 
         <!--Royal Avenue Extension-->
-        
+
 
 <rect class="city"
     data-town="Royal Avenue"
@@ -20691,7 +20691,7 @@
 
 
         <!--Royal Avenue Extension-->
-        
+
 
 <rect class="city"
     data-town="Royal Avenue"
@@ -20708,7 +20708,7 @@
 
 
         <!--Konikoni City-->
-        
+
 
 <rect class="city"
     data-town="Konikoni City"
@@ -20733,7 +20733,7 @@
 
 
         <!--Konikoni City Extension-->
-        
+
 
 <rect class="city"
     data-town="Konikoni City"
@@ -20750,7 +20750,7 @@
 
 
         <!--Aether Paradise-->
-        
+
 
 <rect class="city"
     data-town="Aether Paradise"
@@ -20775,7 +20775,7 @@
 
 
         <!--Roadside Motel-->
-        
+
 
 <rect class="city"
     data-town="Roadside Motel"
@@ -20800,7 +20800,7 @@
 
 
         <!--Roadside Motel Extension-->
-        
+
 
 <rect class="city"
     data-town="Roadside Motel"
@@ -20821,7 +20821,7 @@
         <!-- -------- -->
 
         <!--Pikachu Valley-->
-        
+
 
 
     <rect class="city"
@@ -20846,7 +20846,7 @@
 
 
         <!--Pikachu Valley Extension-->
-        
+
 
 
     <rect class="city"
@@ -20863,7 +20863,7 @@
 
 
         <!--Pikachu Valley-->
-        
+
 
 
     <rect class="city"
@@ -20880,7 +20880,7 @@
 
 
         <!--Paniola Ranch-->
-        
+
 
 
     <rect class="city"
@@ -20905,7 +20905,7 @@
 
 
         <!--Brooklet Hill-->
-        
+
 
 
     <rect class="city"
@@ -20930,7 +20930,7 @@
 
 
         <!--Brooklet Hill Extension-->
-        
+
 
 
     <rect class="city"
@@ -20947,7 +20947,7 @@
 
 
         <!--Brooklet Hill Extension-->
-        
+
 
 
     <rect class="city"
@@ -20964,7 +20964,7 @@
 
 
         <!--Wela Volcano Park-->
-        
+
 
 
     <rect class="city"
@@ -20989,7 +20989,7 @@
 
 
         <!--Wela Volcano Park Extension-->
-        
+
 
 
     <rect class="city"
@@ -21006,7 +21006,7 @@
 
 
         <!--Wela Volcano Park Extension-->
-        
+
 
 
     <rect class="city"
@@ -21023,7 +21023,7 @@
 
 
         <!--Lush Jungle-->
-        
+
 
 
     <rect class="city"
@@ -21048,7 +21048,7 @@
 
 
         <!--Lush Jungle Extension-->
-        
+
 
 
     <rect class="city"
@@ -21065,7 +21065,7 @@
 
 
         <!--Lush Jungle Extension-->
-        
+
 
 
     <rect class="city"
@@ -21082,7 +21082,7 @@
 
 
         <!--Lush Jungle Extension-->
-        
+
 
 
     <rect class="city"
@@ -21099,7 +21099,7 @@
 
 
         <!--Diglett's Tunnel-->
-        
+
 
 
     <rect class="city"
@@ -21124,7 +21124,7 @@
 
 
         <!--Diglett's Tunnel Extension-->
-        
+
 
 
     <rect class="city"
@@ -21141,7 +21141,7 @@
 
 
         <!--Diglett's Tunnel Extension-->
-        
+
 
 
     <rect class="city"
@@ -21158,7 +21158,7 @@
 
 
         <!--Memorial Hill-->
-        
+
 
 
     <rect class="city"
@@ -21183,7 +21183,7 @@
 
 
         <!--Memorial Hill Extension-->
-        
+
 
 
     <rect class="city"
@@ -21200,7 +21200,7 @@
 
 
         <!--Aether Foundation-->
-        
+
 
 
     <rect class="city"
@@ -21225,7 +21225,7 @@
 
 
         <!--Aether Foundation Extension-->
-        
+
 
 
     <rect class="city"
@@ -21242,7 +21242,7 @@
 
 
         <!--Ruins of Life-->
-        
+
 
 
     <rect class="city"
@@ -21271,10 +21271,10 @@
         <!-- ------------------ -->
 
         <!--Tunnel-->
-        
+
 
 <rect class="city"
-    data-town="Dividing Peak Tunnel" 
+    data-town="Dividing Peak Tunnel"
     x="1264"
     y="240"
     height="48"
@@ -21286,10 +21286,10 @@
 </rect>
 
         <!--Tunnel Extension-->
-        
+
 
 <rect class="city"
-    data-town="Dividing Peak Tunnel" 
+    data-town="Dividing Peak Tunnel"
     x="1280"
     y="112"
     height="128"
@@ -21300,10 +21300,10 @@
                 }">
 </rect>
 
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="608"
     y="640"
     height="48"
@@ -21323,7 +21323,7 @@
         <!-- ------ -->
 
         <!--Route 10-->
-        
+
 
 <g
 
@@ -21349,13 +21349,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(10, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Mount Hokulani-->
-        
+
 
 <g
 
@@ -21381,13 +21381,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(22, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 11-->
-        
+
 
 <g
 
@@ -21413,13 +21413,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(11, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 11 Extension-->
-        
+
 
 <g
 
@@ -21436,7 +21436,7 @@
 
 
         <!--Route 12-->
-        
+
 
 <g
 
@@ -21462,13 +21462,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(12, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21485,7 +21485,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21502,7 +21502,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21519,7 +21519,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21536,7 +21536,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21553,7 +21553,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21570,7 +21570,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21587,7 +21587,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21604,7 +21604,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21621,7 +21621,7 @@
 
 
         <!--Route 12 Extension-->
-        
+
 
 <g
 
@@ -21638,7 +21638,7 @@
 
 
         <!--Route 13-->
-        
+
 
 <g
 
@@ -21664,13 +21664,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(13, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Haina Desert-->
-        
+
 
 <g
 
@@ -21696,13 +21696,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(23, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 14-->
-        
+
 
 <g
 
@@ -21728,13 +21728,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(14, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 14 Extension-->
-        
+
 
 <g
 
@@ -21751,7 +21751,7 @@
 
 
         <!--Route 15-->
-        
+
 
 <g
 
@@ -21777,13 +21777,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(15, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 15 Extension-->
-        
+
 
 <g
 
@@ -21800,7 +21800,7 @@
 
 
         <!--Route 15 Extension-->
-        
+
 
 <g
 
@@ -21817,7 +21817,7 @@
 
 
         <!--Route 16-->
-        
+
 
 <g
 
@@ -21843,13 +21843,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(16, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 17-->
-        
+
 
 <g
 
@@ -21875,13 +21875,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(17, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 17 Extension-->
-        
+
 
 <g
 
@@ -21898,7 +21898,7 @@
 
 
         <!--Poni Wilds-->
-        
+
 
 <g
 
@@ -21924,13 +21924,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(24, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Wilds Extension-->
-        
+
 
 <g
 
@@ -21947,7 +21947,7 @@
 
 
         <!--Poni Wilds Extension-->
-        
+
 
 <g
 
@@ -21964,7 +21964,7 @@
 
 
         <!--Ancient Poni Path-->
-        
+
 
 <g
 
@@ -21990,13 +21990,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(25, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Ancient Poni Path Extension-->
-        
+
 
 <g
 
@@ -22013,7 +22013,7 @@
 
 
         <!--Poni Breaker Coast-->
-        
+
 
 <g
 
@@ -22039,13 +22039,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(26, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Grove-->
-        
+
 
 <g
 
@@ -22071,13 +22071,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(27, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Plains-->
-        
+
 
 <g
 
@@ -22103,13 +22103,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(28, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Coast-->
-        
+
 
 <g
 
@@ -22135,13 +22135,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(29, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Gauntlet-->
-        
+
 
 <g
 
@@ -22167,13 +22167,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(30, 6),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Poni Gauntlet Extension-->
-        
+
 
 <g
 
@@ -22190,7 +22190,7 @@
 
 
         <!--Poni Gauntlet Extension-->
-        
+
 
 <g
 
@@ -22207,7 +22207,7 @@
 
 
         <!--Poni Gauntlet Extension-->
-        
+
 
 <g
 
@@ -22224,7 +22224,7 @@
 
 
         <!--Poni Gauntlet Extension-->
-        
+
 
 <g
 
@@ -22241,7 +22241,7 @@
 
 
         <!--Poni Gauntlet Extension-->
-        
+
 
 <g
 
@@ -22262,7 +22262,7 @@
         <!-- ----- -->
 
         <!--Aether Paradise-->
-        
+
 
 <rect class="city"
     data-town="Aether Paradise"
@@ -22287,7 +22287,7 @@
 
 
         <!--Malie City-->
-        
+
 
 <rect class="city"
     data-town="Malie City"
@@ -22312,7 +22312,7 @@
 
 
         <!--Malie City Extension-->
-        
+
 
 <rect class="city"
     data-town="Malie City"
@@ -22329,7 +22329,7 @@
 
 
         <!--Tapu Village-->
-        
+
 
 <rect class="city"
     data-town="Tapu Village"
@@ -22354,7 +22354,7 @@
 
 
         <!--Seafolk Village-->
-        
+
 
 <rect class="city"
     data-town="Seafolk Village"
@@ -22379,7 +22379,7 @@
 
 
         <!--Exeggutor Island-->
-        
+
 
 <rect class="city"
     data-town="Exeggutor Island"
@@ -22404,7 +22404,7 @@
 
 
         <!--Altar of the Sunne and Moone-->
-        
+
 
 <rect class="city"
     data-town="Altar of the Sunne and Moone"
@@ -22429,7 +22429,7 @@
 
 
         <!--Pokémon League Alola-->
-        
+
 
 <rect class="city"
     data-town="Pokémon League Alola"
@@ -22454,7 +22454,7 @@
 
 
         <!--Pokémon League Alola Extension-->
-        
+
 
 <rect class="city"
     data-town="Pokémon League Alola"
@@ -22474,7 +22474,7 @@
         <!-- DUNGEONS -->
         <!-- -------- -->
 
-        
+
 
 
     <rect class="city"
@@ -22498,7 +22498,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22522,7 +22522,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22546,7 +22546,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22570,7 +22570,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22594,7 +22594,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22618,7 +22618,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22642,7 +22642,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22668,7 +22668,7 @@
 
 
         <!--Mina's Houseboat-->
-        
+
 
 
 
@@ -22683,7 +22683,7 @@
 
 
         <!--Exeggutor Island Hill-->
-        
+
 
 
 
@@ -22698,7 +22698,7 @@
 
 
         <!--Vast Poni Canyon Extension-->
-        
+
 
 
     <rect class="city"
@@ -22715,7 +22715,7 @@
 
 
         <!--Vast Poni Canyon Extension-->
-        
+
 
 
     <rect class="city"
@@ -22732,7 +22732,7 @@
 
 
         <!--Vast Poni Canyon Extension-->
-        
+
 
 
     <rect class="city"
@@ -22749,7 +22749,7 @@
 
 
         <!--Lake of the Sunne and Moone-->
-        
+
 
 
     <rect class="city"
@@ -22773,7 +22773,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22797,7 +22797,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22821,7 +22821,7 @@
 
 
 
-        
+
 
 
     <rect class="city"
@@ -22850,10 +22850,10 @@
         <!-- ------------------ -->
 
         <!--Dock-->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="1312"
     y="288"
     height="64"
@@ -22861,7 +22861,7 @@
     data-bind="click:function(){MapHelper.openShipModal()}, attr: { class: MapHelper.calculateTownCssClass(&#39;Malie City&#39;) }">
 </rect>
 
-        
+
 
 <image href="assets/images/map/ashketchumoverworld.png" xlink:href="assets/images/map/ashketchumoverworld.png"
     x="512"
@@ -22900,7 +22900,7 @@
         <!-- ------ -->
 
         <!--Route 1-->
-        
+
 
 <g
 
@@ -22928,13 +22928,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(1, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 2-->
-        
+
 
 <g
 
@@ -22960,12 +22960,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(2, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--extra Route 2-->
-        
+
 
 <g
 
@@ -22984,7 +22984,7 @@
 
 
         <!--Rolling Fields-->
-        
+
 
 <g
 
@@ -23012,13 +23012,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(3, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Dappled Grove-->
-        
+
 
 <g
 
@@ -23044,12 +23044,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(4, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--DG Extras-->
-        
+
 
 <g
 
@@ -23068,7 +23068,7 @@
 
 
         <!--West Lake Axwell-->
-        
+
 
 <g
 
@@ -23096,12 +23096,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(5, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--WLA Extra-->
-        
+
 
 <g
 
@@ -23118,7 +23118,7 @@
 
 
         <!--East Lake Axwell-->
-        
+
 
 <g
 
@@ -23144,12 +23144,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(6, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--ELA Extras-->
-        
+
 
 <g
 
@@ -23168,7 +23168,7 @@
 
 
         <!--North Lake Miloch-->
-        
+
 
 <g
 
@@ -23196,13 +23196,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(9, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--South Lake Miloch-->
-        
+
 
 <g
 
@@ -23228,12 +23228,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(8, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--SLM Extras-->
-        
+
 
 <g
 
@@ -23252,7 +23252,7 @@
 
 
         <!--Giant's Seat-->
-        
+
 
 <g
 
@@ -23278,13 +23278,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(7, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 3-->
-        
+
 
 <g
 
@@ -23310,13 +23310,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(10, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 4-->
-        
+
 
 <g
 
@@ -23344,13 +23344,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(11, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 5-->
-        
+
 
 <g
 
@@ -23376,12 +23376,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(12, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Extra bits of Route 5-->
-        
+
 
 <g
 
@@ -23398,7 +23398,7 @@
 
 
         <!--Motostoke Outskirts-->
-        
+
 
 <g
 
@@ -23424,13 +23424,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(13, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Hammerlocke Hills-->
-        
+
 
 <g
 
@@ -23456,12 +23456,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(14, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--HH extras-->
-        
+
 
 <g
 
@@ -23477,7 +23477,7 @@
 </g>
 
         <!--HH extras-->
-        
+
 
 <g
 
@@ -23496,7 +23496,7 @@
 
 
         <!--Route 6-->
-        
+
 
 <g
 
@@ -23514,7 +23514,7 @@
 </g>
 
         <!--Extra bit of Route 6-->
-        
+
 
 <g
 
@@ -23540,12 +23540,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(15, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Extra bit of Route 6-->
-        
+
 
 <g
 
@@ -23563,7 +23563,7 @@
 </g>
 
         <!--Extra bit of Route 6-->
-        
+
 
 <g
 
@@ -23580,7 +23580,7 @@
 
 
         <!--Route 7-->
-        
+
 
 <g
 
@@ -23606,13 +23606,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(16, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 8-->
-        
+
 
 <g
 
@@ -23640,13 +23640,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(17, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Steamdrift Way-->
-        
+
 
 <g
 
@@ -23674,13 +23674,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(18, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 2 Lakeside-->
-        
+
 
 <g
 
@@ -23706,12 +23706,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(19, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 2 LS extras-->
-        
+
 
 <g
 
@@ -23728,7 +23728,7 @@
 
 
         <!--Route 9-->
-        
+
 
 <g
 
@@ -23756,13 +23756,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(20, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Circhester Bay-->
-        
+
 
 <g
 
@@ -23790,13 +23790,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(21, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Outer Spikemuth-->
-        
+
 
 <g
 
@@ -23822,13 +23822,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(22, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 10-->
-        
+
 
 <g
 
@@ -23856,13 +23856,13 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(23, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
 
         <!--Route 10 North-->
-        
+
 
 <g
 
@@ -23890,12 +23890,12 @@
         data-bind="visible: MapHelper.isRouteCurrentLocation(24, 7),
             attr: {href:`assets/images/profile/trainer-${App.game.profile.trainer() || 0}.png`}">
     </image>
-    
+
 
 </g>
 
         <!--Route 10 North extras-->
-        
+
 
 <g
 
@@ -23916,7 +23916,7 @@
         <!-- ----- -->
 
         <!--Postwick-->
-        
+
 
 <rect class="city"
     data-town="Postwick"
@@ -23927,7 +23927,7 @@
     data-bind="
         click:function(){MapHelper.moveToTown('Postwick')},
         attr: { class: MapHelper.calculateTownCssClass('Postwick') },
-        
+
             css: { flash: MapHelper.ableToTravel() }
         ">
 </rect>
@@ -23943,7 +23943,7 @@
 
 
         <!--Wedgehurst-->
-        
+
 
 <rect class="city"
     data-town="Wedgehurst"
@@ -23968,7 +23968,7 @@
 
 
         <!--Motostoke-->
-        
+
 
 <rect class="city"
     data-town="Motostoke"
@@ -23992,7 +23992,7 @@
 
 
         <!--Motostoke Extension-->
-        
+
 
 <rect class="city"
     data-town="Motostoke"
@@ -24017,7 +24017,7 @@
 
 
         <!--Turffield-->
-        
+
 
 <rect class="city"
     data-town="Turffield"
@@ -24042,7 +24042,7 @@
 
 
         <!--Hulbury-->
-        
+
 
 <rect class="city"
     data-town="Hulbury"
@@ -24067,7 +24067,7 @@
 
 
         <!--Hammerlocke-->
-        
+
 
 <rect class="city"
     data-town="Hammerlocke"
@@ -24092,7 +24092,7 @@
 
 
         <!--Stow-on-Side-->
-        
+
 
 <rect class="city"
     data-town="Stow-on-Side"
@@ -24117,7 +24117,7 @@
 
 
         <!--Ballonlea-->
-        
+
 
 <rect class="city"
     data-town="Ballonlea"
@@ -24142,7 +24142,7 @@
 
 
         <!--Circhester-->
-        
+
 
 <rect class="city"
     data-town="Circhester"
@@ -24166,7 +24166,7 @@
 
 
         <!--Circhester extension-->
-        
+
 
 <rect class="city"
     data-town="Circhester"
@@ -24191,7 +24191,7 @@
 
 
         <!--Spikemuth-->
-        
+
 
 <rect class="city"
     data-town="Spikemuth"
@@ -24216,7 +24216,7 @@
 
 
         <!--Wyndon-->
-        
+
 
 <rect class="city"
     data-town="Wyndon"
@@ -24240,7 +24240,7 @@
 
 
         <!--Wyndon Extension-->
-        
+
 
 <rect class="city"
     data-town="Wyndon"
@@ -24265,7 +24265,7 @@
 
 
         <!--Wyndon Stadium-->
-        
+
 
 <rect class="city"
     data-town="Wyndon Stadium"
@@ -24295,7 +24295,7 @@
         <!-- -------- -->
 
         <!--Slumbering Weald-->
-        
+
 
 
     <rect class="city"
@@ -24320,7 +24320,7 @@
 
 
         <!--Inner Slumbering Weald-->
-        
+
 
 
     <rect class="city"
@@ -24345,7 +24345,7 @@
 
 
         <!--Watchtower Ruins-->
-        
+
 
 
     <rect class="city"
@@ -24370,7 +24370,7 @@
 
 
         <!--Galar Mine-->
-        
+
 
 
     <rect class="city"
@@ -24395,7 +24395,7 @@
 
 
         <!--Galar Mine No. 2-->
-        
+
 
 
     <rect class="city"
@@ -24420,7 +24420,7 @@
 
 
         <!--Dusty Bowl-->
-        
+
 
 
     <rect class="city"
@@ -24445,7 +24445,7 @@
 
 
         <!--Lake of Outrage-->
-        
+
 
 
     <rect class="city"
@@ -24470,7 +24470,7 @@
 
 
         <!--Glimwood Tangle-->
-        
+
 
 
     <rect class="city"
@@ -24495,7 +24495,7 @@
 
 
         <!--Rose Tower-->
-        
+
 
 
     <rect class="city"
@@ -24523,10 +24523,10 @@
         <!-- PLACES OF INTEREST -->
 
         <!-- ------------------ -->
-        
+
 
 <rect class="city"
-    data-town="Dock" 
+    data-town="Dock"
     x="960"
     y="528"
     height="48"
@@ -27683,7 +27683,7 @@ aria-labelledby="badgeCaseModalLabel">
                         <span data-bind="template: { name: 'amountTemplate', data: App.game.quests.getRefreshCost() }"></span> - Refresh
                     </button>
                     <!-- /ko -->
-                    
+
                 </div>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
@@ -28773,7 +28773,7 @@ aria-labelledby="badgeCaseModalLabel">
                 data-bind="template: { name: 'pokeballSelectionTemplate', data: $data},
                   click: function(){App.game.pokeballs.selectedSelection()($data.type)},
                   visible: $data.unlocked(),
-                  css: { 
+                  css: {
                     'clickable': !($data.type === GameConstants.Pokeball.Masterball && App.game.challenges.list.disableMasterballs.active()),
                     'disabled no-click text-muted': ($data.type === GameConstants.Pokeball.Masterball && App.game.challenges.list.disableMasterballs.active()),
                   }"></tr>
