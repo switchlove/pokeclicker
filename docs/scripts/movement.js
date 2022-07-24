@@ -423,6 +423,40 @@ ChallengeRequirement.add(GymList['Blackthorn City'], new ItemRequirement(ItemLis
 ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
 ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.johto, 27), new DungeonShinyRequirement('Dark Cave'));
 //#endregion
+//#region Hoenn
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));
+ChallengeRequirement.add(Routes.getRoute(GameConstants.Region.hoenn, 104), new ItemRequirement(ItemList.Kings_rock));
+ChallengeRequirement.add(GymList['Rustboro City'], new ItemRequirement(ItemList.Mystery_egg));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 116), new GymBadgeRequirement(BadgeEnums.Stone));
+ChallengeRequirement.set(TownList['Granite Cave'], new GymBadgeRequirement(BadgeEnums.Knuckle));
+ChallengeRequirement.add(Routes.getRoute(GameConstants.Region.hoenn, 110), new DockRequirement(), new ItemRequirement(ItemList.Linking_cord));
+ChallengeRequirement.add(GymList['Mauville City'], new ItemRequirement(ItemList.Thunder_stone), new ItemRequirement(ItemList.Metal_coat));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 117), new GymBadgeRequirement(BadgeEnums.Dynamo));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 111), new RouteShinyRequirement(GameConstants.Region.hoenn, 117), new ItemRequirement(ItemList.Soothe_bell));
+ChallengeRequirement.add(Routes.getRoute(GameConstants.Region.hoenn, 114), new ItemRequirement(ItemList.Moon_stone), new ItemRequirement(ItemList.Sun_stone));
+ChallengeRequirement.set(TownList['Mt. Chimney Crater'], new RouteShinyRequirement(GameConstants.Region.hoenn, 115));
+ChallengeRequirement.add(GymList['Lavaridge Town'], new ItemRequirement(ItemList.Fire_stone));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 105), new DungeonShinyRequirement('New Mauville'));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 106), new RouteShinyRequirement(GameConstants.Region.hoenn, 105));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 107), new RouteShinyRequirement(GameConstants.Region.hoenn, 106));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 108), new RouteShinyRequirement(GameConstants.Region.hoenn, 107));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 109), new RouteShinyRequirement(GameConstants.Region.hoenn, 108));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 118), new RouteShinyRequirement(GameConstants.Region.hoenn, 109));
+ChallengeRequirement.add(GymList['Fortree City'], new ItemRequirement(ItemList.Leaf_stone));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 120), new GymBadgeRequirement(BadgeEnums.Feather));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 123), new DungeonShinyRequirement('Mt. Pyre'));
+ChallengeRequirement.set(TownList['Magma Hideout'], new RouteShinyRequirement(GameConstants.Region.hoenn, 123));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 125), new RouteShinyRequirement(GameConstants.Region.hoenn, 126));
+ChallengeRequirement.set(TownList['Mossdeep City'], new DungeonShinyRequirement('Shoal Cave'));
+ChallengeRequirement.add(GymList['Mossdeep City'], new ItemRequirement(ItemList.Beldum), new ItemRequirement(ItemList.Prism_scale), new ItemRequirement(ItemList.Upgrade));
+ChallengeRequirement.add(Routes.getRoute(GameConstants.Region.hoenn, 127), new ItemRequirement(ItemList.Water_stone));
+ChallengeRequirement.set(Routes.getRoute(GameConstants.Region.hoenn, 129), new DungeonShinyRequirement('Seafloor Cavern'));
+ChallengeRequirement.set(TownList['Cave of Origin'], new RouteShinyRequirement(GameConstants.Region.hoenn, 131));
+ChallengeRequirement.set(TownList['Pacifidlog Town'], new GymBadgeRequirement(BadgeEnums.Rain));
+ChallengeRequirement.add(Routes.getRoute(GameConstants.Region.hoenn, 132), new GymBadgeRequirement(BadgeEnums.Rain), new ItemRequirement(ItemList.Deepsea_tooth), new ItemRequirement(ItemList.Deepsea_scale));
+ChallengeRequirement.set(TownList['Ever Grande City'], new DungeonShinyRequirement('Sealed Chamber'));
+ChallengeRequirement.set(TownList['Victory Road Hoenn'], new DungeonShinyRequirement('Sealed Chamber'), new ItemRequirement(ItemList.Dragon_scale));
+//#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
 for (let town of Object.values(TownList)) {
