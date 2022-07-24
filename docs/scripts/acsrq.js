@@ -4388,7 +4388,7 @@ function setupShinyRequirements() {
                 if (this.dungeon || this.content.some(c => c instanceof MoveToDungeon)) {
                     const dungeon = this.dungeon?.name ?? this.content.find(c => c instanceof MoveToDungeon)?.name;
                     this.wasUnlock = this.wasUnlock || App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon)]();
-                } 
+                }
                 if (this.content.some(c => c instanceof Gym)) {
                     const badge = this.content.find(c => c instanceof Gym)?.badgeReward;
                     this.wasUnlock = this.wasUnlock || App.game.badgeCase.hasBadge(badge);
@@ -4400,7 +4400,7 @@ function setupShinyRequirements() {
         RegionRoute.prototype.isUnlocked = function () {
             cache.dungeons = [];
             cache.routes = [];
-            
+
             if (!this.wasUnlock) {
                 this.wasUnlock = App.game.statistics.routeKills[this.region][this.number]() ||  routeUnlock.call(this);
             }
@@ -4412,11 +4412,11 @@ function setupShinyRequirements() {
             constructor(region, route) {
                 super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
             }
-            
+
             isCompleted() {
                 return this.isCompletedLocaly() && this.deepScan(Routes.getRoute(this.region, this.route).requirements)
             }
-            
+
             isCompletedLocaly() {
                 return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
             }
@@ -4424,7 +4424,7 @@ function setupShinyRequirements() {
             hint() {
                 if (!this.isCompletedLocaly())
                     return super.hint()
-                    
+
                 for (const route of Routes.getRoutesByRegion(this.region)) {
                     let hints = route.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
                     if (hints.length)
@@ -4441,11 +4441,11 @@ function setupShinyRequirements() {
             isCompleted() {
                 return this.isCompletedLocaly() && this.deepScan(this.town.requirements)
             }
-            
+
             isCompletedLocaly() {
                 return super.isCompleted() && DungeonRunner.dungeonCompleted(this.town.dungeon, true)
             }
-            
+
             hint() {
                 if (!this.isCompletedLocaly())
                     return super.hint()
@@ -4504,15 +4504,15 @@ function setupShinyRequirements() {
             }
 
             isCompleted() {
-                return this.isCompletedLocaly() 
-                    && (this.gym.parent.region != player.region || this.deepScan(this.gym.parent.requirements)) 
+                return this.isCompletedLocaly()
+                    && (this.gym.parent.region != player.region || this.deepScan(this.gym.parent.requirements))
                     && this.deepScan(this.gym.requirements)
             }
-            
+
             isCompletedLocaly() {
                 return super.isCompleted()
             }
-            
+
             hint() {
                 if (!this.isCompletedLocaly())
                     return super.hint()
@@ -4529,11 +4529,11 @@ function setupShinyRequirements() {
             isCompleted() {
                 return this.isCompletedLocaly() && this.deepScan(this.battle.requirements)
             }
-            
+
             isCompletedLocaly() {
                 return super.isCompleted()
             }
-            
+
             hint() {
                 if (!this.isCompletedLocaly())
                     return super.hint()
@@ -4633,13 +4633,13 @@ function setupShinyRequirements() {
             new RouteShinyRequirements(0,20),
             new CaughtIndicatingRequirement(ItemList.Fire_stone)]
         GymList['Viridian City'].requirements.push(new RouteShinyRequirements(0,21))
-        // Sevii island    
+        // Sevii island
         Routes.getRoute(0,26).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 0)]
         Routes.getRoute(0,27).requirements = [new RouteShinyRequirements(0,26)]
         TownList['Two Island'].requirements = [new ShinyDungeonRequirement('Mt. Ember Summit')]
         Routes.getRoute(0,28).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 1)]
         TownList['Three Island'].requirements = [new RouteShinyRequirements(0,28)]
-        Routes.getRoute(0,21).requirements = [new QuestLineCompletedRequirement('Bill\'s Errand')]S
+        Routes.getRoute(0,21).requirements = [new QuestLineCompletedRequirement('Bill\'s Errand')]
     //#endregion
     //#region Johto
         TownList['Cherrygrove City'].requirements = [new RouteShinyRequirements(1,46)]
@@ -4695,4 +4695,3 @@ function setupShinyRequirements() {
         Routes.getRoute(1,28).requirements.push(new RouteShinyRequirements(1,26))
     //#endregion
 }
-S
