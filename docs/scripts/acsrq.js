@@ -49,7 +49,7 @@ window.addEventListener("load", function() {
             new SettingOption('Pokéballs', 'pokeballSelector'),
         ], 'pokeballSelector'));
         Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-        Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
+        Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false));
         Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
         Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
         Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
@@ -213,7 +213,7 @@ window.addEventListener("load", function() {
         a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('gideBItem')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideBItem')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
@@ -857,15 +857,18 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        if (Settings.getSetting('hideOak').observableValue() == true) {
-            document.querySelector("#oakItemsContainer").style.display = 'none';
-        } else {
-            document.querySelector("#oakItemsContainer").removeAttribute("style");
-        }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
-            document.querySelector("#battleItemContainer").style.display = 'none';
-        } else {
-            document.querySelector("#battleItemContainer").removeAttribute("style");
+        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
+        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
+            if (Settings.getSetting('hideOak').observableValue() == true) {
+                document.querySelector("#oakItemsContainer").style.display = 'none';
+            } else {
+                document.querySelector("#oakItemsContainer").removeAttribute("style");
+            }
+            if (Settings.getSetting('hideBItem').observableValue() == true) {
+                document.querySelector("#battleItemContainer").style.display = 'none';
+            } else {
+                document.querySelector("#battleItemContainer").removeAttribute("style");
+            }
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -898,7 +901,7 @@ function a6menu(){
         } else {
             document.querySelector("#oakItemsContainer").removeAttribute("style");
         }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
+        if (Settings.getSetting('hideBItem').observableValue() == true) {
             document.querySelector("#battleItemContainer").style.display = 'none';
         } else {
             document.querySelector("#battleItemContainer").removeAttribute("style");
