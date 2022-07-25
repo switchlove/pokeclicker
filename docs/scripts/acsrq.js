@@ -1318,7 +1318,11 @@ function uniqueCheckEvent() {
 }
 
 function boostedRoute() {
-    document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
+    if (player.region == 6) {
+        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
+    } else {
+        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
+    }
 }
 
 function lastPokeEncounter() {
@@ -1344,11 +1348,21 @@ async function missingLoot() {
         if (Settings.getSetting('showLoot').observableValue() == true) {
             if (player.town().dungeon != undefined && player.route() == 0) {
                 document.querySelector("#possibleLoot").removeAttribute("style");
-                var dLoot = player.town().dungeon.itemList;
+                var dLoot1 = player.town().dungeon.lootTable.common;
+                var dLoot2 = player.town().dungeon.lootTable.epic;
+                var dLoot3 = player.town().dungeon.lootTable.mythic;
                 var dLootA = [];
 
-                for (let x = 0; x < dLoot.length; x++) {
-                    var lootI = GameConstants.humanifyString(dLoot[x].loot);
+                for (let x = 0; x < dLoot1.length; x++) {
+                    var lootI = GameConstants.humanifyString(dLoot1[x].loot);
+                    dLootA.push( lootI );
+                }
+                for (let x = 0; x < dLoot2.length; x++) {
+                    var lootI = GameConstants.humanifyString(dLoot2[x].loot);
+                    dLootA.push( lootI );
+                }
+                for (let x = 0; x < dLoot3.length; x++) {
+                    var lootI = GameConstants.humanifyString(dLoot3[x].loot);
                     dLootA.push( lootI );
                 }
                 dLootA = [ ...new Set(dLootA) ].sort().join(', ');
