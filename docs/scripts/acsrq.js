@@ -49,7 +49,7 @@ window.addEventListener("load", function() {
             new SettingOption('Pokéballs', 'pokeballSelector'),
         ], 'pokeballSelector'));
         Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-        Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
+        Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false));
         Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
         Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
         Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
@@ -213,7 +213,7 @@ window.addEventListener("load", function() {
         a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('gideBItem')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideBItem')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
@@ -325,8 +325,6 @@ window.addEventListener("load", function() {
             }
         }, 3000);
     }, 3000);
-
-    setupShinyRequirements();
 });
 
 function main(){
@@ -859,15 +857,18 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        if (Settings.getSetting('hideOak').observableValue() == true) {
-            document.querySelector("#oakItemsContainer").style.display = 'none';
-        } else {
-            document.querySelector("#oakItemsContainer").removeAttribute("style");
-        }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
-            document.querySelector("#battleItemContainer").style.display = 'none';
-        } else {
-            document.querySelector("#battleItemContainer").removeAttribute("style");
+        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
+        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
+            if (Settings.getSetting('hideOak').observableValue() == true) {
+                document.querySelector("#oakItemsContainer").style.display = 'none';
+            } else {
+                document.querySelector("#oakItemsContainer").removeAttribute("style");
+            }
+            if (Settings.getSetting('hideBItem').observableValue() == true) {
+                document.querySelector("#battleItemContainer").style.display = 'none';
+            } else {
+                document.querySelector("#battleItemContainer").removeAttribute("style");
+            }
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -900,7 +901,7 @@ function a6menu(){
         } else {
             document.querySelector("#oakItemsContainer").removeAttribute("style");
         }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
+        if (Settings.getSetting('hideBItem').observableValue() == true) {
             document.querySelector("#battleItemContainer").style.display = 'none';
         } else {
             document.querySelector("#battleItemContainer").removeAttribute("style");
@@ -4320,378 +4321,4 @@ async function ballBot() {
                 }
         }
     }
-}
-
-function setupShinyRequirements() {
-    //#region End region conditions
-        // replace ableToTravel
-        const mapTravel = MapHelper.ableToTravel;
-        MapHelper.ableToTravel = () => mapTravel() && MapHelper.isRegionCleared(player.highestRegion());
-        MapHelper.isRegionCleared = (region) => {
-            let check = App.game.party.caughtPokemon.every(pokemon => pokemon.shiny);
-            for (let i = 0; check && i <= region; i++) {
-                check = check && Routes.getRoutesByRegion(i).every(r => RouteHelper.routeCompleted(r.number, i, false));
-                check = check && GameConstants.RegionDungeons[i].every(n => DungeonRunner.dungeonCompleted(dungeonList[n], false));
-                check = check && RoamingPokemonList.list[i].every(p => App.game.party.alreadyCaughtPokemonByName(p.pokemon.name));
-            }
-            return check;
-        }
-
-        // replace Pokedex by Shiny pokedex in prof oak check
-        const profDialog = Object.getOwnPropertyDescriptor(ProfNPC.prototype, 'dialogHTML').get
-            .toString()
-            .replace('get dialogHTML', 'function')
-            .replace('html += `<p>${this.pokedexCompleteText}</p>`;',
-                'html += `<p>${this.pokedexCompleteText}</p>`;\
-                if (!MapHelper.isRegionCleared(this.region)) {\
-                    html += `<p>But it seems you are still missing something</p>`;\
-                }'
-            )
-            .replace('(?<!Shiny )Master', 'Shiny Master')
-            .replace('nextRegionUnlocked && (', 'nextRegionUnlocked && MapHelper.isRegionCleared(this.region) && (')
-        Object.defineProperty(ProfNPC.prototype, 'dialogHTML', {
-            get: eval('(' + profDialog + ')')
-        })
-    //#endregion
-    //#region once unlock, always unlock
-        let cache = { dungeons : [], routes : [] }
-        Requirement.prototype.deepScan = function (requirements) {
-            let check = true;
-            for (let rdx = 0; rdx < requirements.length && check; rdx++) {
-                const req = requirements[rdx];
-                if (req instanceof ClearDungeonRequirement) {
-                    const id = req.dungeonIndex;
-                    if (!cache.dungeons.includes(id)) {
-                        cache.dungeons.push(id);
-                        check = req.isCompleted();
-                    }
-                } else if (req instanceof RouteKillRequirement){
-                    const id = `${req.region},${req.route}`;
-                    if (!cache.routes.includes(id)) {
-                        cache.routes.push(id);
-                        check = req.isCompleted();
-                    }
-                } else {
-                    check = req.isCompleted();
-                }
-            }
-            return check;
-        }
-
-        const townUnlock = Town.prototype.isUnlocked;
-        Town.prototype.isUnlocked = function () {
-            cache.dungeons = [];
-            cache.routes = [];
-
-            if (!this.wasUnlock) {
-                this.wasUnlock = townUnlock.call(this);
-                if (this.dungeon || this.content.some(c => c instanceof MoveToDungeon)) {
-                    const dungeon = this.dungeon?.name ?? this.content.find(c => c instanceof MoveToDungeon)?.name;
-                    this.wasUnlock = this.wasUnlock || App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon)]();
-                }
-                if (this.content.some(c => c instanceof Gym)) {
-                    const badge = this.content.find(c => c instanceof Gym)?.badgeReward;
-                    this.wasUnlock = this.wasUnlock || App.game.badgeCase.hasBadge(badge);
-                }
-            }
-            return this.wasUnlock;
-        }
-        const routeUnlock = RegionRoute.prototype.isUnlocked;
-        RegionRoute.prototype.isUnlocked = function () {
-            cache.dungeons = [];
-            cache.routes = [];
-
-            if (!this.wasUnlock) {
-                this.wasUnlock = App.game.statistics.routeKills[this.region][this.number]() ||  routeUnlock.call(this);
-            }
-            return this.wasUnlock;
-        }
-    //#endregion
-    //#region CustomRequirements
-        class RouteShinyRequirements extends RouteKillRequirement {
-            constructor(region, route) {
-                super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
-            }
-
-            isCompleted() {
-                return this.isCompletedLocaly() && this.deepScan(Routes.getRoute(this.region, this.route).requirements)
-            }
-
-            isCompletedLocaly() {
-                return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
-            }
-
-            hint() {
-                if (!this.isCompletedLocaly())
-                    return super.hint()
-
-                for (const route of Routes.getRoutesByRegion(this.region)) {
-                    let hints = route.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
-                    if (hints.length)
-                        return hints.join('\n')
-                }
-            }
-        }
-        class ShinyDungeonRequirement extends ClearDungeonRequirement {
-            constructor(dungeonName) {
-                super(1, GameConstants.getDungeonIndex(dungeonName));
-                this.town = TownList[dungeonName];
-            }
-
-            isCompleted() {
-                return this.isCompletedLocaly() && this.deepScan(this.town.requirements)
-            }
-
-            isCompletedLocaly() {
-                return super.isCompleted() && DungeonRunner.dungeonCompleted(this.town.dungeon, true)
-            }
-
-            hint() {
-                if (!this.isCompletedLocaly())
-                    return super.hint()
-
-                for (const route of Routes.getRoutesByRegion(this.region)) {
-                    let hints = route.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
-                    if (hints.length)
-                        return hints.join('\n')
-                }
-
-                let hints = this.town.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
-                return hints.join('\n')
-            }
-        }
-        class ShinySafariRequirement extends Requirement {
-            constructor() {
-                super(0, 2);
-            }
-
-            isCompleted() {
-                return Safari.completed(true)
-            }
-
-            hint() {
-                return 'Safari needs to be completed.'
-            }
-        }
-        class CaughtIndicatingRequirement extends Requirement {
-            constructor(item) {
-                super(0, 2);
-                this.item = item
-            }
-
-            isCompleted() {
-                return this.item.getCaughtStatus() == CaughtStatus.CaughtShiny
-            }
-
-            hint() {
-                return `${this.item.displayName} needs to be completed.`
-            }
-        }
-        class ShinyShopRequirement extends MultiRequirement {
-            constructor(shop) {
-                let items = shop.items.filter(i => i instanceof CaughtIndicatingItem);
-                super(items.map(i => new CaughtIndicatingRequirement(i)));
-                this.shop = shop;
-            }
-
-            hint() {
-                return `${ this.shop.displayName } needs to be completed.`
-            }
-        }
-        class _GymBadgeRequirement extends GymBadgeRequirement {
-            get gym() {
-                return Object.values(GymList).find(({badgeReward}) => badgeReward == this.badge)
-            }
-
-            isCompleted() {
-                return this.isCompletedLocaly()
-                    && (this.gym.parent.region != player.region || this.deepScan(this.gym.parent.requirements))
-                    && this.deepScan(this.gym.requirements)
-            }
-
-            isCompletedLocaly() {
-                return super.isCompleted()
-            }
-
-            hint() {
-                if (!this.isCompletedLocaly())
-                    return super.hint()
-
-                let hints = this.gym.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
-                return hints.join('\n')
-            }
-        }
-        class _TemporaryBattleRequirement extends TemporaryBattleRequirement  {
-            get battle() {
-                return TemporaryBattleList[this.battleName]
-            }
-
-            isCompleted() {
-                return this.isCompletedLocaly() && this.deepScan(this.battle.requirements)
-            }
-
-            isCompletedLocaly() {
-                return super.isCompleted()
-            }
-
-            hint() {
-                if (!this.isCompletedLocaly())
-                    return super.hint()
-
-                let hints = this.battle.requirements.filter(r => !r.isCompleted()).map(r => r.hint())
-                return hints.join('\n')
-            }
-        }
-    //#endregion
-
-    function replaceRequirements(requirements) {
-        for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
-            switch (requirements[reqIdx]?.constructor.name) {
-                case "MultiRequirement":
-                case "OneFromManyRequirement":
-                    replaceRequirements(requirements[reqIdx].requirements);
-                    break;
-                case "RouteKillRequirement":
-                    requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
-                    break;
-                case "ClearDungeonRequirement":
-                    requirements[reqIdx] = new ShinyDungeonRequirement(GameConstants.RegionDungeons.flat()[requirements[reqIdx].dungeonIndex]);
-                    break;
-                case "GymBadgeRequirement":
-                    requirements[reqIdx] = new _GymBadgeRequirement(requirements[reqIdx].badge);
-                    break;
-                case "TemporaryBattleRequirement":
-                    requirements[reqIdx] = new _TemporaryBattleRequirement(requirements[reqIdx].battleName);
-                    break;
-            }
-        }
-    }
-
-    // Replace Requirement on Town and Dungeons
-    for (let town of Object.values(TownList)) {
-        replaceRequirements(town?.requirements);
-    }
-    // Replace Requirement on Temporary Battle
-    for (let gym of Object.values(GymList).filter(g => !(g instanceof Champion))) {
-        replaceRequirements(gym?.requirements);
-    }
-    // Replace Requirement on Temporary Battle
-    for (let battle of Object.values(TemporaryBattleList)) {
-        replaceRequirements(battle?.requirements);
-        replaceRequirements(battle?.completeRequirements);
-    }
-    // Replace Requirement on Routes
-    for (let region = 0; region < GameConstants.Region.final; region++) {
-        for (let route of Routes.getRoutesByRegion(region)) {
-            replaceRequirements(route?.requirements);
-        }
-    }
-
-    //--- Split path requirements ---//
-    //#region Kanto
-        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
-        Route3Shop.areaStatus = function() {
-            if (this.items.length == this.items.filter(i=> !(i instanceof CaughtIndicatingItem) || i.getCaughtStatus() == CaughtStatus.CaughtShiny).length) {
-                return areaStatus.completed;
-            }
-            return areaStatus.unlockedUnfinished;
-        };
-        TownList['Mt. Moon'].requirements.push(new ShinyShopRequirement(Route3Shop))
-        Routes.getRoute(0,24).requirements.push(new _GymBadgeRequirement(BadgeEnums.Cascade));
-        Routes.getRoute(0,6).requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Mystery_egg),
-            new CaughtIndicatingRequirement(ItemList.Water_stone))
-        GymList['Vermilion City'].requirements.push(new CaughtIndicatingRequirement(ItemList.Thunder_stone))
-        TownList['Diglett\'s Cave'].requirements.push(new _GymBadgeRequirement(BadgeEnums.Thunder))
-        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement('Diglett\'s Cave'))
-        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
-        GymList['Celadon City'].requirements.push(new ShinyShopRequirement(CeladonCityShop))
-        TownList['Rocket Game Corner'].requirements.push(new _GymBadgeRequirement(BadgeEnums.Rainbow))
-        TownList['Saffron City'].requirements.push(new ShinyDungeonRequirement('Rocket Game Corner'))
-        TemporaryBattleList['Fighting Dojo'].requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Leaf_stone),
-            new CaughtIndicatingRequirement(ItemList.Moon_stone)
-        )
-        TownList['Pokémon Tower'].requirements.push(...TemporaryBattleList['Fighting Dojo'].completeRequirements)
-        TownList['Silph Co.'].requirements.push(new ShinyDungeonRequirement('Pokémon Tower'))
-        Routes.getRoute(0,12).requirements.push(new _GymBadgeRequirement(BadgeEnums.Marsh))
-        Routes.getRoute(0,13).requirements = [new RouteShinyRequirements(0,12)]
-        Routes.getRoute(0,14).requirements = [new RouteShinyRequirements(0,13)]
-        Routes.getRoute(0,15).requirements = [new RouteShinyRequirements(0,14)]
-        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
-        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
-        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
-        TownList['Fuchsia City'].requirements = [new RouteShinyRequirements(0,18)]
-        GymList['Fuchsia City'].requirements = [
-            new RouteShinyRequirements(0,18),
-            new CaughtIndicatingRequirement(ItemList.Linking_cord)]
-        TownList['Power Plant'].requirements.push(new ShinySafariRequirement())
-        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement('Power Plant'))
-        Routes.getRoute(0,20).requirements = [new ShinyDungeonRequirement('Seafoam Islands')]
-        TownList['Cinnabar Island'].requirements = [new RouteShinyRequirements(0,20)]
-        TownList['Pokémon Mansion'].requirements = [
-            new RouteShinyRequirements(0,20),
-            new CaughtIndicatingRequirement(ItemList.Fire_stone)]
-        GymList['Viridian City'].requirements.push(new RouteShinyRequirements(0,21))
-        // Sevii island
-        Routes.getRoute(0,26).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 0)]
-        Routes.getRoute(0,27).requirements = [new RouteShinyRequirements(0,26)]
-        TownList['Two Island'].requirements = [new ShinyDungeonRequirement('Mt. Ember Summit')]
-        Routes.getRoute(0,28).requirements = [new QuestLineStepCompletedRequirement("Bill's Errand", 1)]
-        TownList['Three Island'].requirements = [new RouteShinyRequirements(0,28)]
-        Routes.getRoute(0,21).requirements = [new QuestLineCompletedRequirement('Bill\'s Errand')]
-    //#endregion
-    //#region Johto
-        TownList['Cherrygrove City'].requirements = [new RouteShinyRequirements(1,46)]
-        Routes.getRoute(1,30).requirements = [new RouteShinyRequirements(1,46)]
-        TownList['Cherrygrove City'].requirements = [new RouteShinyRequirements(1,46)]
-        TownList['Sprout Tower'].requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Togepi),
-            new CaughtIndicatingRequirement(ItemList.Mystery_egg),
-            // same as just doing (new ShinyShopRequirement(VioletCityShop))
-        )
-        TownList['Union Cave'].requirements.push(
-            new ShinyDungeonRequirement('Ruins of Alph')
-        )
-        TownList['Azalea Town'].requirements.push(
-            new ShinyDungeonRequirement('Slowpoke Well')
-        )
-        GymList['Azalea Town'].requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Leaf_stone),
-            new CaughtIndicatingRequirement(ItemList.Kings_rock),
-        )
-        Routes.getRoute(1,35).requirements.push(new _GymBadgeRequirement(BadgeEnums.Plain))
-        Routes.getRoute(1,36).requirements = [new RouteShinyRequirements(1,35)]
-        GymList['Ecruteak City'].requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Fire_stone),
-            new CaughtIndicatingRequirement(ItemList.Soothe_bell),
-        )
-        TownList['Burned Tower'].requirements.push(new _GymBadgeRequirement(BadgeEnums.Fog))
-        Routes.getRoute(1,38).requirements = [new ShinyDungeonRequirement('Burned Tower')]
-        Routes.getRoute(1,42).requirements = [new RouteShinyRequirements(1,48)]
-        TownList['Mt. Mortar'].requirements = [new RouteShinyRequirements(1,42)]
-        Routes.getRoute(1,40).requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Water_stone),
-            new CaughtIndicatingRequirement(ItemList.Thunder_stone),
-            new CaughtIndicatingRequirement(ItemList.Metal_coat),
-            //TODO: require Kanto
-        )
-        GymList['Cianwood City'].requirements.push(
-            new CaughtIndicatingRequirement(ItemList.Sun_stone),
-            new CaughtIndicatingRequirement(ItemList.Moon_stone),
-        )
-        TownList['Mahogany Town'].requirements.push(new ShinyDungeonRequirement('Mt. Mortar'))
-        Routes.getRoute(1,43).requirements.push(new CaughtIndicatingRequirement(ItemList.Upgrade))
-        TownList['Tin Tower'].requirements = [
-            new ShinyDungeonRequirement('Whirl Islands'),
-            new ObtainedPokemonRequirement(pokemonNameIndex.entei),
-            new ObtainedPokemonRequirement(pokemonNameIndex.suicune),
-            new ObtainedPokemonRequirement(pokemonNameIndex.raikou),
-        ]
-        Routes.getRoute(1,44).requirements = [new ShinyDungeonRequirement('Tin Tower')]
-        GymList['Blackthorn City'].requirements.push(new CaughtIndicatingRequirement(ItemList.Dragon_scale))
-        Routes.getRoute(1,45).requirements = [new _GymBadgeRequirement(BadgeEnums.Rising)]
-        Routes.getRoute(1,27).requirements = [new ShinyDungeonRequirement('Dark Cave')]
-        Routes.getRoute(1,28).requirements.push(new RouteShinyRequirements(1,26))
-    //#endregion
 }
