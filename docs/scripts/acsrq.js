@@ -1352,18 +1352,23 @@ async function missingLoot() {
                 var dLoot2 = player.town().dungeon.lootTable.epic;
                 var dLoot3 = player.town().dungeon.lootTable.mythic;
                 var dLootA = [];
-
-                for (let x = 0; x < dLoot1.length; x++) {
-                    var lootI = GameConstants.humanifyString(dLoot1[x].loot);
-                    dLootA.push( lootI );
+                if (dLoot1 != undefined) {
+                    for (let x = 0; x < dLoot1.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot1[x].loot);
+                        dLootA.push( lootI );
+                    }
                 }
-                for (let x = 0; x < dLoot2.length; x++) {
-                    var lootI = GameConstants.humanifyString(dLoot2[x].loot);
-                    dLootA.push( lootI );
+                if (dLoot2 != undefined) {
+                    for (let x = 0; x < dLoot2.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot2[x].loot);
+                        dLootA.push( lootI );
+                    }
                 }
-                for (let x = 0; x < dLoot3.length; x++) {
-                    var lootI = GameConstants.humanifyString(dLoot3[x].loot);
-                    dLootA.push( lootI );
+                if (dLoot3 != undefined) {
+                    for (let x = 0; x < dLoot3.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot3[x].loot);
+                        dLootA.push( lootI );
+                    }
                 }
                 dLootA = [ ...new Set(dLootA) ].sort().join(', ');
                 document.querySelector("#possibleLoot > td:nth-child(2)").innerText = dLootA;
@@ -1407,15 +1412,62 @@ async function missingShinies() {
                 var missDP = player.town().dungeon.pokemonList;
                 var missDBP = player.town().dungeon.bossPokemonList;
                 var missDBPa = player.town().dungeon.bossEncounterList;
+                var ultraArr = ['Nihilego', 'Buzzwole', 'Pheromosa', 'Xurkitree', 'Kartana', 'Celesteela', 'Blacephalon', 'Stakataka', 'Guzzlord', 'Poipole', 'Naganadel',];
+
                 for (let x = 0; x < missDP.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
-                        missTemp.push(missDP[x])
+                    if ( App.game.quests.getQuestLine('Ultra Beast Hunt').state() == 1) {
+                        if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon != undefined) {
+                            if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon.name == missDP[x]) {
+                                if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                    missTemp.push(missDP[x])
+                                }
+                            }
+                        } else if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests != undefined ) {
+                            var cQuests = App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests;
+                            for (let y = 0; y < cQuests.length; y++) {
+                                if ( cQuests[y].pokemon.name == missDP[x]) {
+                                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                        missTemp.push(missDP[x])
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if(ultraArr.indexOf(missDP[x]) === -1) {
+                            if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                missTemp.push(missDP[x])
+                            }
+                        }
                     }
                 }
-                for (let x = 0; x < missDBP.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
-                        if ( missDBPa[x].lock != true ) {
-                            missTemp.push(missDBP[x])
+                if (player.region < 6) {
+                    for (let x = 0; x < missDBP.length; x++) {
+                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
+                            npID = npID.split('.')[0];
+                            for (let y = 0; y < missDBPa.length; y++) {
+                                var image = Number(missDBPa[y].image.split('/').pop().split('.')[0]);
+                                if (npID == image) {
+                                    if ( missDBPa[y].lock != true ) {
+                                        missTemp.push(missDBP[x]);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                } else if (player.region == 6) {
+                    for (let x = 0; x < missDBP.length; x++) {
+                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
+                            for (let y = 0; y < missDBPa.length; y++) {
+                                var image = missDBPa[y].image.split('/').pop().split('.png')[0];
+                                if (npID == image) {
+                                    if ( missDBPa[y].lock != true ) {
+                                        missTemp.push(missDBP[x]);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
