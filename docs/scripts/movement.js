@@ -71,24 +71,47 @@ function switchRequirement(req) {
 }
 
 /** For object with {requirement} */
-function ChallengeRequirement(place, requirement) {
-    place.requirement = {
-        originalRequirement: place.requirement,
-        newRequirement: requirement,
-        get requirement() {
-            if (!App.game?.challenges.list.shinyMovement?.active()) {
-                return this.originalRequirement;
+class ChallengeRequirement extends Requirement {
+    constructor(
+        originalRequirement,
+        newRequirement,
+        override = false
+    ) {
+        super(1, GameConstants.AchievementOption.more);
+        this.originalRequirement = originalRequirement;
+        this.newRequirement = newRequirement;
+        this.override = override;
+    }
+
+    get requirements() {
+        if (!App.game?.challenges.list.shinyMovement?.active()) {
+            return [this.originalRequirement];
+        } else {
+            if (this.override) {
+                return [this.newRequirement];
             } else {
-                return this.newRequirement;
+                return [this.originalRequirement, this.newRequirement];
             }
-        },
-        isCompleted() {
-            return this.requirement.isCompleted();
-        },
-        hint() {
-            return this.requirement.hint();
-        },
-    };
+        }
+    }
+
+    static set(place, requirement) {
+        let oldReq = place.requirement;
+        place.requirement = new this(oldReq, requirement, true);
+    }
+
+    static add(place, requirement) {
+        let oldReq = place.requirement;
+        place.requirement = new this(oldReq, requirement);
+    }
+
+    isCompleted() {
+        return this.requirements.every(r => r.isCompleted());
+    }
+
+    hint() {
+        return '';
+    }
 }
 
 /** For object with {requirements} */
@@ -292,7 +315,7 @@ const townUnlock = Town.prototype.isUnlocked;
 Town.prototype.isUnlocked = function () {
     ChallengeRequirements.cache.clear();
     if (!this.wasUnlock  && App.game?.challenges.list.shinyMovement?.active()) {
-        this.wasUnlock = false;
+        this.wasUnlock = townUnlock.call(this) || this.npcs?.some(n => n.talkedTo());
         if (this.dungeon || this.content.some(c => c instanceof MoveToDungeon)) {
             const dungeon = this.dungeon?.name ?? this.content.find(c => c instanceof MoveToDungeon)?.name;
             this.wasUnlock = this.wasUnlock || App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon)]();
@@ -328,6 +351,7 @@ MapHelper.isRegionCleared = (region) => {
         check = check && Routes.getRoutesByRegion(region).every(r => RouteHelper.routeCompleted(r.number, region, false));
         check = check && GameConstants.RegionDungeons[region].every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false));
         check = check && RoamingPokemonList.list[0].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
+        check = check && Object.values(TemporaryBattleList).filter(b => b.parent?.region == region)?.every(b => b.completeRequirements.every(r => r.isCompleted()));
     }
     return check;
 };
@@ -515,9 +539,9 @@ ChallengeRequirements.add(TownList['Iron Island'], new ItemsRequirement(ItemList
 ChallengeRequirements.add(GymList['Snowpoint City'], new ItemsRequirement(ItemList.Upgrade));
 ChallengeRequirements.add(GymList['Sunyshore City'], new ItemsRequirement(ItemList.Thunder, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
 ChallengeRequirements.set(TownList['Sendoff Spring'], new DungeonShinyRequirement('Flower Paradise'));
-ChallengeRequirement(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement(dungeonList['Distortion World'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Sendoff Spring'));
+ChallengeRequirement.set(dungeonList['Distortion World'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
 ChallengeRequirements.set(TownList['Hall of Origin'], new DungeonShinyRequirement('Sendoff Spring'));
 ChallengeRequirements.set(TownList['Snowpoint Temple'], new DungeonShinyRequirement('Hall of Origin'));
 ChallengeRequirements.set(TownList['Newmoon Island'], new DungeonShinyRequirement('Snowpoint Temple'));
@@ -566,6 +590,40 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 2), new Du
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 1), new ItemsRequirement(ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 17), new ItemsRequirement(ItemList.Electirizer, ItemList.Magmarizer));
 ChallengeRequirements.set(TownList['P2 Laboratory'], new RouteShinyRequirement(GameConstants.Region.unova, 18));
+//#endregion
+//#region Kalos
+ChallengeRequirements.add(GymList['Santalune City'], new ItemsRequirement(ItemList.Mystery_egg));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 22), new GymBadgeRequirement(BadgeEnums.Bug));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 4), new RouteShinyRequirement(GameConstants.Region.kalos, 22));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 5), new ItemsRequirement(...FriseurFurfrouShop.items));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new ItemsRequirement(ItemList.Thunder_stone));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 9), new ItemsRequirement(ItemList.Water_stone));
+ChallengeRequirements.add(GymList['Cyllage City'], new ItemsRequirement(ItemList.Upgrade, ItemList.Prism_scale));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 10), new GymBadgeRequirement(BadgeEnums.Cliff));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 11), new ItemsRequirement(ItemList.Fire_stone, ItemList.Kings_rock));
+ChallengeRequirements.add(GymList['Shalour City'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Metal_coat));
+ChallengeRequirements.add(GymList['Coumarine City'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 23), new GymBadgeRequirement(BadgeEnums.Plant), new DockRequirement());
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 13), new DungeonShinyRequirement('Sea Spirit\'s Den'));
+ChallengeRequirements.add(GymList['Laverre City'], new ItemsRequirement(ItemList.Deepsea_tooth, ItemList.Deepsea_scale, ItemList.Sachet, ItemList.Whipped_dream));
+ChallengeRequirements.set(TownList['Frost Cavern'], new DungeonShinyRequirement('Lost Hotel'));
+ChallengeRequirements.set(TownList['Dendemille Town'], new DungeonShinyRequirement('Frost Cavern'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 16), new DungeonShinyRequirement('Frost Cavern'), new ItemsRequirement(ItemList.Dusk_stone, ItemList.Shiny_stone, ItemList.Dawn_stone));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 17), new RouteShinyRequirement(GameConstants.Region.kalos, 16));
+ChallengeRequirements.add(GymList['Anistar City'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Razor_claw, ItemList.Razor_fang));
+ChallengeRequirements.set(TownList['Couriway Town'], new DungeonShinyRequirement('Terminus Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 19), new DungeonShinyRequirement('Terminus Cave'), new ItemsRequirement(ItemsRequirement.Dragon_scale));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new GymBadgeRequirement(BadgeEnums.Iceberg));
+ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
+ChallengeRequirement.set(dungeonList['Reflection Cave'].bossList[2].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
+ChallengeRequirement.add(dungeonList['Kalos Power Plant'].bossList[1].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
+ChallengeRequirement.add(dungeonList['Terminus Cave'].bossList[1].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
+ChallengeRequirements.add(TemporaryBattleList.AZ,
+    new DungeonShinyRequirement('Reflection Cave'), new ObtainedPokemonRequirement(pokemonNameIndex.diancie),
+    new DungeonShinyRequirement('Kalos Power Plant'), new ObtainedPokemonRequirement(pokemonNameIndex.volcanion),
+    new DungeonShinyRequirement('Terminus Cave'), new ObtainedPokemonRequirement(pokemonNameIndex.zygarde)
+);
 //#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
