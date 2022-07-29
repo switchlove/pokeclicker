@@ -1,7 +1,7 @@
 {
     "version": "0.0.13c",
     "files": [
-        "scripts/ascrq.js",
+        "scripts/acsrq.js",
         "scripts/movement.js",
         "index.html"
     ]
