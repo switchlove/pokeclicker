@@ -375,10 +375,10 @@ MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyM
 MapHelper.isRegionCleared = (region) => {
     let check = true;
     for (let i = 0; check && i <= region; i++) {
-        check = check && Routes.getRoutesByRegion(region).every(r => RouteHelper.routeCompleted(r.number, region, false));
-        check = check && GameConstants.RegionDungeons[region].every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false));
-        check = check && RoamingPokemonList.list[0].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
-        check = check && Object.values(TemporaryBattleList).filter(b => b.parent?.region == region)?.every(b => b.completeRequirements.every(r => r.isCompleted()));
+        check = check && Routes.getRoutesByRegion(i).every(r => RouteHelper.routeCompleted(r.number, i, false));
+        check = check && GameConstants.RegionDungeons[i].every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false));
+        check = check && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
+        check = check && Object.values(TemporaryBattleList).filter(b => b.parent?.region == i)?.every(b => b.completeRequirements.every(r => r.isCompleted()));
     }
     return check;
 };
