@@ -1307,14 +1307,15 @@ function uniqueCheckAll() {
 }
 
 function uniqueCheckEvent() {
-    var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)"];
+    var eventPoke = [
+        "Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)","Bulbasaur (Rose)","Red Spearow", "Surprise Togepi"];
     var eventCaught = 0;
     for (let eP = 0; eP < eventPoke.length; eP++) {
         if ( App.game.party.alreadyCaughtPokemonByName(eventPoke[eP]) == true) {
             eventCaught++;
         }
     }
-    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/27';
+    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/' + eventPoke.length;
 }
 
 function boostedRoute() {
