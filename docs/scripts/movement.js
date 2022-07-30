@@ -74,12 +74,12 @@ function switchRequirement(req) {
 class ChallengeRequirement extends Requirement {
     constructor(
         originalRequirement,
-        newRequirement,
+        newRequirements,
         override = false
     ) {
         super(1, GameConstants.AchievementOption.more);
         this.originalRequirement = originalRequirement;
-        this.newRequirement = newRequirement;
+        this.newRequirements = newRequirements;
         this.override = override;
     }
 
@@ -88,21 +88,21 @@ class ChallengeRequirement extends Requirement {
             return [this.originalRequirement];
         } else {
             if (this.override) {
-                return [this.newRequirement];
+                return this.newRequirements;
             } else {
-                return [this.originalRequirement, this.newRequirement];
+                return [this.originalRequirement, ...this.newRequirements];
             }
         }
     }
 
-    static set(place, requirement) {
+    static set(place, ...requirements) {
         let oldReq = place.requirement;
-        place.requirement = new this(oldReq, requirement, true);
+        place.requirement = new this(oldReq, requirements, true);
     }
 
-    static add(place, requirement) {
+    static add(place, ...requirements) {
         let oldReq = place.requirement;
-        place.requirement = new this(oldReq, requirement);
+        place.requirement = new this(oldReq, requirements);
     }
 
     isCompleted() {
@@ -111,6 +111,19 @@ class ChallengeRequirement extends Requirement {
 
     hint() {
         return '';
+    }
+}
+
+/** For object with {req} */
+class ChallengeReq extends ChallengeRequirement {
+    static set(place, ...requirements) {
+        let oldReq = place.req;
+        place.req = new this(oldReq, requirements, true);
+    }
+
+    static add(place, ...requirements) {
+        let oldReq = place.req;
+        place.req = new this(oldReq, requirements);
     }
 }
 
@@ -224,6 +237,16 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
     }
 }
 
+class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
+    constructor(pokemon) {
+        super(pokemonNameIndex[pokemon.name.toLowerCase()]);
+    }
+
+    getProgress() {
+        return Math.min(App.game?.statistics?.shinyPokemonCaptured[this.pokemonID](), this.requiredValue);
+    }
+}
+
 class ItemsRequirement extends Requirement {
     constructor(...items) {
         super(CaughtStatus.CaughtShiny, GameConstants.AchievementOption.more);
@@ -235,12 +258,12 @@ class ItemsRequirement extends Requirement {
             if (!App.game.breeding.canAccess() && item instanceof EggItem) {
                 return true;
             }
-            return item.getCaughtStatus() == CaughtStatus.CaughtShiny;
+            return (item.getCaughtStatus() ?? CaughtStatus.CaughtShiny) == CaughtStatus.CaughtShiny;
         });
     }
 
     hint() {
-        const incomplete = this.items.filter(item => item.getCaughtStatus() != CaughtStatus.CaughtShiny);
+        const incomplete = this.items.filter(item => (item.getCaughtStatus() ?? CaughtStatus.CaughtShiny) != CaughtStatus.CaughtShiny);
         const output = [];
 
         const pkmn = incomplete.filter(item => item instanceof PokemonItem);
@@ -317,12 +340,16 @@ Town.prototype.isUnlocked = function () {
     if (!this.wasUnlock  && App.game?.challenges.list.shinyMovement?.active()) {
         this.wasUnlock = townUnlock.call(this) || this.npcs?.some(n => n.talkedTo());
         if (this.dungeon || this.content.some(c => c instanceof MoveToDungeon)) {
-            const dungeon = this.dungeon?.name ?? this.content.find(c => c instanceof MoveToDungeon)?.name;
-            this.wasUnlock = this.wasUnlock || App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon)]();
+            const dungeons = [this.dungeon?.name] ?? this.content.filter(c => c instanceof MoveToDungeon).map(dungeon => dungeon.name);
+            this.wasUnlock = this.wasUnlock || dungeons.some(name => App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(name)]());
         }
         if (this.content.some(c => c instanceof Gym)) {
-            const badge = this.content.find(c => c instanceof Gym)?.badgeReward;
-            this.wasUnlock = this.wasUnlock || App.game.badgeCase.hasBadge(badge);
+            const badges = this.content.filter(c => c instanceof Gym).map(gym => gym.badgeReward);
+            this.wasUnlock = this.wasUnlock || badges.some(badge => App.game.badgeCase.hasBadge(badge));
+        }
+        if (this.content.some(c => c instanceof TemporaryBattle)) {
+            const battles = this.content.filter(c => c instanceof TemporaryBattle);
+            this.wasUnlock = this.wasUnlock || battles.some(battle => battle.completeRequirements.some(req => req.isCompleted()));
         }
     }
     return townUnlock.call(this) || this.wasUnlock;
@@ -616,14 +643,80 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 19), new D
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new GymBadgeRequirement(BadgeEnums.Iceberg));
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
-ChallengeRequirement.set(dungeonList['Reflection Cave'].bossList[2].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
-ChallengeRequirement.add(dungeonList['Kalos Power Plant'].bossList[1].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
-ChallengeRequirement.add(dungeonList['Terminus Cave'].bossList[1].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
-ChallengeRequirements.add(TemporaryBattleList.AZ,
-    new DungeonShinyRequirement('Reflection Cave'), new ObtainedPokemonRequirement(pokemonNameIndex.diancie),
-    new DungeonShinyRequirement('Kalos Power Plant'), new ObtainedPokemonRequirement(pokemonNameIndex.volcanion),
-    new DungeonShinyRequirement('Terminus Cave'), new ObtainedPokemonRequirement(pokemonNameIndex.zygarde)
+ChallengeRequirement.add(dungeonList['Reflection Cave'].bossList[2].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
+ChallengeRequirement.add(dungeonList['Kalos Power Plant'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Reflection Cave'].bossList[2]));
+ChallengeRequirement.add(dungeonList['Terminus Cave'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Kalos Power Plant'].bossList[1]));
+ChallengeRequirements.add(TemporaryBattleList.AZ, new ObtainedPokemonShinyRequirement(dungeonList['Terminus Cave'].bossList[1]));
+//#endregion
+//#region Alola
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
+ChallengeRequirements.set(TownList['Melemele Woods'], new DungeonShinyRequirement('Hau\'oli Cemetery'));
+ChallengeRequirements.set(TownList['Iki Town'], new DungeonShinyRequirement('Seaward Cave'));
+ChallengeRequirement.set(SubRegions.getSubRegionById(GameConstants.Region.alola, 1), new DungeonShinyRequirement('Ten Carat Hill'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 4), new ItemsRequirement(ItemList.Water_stone, ItemList.Kings_rock, ItemList.Metal_coat));
+ChallengeRequirements.set(TownList['Paniola Ranch'], new DungeonShinyRequirement('Pikachu Valley'));
+ChallengeRequirements.set(TownList['Paniola Town'], new DungeonShinyRequirement('Pikachu Valley'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 20), new RouteShinyRequirement(GameConstants.Region.alola, 19));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 6), new RouteShinyRequirement(GameConstants.Region.alola, 20));
+ChallengeRequirements.add(GymList['Konikoni City'], new ItemsRequirement(ItemList.Fire_stone, ItemList.Linking_cord, ItemList.Soothe_bell));
+ChallengeRequirements.set(TownList['Memorial Hill'], new GymBadgeRequirement(BadgeEnums.RockiumZ));
+ChallengeRequirements.set(TownList['Aether Paradise'],  new RouteShinyRequirement(GameConstants.Region.alola, 21));
+ChallengeRequirements.add(TemporaryBattleList['Ultra Wormhole'], new ItemsRequirement(ItemList.Upgrade, ItemList['Type: Null']));
+ChallengeRequirements.add(TownList['Malie Garden'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 11), new DungeonShinyRequirement('Hokulani Observatory'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 14), new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Ice_stone));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 15), new RouteShinyRequirement(GameConstants.Region.alola, 23));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 24), new ItemsRequirement(ItemList.Deepsea_scale, ItemList.Deepsea_tooth, ItemList.Prism_scale, ItemList.Sachet, ItemList.Whipped_dream));
+ChallengeRequirements.add(TownList['Exeggutor Island Hill'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Dragon_scale, ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 26), new DungeonShinyRequirement('Exeggutor Island Hill'));
+ChallengeRequirements.set(TownList['Vast Poni Canyon'],  new RouteShinyRequirement(GameConstants.Region.alola, 26));
+ChallengeRequirements.add(TemporaryBattleList['Ultra Megalopolis'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Poipole));
+// Post Game
+ChallengeRequirements.add(TownList['Ruins of Conflict'],
+    new ObtainedPokemonShinyRequirement(dungeonList['Verdant Cavern'].bossList[2]),
+    new ObtainedPokemonShinyRequirement(dungeonList['Verdant Cavern'].bossList[3])
 );
+ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[2].options, new DungeonShinyRequirement('Ruins of Conflict'));
+ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[3].options, new DungeonShinyRequirement('Ruins of Conflict'));
+ChallengeRequirement.add(dungeonList['Lush Jungle'].bossList[1].options,
+    new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[2]),
+    new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[3])
+);
+ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
+ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
+ChallengeRequirement.add(dungeonList['Wela Volcano Park'].enemyList[6].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
+ChallengeRequirement.add(dungeonList['Diglett\'s Tunnel'].enemyList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
+ChallengeRequirement.add(dungeonList['Verdant Cavern'].enemyList[5].options,
+    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[2]),
+    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[3])
+);
+ChallengeRequirement.add(dungeonList['Melemele Meadow'].enemyList[6].options,
+    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[2]),
+    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[3])
+);
+ChallengeRequirements.set(TownList['Ruins of Life'],  new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 10));
+
+ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[14].options, new DungeonShinyRequirement('Ruins of Life'));
+ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[15].options, new DungeonShinyRequirement('Ruins of Life'));
+
+ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 17).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
+ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 23).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
+
+ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[2].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
+ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[3].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
+ChallengeRequirements.add(TownList['Ruins of Abundance'],
+    new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[2]),
+    new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[3])
+);
+ChallengeRequirement.add(dungeonList['Thrifty Megamart'].bossList[1].options, new DungeonShinyRequirement('Ruins of Abundance'));
+ChallengeRequirements.add(TownList['Lake of the Sunne and Moone'], new ObtainedPokemonShinyRequirement(dungeonList['Thrifty Megamart'].bossList[1]));
+ChallengeRequirement.add(dungeonList['Mina\'s Houseboat'].bossList[1].options, new DungeonShinyRequirement('Lake of the Sunne and Moone'), new ObtainedPokemonRequirement(pokemonNameIndex.solgaleo), new ObtainedPokemonRequirement(pokemonNameIndex.lunala));
+ChallengeRequirement.add(dungeonList['Vast Poni Canyon'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Mina\'s Houseboat'].bossList[1]));
+ChallengeRequirements.add(TownList['Ruins of Hope'], new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 27), new DungeonShinyRequirement('Ruins of Hope'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 28), new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Poni Meadow', 16));
+ChallengeRequirements.add(TownList['Resolution Cave'], new RouteShinyRequirement(GameConstants.Region.alola, 30));
 //#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
