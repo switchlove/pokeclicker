@@ -515,7 +515,7 @@ ChallengeRequirements.add(GymList['Rustboro City'], new ItemsRequirement(ItemLis
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 116), new GymBadgeRequirement(BadgeEnums.Stone));
 ChallengeRequirements.set(TownList['Granite Cave'], new GymBadgeRequirement(BadgeEnums.Knuckle));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 110), new DockRequirement(), new ItemsRequirement(ItemList.Linking_cord));
-ChallengeRequirements.add(GymList['Mauville City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
+ChallengeRequirements.add(GymList['Mauville City'], new ItemsSRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 117), new GymBadgeRequirement(BadgeEnums.Dynamo));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 111), new RouteShinyRequirement(GameConstants.Region.hoenn, 117), new ItemsRequirement(ItemList.Soothe_bell));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 114), new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
@@ -534,7 +534,7 @@ ChallengeRequirements.set(TownList['Magma Hideout'], new RouteShinyRequirement(G
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 125), new RouteShinyRequirement(GameConstants.Region.hoenn, 126));
 ChallengeRequirements.set(TownList['Mossdeep City'], new DungeonShinyRequirement('Shoal Cave'));
 ChallengeRequirements.add(GymList['Mossdeep City'], new ItemsRequirement(ItemList.Beldum, ItemList.Prism_scale, ItemList.Upgrade));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 127), new ItemsRequirement(ItemList.Water_stone));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 127), new GymBadgeRequirement(BadgeEnums.Mind), new ItemsRequirement(ItemList.Water_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 129), new DungeonShinyRequirement('Seafloor Cavern'));
 ChallengeRequirements.set(TownList['Cave of Origin'], new RouteShinyRequirement(GameConstants.Region.hoenn, 131));
 ChallengeRequirements.set(TownList['Pacifidlog Town'], new GymBadgeRequirement(BadgeEnums.Rain));
