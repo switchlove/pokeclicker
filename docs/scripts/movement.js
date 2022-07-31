@@ -563,6 +563,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 211), new
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 219), new RouteShinyRequirement(GameConstants.Region.sinnoh, 211));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 218), new ItemsRequirement(...PalParkShop.items));
 ChallengeRequirements.add(TownList['Iron Island'], new ItemsRequirement(ItemList.Metal_coat), new DockRequirement());
+ChallengeRequirements.add(TownList['Lake Valor'], new DungeonShinyRequirement('Iron Island'));
 ChallengeRequirements.add(GymList['Snowpoint City'], new ItemsRequirement(ItemList.Upgrade));
 ChallengeRequirements.add(GymList['Sunyshore City'], new ItemsRequirement(ItemList.Thunder, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
 ChallengeRequirements.set(TownList['Sendoff Spring'], new DungeonShinyRequirement('Flower Paradise'));
