@@ -49,7 +49,7 @@ window.addEventListener("load", function() {
             new SettingOption('Pokéballs', 'pokeballSelector'),
         ], 'pokeballSelector'));
         Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-        Settings.add(new BooleanSetting('gideBItem', 'Hide Battle Item window', false));
+        Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false));
         Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
         Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
         Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
@@ -127,7 +127,7 @@ window.addEventListener("load", function() {
             new SettingOption('Soothe Bell', 'Soothe_bell'),
             new SettingOption('Sun Stone', 'Sun_stone'),
             new SettingOption('Thunder Stone', 'Thunder_stone'),
-            new SettingOption('Trade Stone', 'Trade_stone'),
+            new SettingOption('Linking Cord', 'Linking_cord'),
             new SettingOption('Upgrade', 'Upgrade'),
             new SettingOption('Water Stone', 'Water_stone'),
             new SettingOption('Whipped Dream', 'Whipped_dream'),
@@ -213,7 +213,7 @@ window.addEventListener("load", function() {
         a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
         <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('gideBItem')}"></tr>
+        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideBItem')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
         <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
@@ -325,8 +325,6 @@ window.addEventListener("load", function() {
             }
         }, 3000);
     }, 3000);
-
-    setTimeout(setupShinyRequirements, 3000);
 });
 
 function main(){
@@ -374,12 +372,12 @@ function main(){
             document.querySelector("#phaseModal").style.display = "block";
         });
 
-        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
+        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > div > button:nth-child(2)");
         phaseExport.addEventListener("click", function() {
             if(!event.detail || event.detail == 1) {
                 if (hasExported == 0) {
                     setTimeout(function(){
-                        a6export()
+                        a6export();
                     }, 2000);
                     hasExported = 1;
                 }
@@ -831,7 +829,7 @@ function a6menu(){
         var ptModalHeader = document.createElement('div');
         ptModalHeader.className = 'modal-header';
         ptModalHeader.setAttribute("role", "document");
-        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><button class="btn btn-secondary" type="button" data-toggle="collapse" style="margin-left: 25px;">Export</button>`;
+        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><div><button class="btn btn-secondary" type="button" onclick="removeAllPhases()">Remove All</button><button class="btn btn-secondary" type="button">Export</button></div>`;
 
         var ptModalBody = document.createElement('div');
         ptModalBody.className = 'modal-body';
@@ -859,15 +857,18 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        if (Settings.getSetting('hideOak').observableValue() == true) {
-            document.querySelector("#oakItemsContainer").style.display = 'none';
-        } else {
-            document.querySelector("#oakItemsContainer").removeAttribute("style");
-        }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
-            document.querySelector("#battleItemContainer").style.display = 'none';
-        } else {
-            document.querySelector("#battleItemContainer").removeAttribute("style");
+        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
+        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
+            if (Settings.getSetting('hideOak').observableValue() == true) {
+                document.querySelector("#oakItemsContainer").style.display = 'none';
+            } else {
+                document.querySelector("#oakItemsContainer").removeAttribute("style");
+            }
+            if (Settings.getSetting('hideBItem').observableValue() == true) {
+                document.querySelector("#battleItemContainer").style.display = 'none';
+            } else {
+                document.querySelector("#battleItemContainer").removeAttribute("style");
+            }
         }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
@@ -900,7 +901,7 @@ function a6menu(){
         } else {
             document.querySelector("#oakItemsContainer").removeAttribute("style");
         }
-        if (Settings.getSetting('gideBItem').observableValue() == true) {
+        if (Settings.getSetting('hideBItem').observableValue() == true) {
             document.querySelector("#battleItemContainer").style.display = 'none';
         } else {
             document.querySelector("#battleItemContainer").removeAttribute("style");
@@ -1317,7 +1318,11 @@ function uniqueCheckEvent() {
 }
 
 function boostedRoute() {
-    document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.getIncreasedChanceRouteByRegion(player.region)().routeName;
+    if (player.region == 6) {
+        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
+    } else {
+        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
+    }
 }
 
 function lastPokeEncounter() {
@@ -1343,12 +1348,27 @@ async function missingLoot() {
         if (Settings.getSetting('showLoot').observableValue() == true) {
             if (player.town().dungeon != undefined && player.route() == 0) {
                 document.querySelector("#possibleLoot").removeAttribute("style");
-                var dLoot = player.town().dungeon.itemList;
+                var dLoot1 = player.town().dungeon.lootTable.common;
+                var dLoot2 = player.town().dungeon.lootTable.epic;
+                var dLoot3 = player.town().dungeon.lootTable.mythic;
                 var dLootA = [];
-
-                for (let x = 0; x < dLoot.length; x++) {
-                    var lootI = GameConstants.humanifyString(dLoot[x].loot);
-                    dLootA.push( lootI );
+                if (dLoot1 != undefined) {
+                    for (let x = 0; x < dLoot1.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot1[x].loot);
+                        dLootA.push( lootI );
+                    }
+                }
+                if (dLoot2 != undefined) {
+                    for (let x = 0; x < dLoot2.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot2[x].loot);
+                        dLootA.push( lootI );
+                    }
+                }
+                if (dLoot3 != undefined) {
+                    for (let x = 0; x < dLoot3.length; x++) {
+                        var lootI = GameConstants.humanifyString(dLoot3[x].loot);
+                        dLootA.push( lootI );
+                    }
                 }
                 dLootA = [ ...new Set(dLootA) ].sort().join(', ');
                 document.querySelector("#possibleLoot > td:nth-child(2)").innerText = dLootA;
@@ -1392,15 +1412,62 @@ async function missingShinies() {
                 var missDP = player.town().dungeon.pokemonList;
                 var missDBP = player.town().dungeon.bossPokemonList;
                 var missDBPa = player.town().dungeon.bossEncounterList;
+                var ultraArr = ['Nihilego', 'Buzzwole', 'Pheromosa', 'Xurkitree', 'Kartana', 'Celesteela', 'Blacephalon', 'Stakataka', 'Guzzlord', 'Poipole', 'Naganadel',];
+
                 for (let x = 0; x < missDP.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
-                        missTemp.push(missDP[x])
+                    if ( App.game.quests.getQuestLine('Ultra Beast Hunt').state() == 1) {
+                        if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon != undefined) {
+                            if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon.name == missDP[x]) {
+                                if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                    missTemp.push(missDP[x])
+                                }
+                            }
+                        } else if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests != undefined ) {
+                            var cQuests = App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests;
+                            for (let y = 0; y < cQuests.length; y++) {
+                                if ( cQuests[y].pokemon.name == missDP[x]) {
+                                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                        missTemp.push(missDP[x])
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if(ultraArr.indexOf(missDP[x]) === -1) {
+                            if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
+                                missTemp.push(missDP[x])
+                            }
+                        }
                     }
                 }
-                for (let x = 0; x < missDBP.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
-                        if ( missDBPa[x].lock != true ) {
-                            missTemp.push(missDBP[x])
+                if (player.region < 6) {
+                    for (let x = 0; x < missDBP.length; x++) {
+                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
+                            npID = npID.split('.')[0];
+                            for (let y = 0; y < missDBPa.length; y++) {
+                                var image = Number(missDBPa[y].image.split('/').pop().split('.')[0]);
+                                if (npID == image) {
+                                    if ( missDBPa[y].lock != true ) {
+                                        missTemp.push(missDBP[x]);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                } else if (player.region == 6) {
+                    for (let x = 0; x < missDBP.length; x++) {
+                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
+                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
+                            for (let y = 0; y < missDBPa.length; y++) {
+                                var image = missDBPa[y].image.split('/').pop().split('.png')[0];
+                                if (npID == image) {
+                                    if ( missDBPa[y].lock != true ) {
+                                        missTemp.push(missDBP[x]);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1414,32 +1481,41 @@ async function missingShinies() {
                 document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
                 //Dungeon Chest Poke
                 var lootA = [];
-                var lootL = player.town().dungeon.itemList;
-                for (let x = 0; x < lootL.length; x++) {
+                var lootR = [];
+                //var lootL = player.town().dungeon.itemList;
+                var lootIC = player.town().dungeon.lootTable.common
+                var lootIE = player.town().dungeon.lootTable.epic
+                var lootIL = player.town().dungeon.lootTable.mythic
+
+                lootA.concat(lootIC);
+                lootA.concat(lootIE);
+                lootA.concat(lootIL);
+
+                for (let x = 0; x < lootA.length; x++) {
                     if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootA.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
+                        lootR.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
                     }
                 }
                 var lootC = [];
-                for (let x = 0; x < lootA.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(lootA[x], true) == true) {
-                        lootC.push(lootA[x])
+                for (let x = 0; x < lootR.length; x++) {
+                    if ( App.game.party.alreadyCaughtPokemonByName(lootR[x], true) == true) {
+                        lootC.push(lootR[x])
                     }
                 }
-                lootA = lootA.filter( ( el ) => !lootC.includes( el ) );
-                if (missTemp.length >= 1 && lootA.length >= 1) {
-                    missTemp = missTemp.concat(lootA);
+                lootR = lootR.filter( ( el ) => !lootC.includes( el ) );
+                if (missTemp.length >= 1 && lootR.length >= 1) {
+                    missTemp = missTemp.concat(lootR);
                     missTemp = missTemp.sort().join(', ');
                     document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
                 } else if (missTemp.length == 0) {
-                    if ( lootA.length == 0) {
-                        lootA = 'N/A';
-                    } else if ( lootA.length == 1) {
-                        lootA = lootA[0];
-                    } else if (lootA.length > 1) {
-                        lootA = lootA.sort().join(', ');
+                    if ( lootR.length == 0) {
+                        lootR = 'N/A';
+                    } else if ( lootR.length == 1) {
+                        lootR = lootR[0];
+                    } else if (lootR.length > 1) {
+                        lootR = lootR.sort().join(', ');
                     }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootA;
+                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootR;
                 }
             }
             //Shop Poke
@@ -2011,6 +2087,14 @@ function removePhase(id){
 		}
 	}
 	phases = newArray;
+	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+	hasRun = 0;
+	a6phases();
+}
+
+function removeAllPhases(){
+	phases = [];
 	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 	hasRun = 0;
@@ -4310,136 +4394,5 @@ async function ballBot() {
                     }
                 }
         }
-    }
-}
-
-function setupShinyRequirements() {
-    class RouteShinyRequirements extends RouteKillRequirement {
-        constructor(region, route) {
-            super(GameConstants.ROUTE_KILLS_NEEDED, region, route);
-        }
-
-        isCompleted() {
-            return super.isCompleted() && RouteHelper.routeCompleted(this.route, this.region, true)
-        }
-    }
-    class ShinyDungeonRequirement extends ClearDungeonRequirement {
-        constructor(dungeonIndex) {
-            super(1, dungeonIndex);
-        }
-
-        isCompleted() {
-            return super.isCompleted() && DungeonRunner.dungeonCompleted(dungeonList[GameConstants.RegionDungeons.flat()[this.dungeonIndex]], true)
-        }
-    }
-    class ShinySafariRequirement extends Requirement {
-        constructor() {
-            super(0, 2);
-        }
-
-        isCompleted() {
-            return Safari.completed(true)
-        }
-
-        hint() {
-            return 'Safari needs to be completed.'
-        }
-    }
-
-    function replaceRequirements(requirements) {
-        for (let reqIdx = 0; reqIdx <= requirements?.length; reqIdx++) {
-            switch (requirements[reqIdx]?.constructor.name) {
-                case "MultiRequirement":
-                case "OneFromManyRequirement":
-                    replaceRequirements(requirements[reqIdx].requirements);
-                    break;
-                case "RouteKillRequirement":
-                    requirements[reqIdx] = new RouteShinyRequirements(requirements[reqIdx].region, requirements[reqIdx].route);
-                    break;
-                case "ClearDungeonRequirement":
-                    requirements[reqIdx] = new ShinyDungeonRequirement(requirements[reqIdx].dungeonIndex);
-                    break;
-            }
-        }
-    }
-
-    if (App.game != undefined) {
-        for (let town of Object.values(TownList)) {
-            replaceRequirements(town?.requirements);
-            if (town.constructor.name === "DungeonTown") {
-                Object.assign(town, {
-                    isUnlocked: function () {
-                        return (
-                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.dungeon.name)]() ||
-                            this.requirements.every(requirement => requirement.isCompleted())
-                        );
-                    }
-                });
-            } else {
-                town.hasGym = -1;
-                town.hasDungeon = -1;
-
-                for (let i = 0; i < town.content.length; i++ ) {
-                    if (town.content[i]?.constructor.name === "Gym")
-                        town.hasGym = i;
-                    if (town.content[i]?.constructor.name === "MoveToDungeon")
-                        town.hasDungeon = i;
-                }
-
-                Object.assign(town, {
-                    isUnlocked: function () {
-                        const alreadyClearGym = (
-                            this.hasGym >= 0 &&
-                            App.game.badgeCase.hasBadge(this.content[this.hasGym].badgeReward)
-                        );
-                        const alreadyClearDungeon = (
-                            this.hasDungeon >=0 &&
-                            App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(this.content[this.hasDungeon].dungeon.name)]()
-                        );
-                        return (
-                            alreadyClearGym || alreadyClearDungeon ||
-                            this.requirements.every(requirement => requirement.isCompleted())
-                        );
-                    }
-                });
-            }
-        }
-
-        for (
-            let regIdx = 0;
-            GameConstants.Region[regIdx] != undefined;
-            regIdx++
-        ) {
-            const routes = Routes.getRoutesByRegion(regIdx);
-            for (let routeIdx = 0; routeIdx <= routes.length; routeIdx++) {
-                if (routes[routeIdx]) {
-                    replaceRequirements(routes[routeIdx]?.requirements);
-                    Object.assign(routes[routeIdx], {
-                        isUnlocked: function () {
-                            return (
-                                App.game.statistics.routeKills[this.region][this.number]() ||
-                                this.requirements.every(requirement => requirement.isCompleted())
-                            );
-                        }
-                    });
-                }
-            }
-        }
-
-        // Split path requirements
-        // Kanto
-        Routes.getRoute(0,2).requirements.push(new RouteShinyRequirements(0,22)) // route 2 require route 22
-        Routes.getRoute(0,11).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Diglett\'s Cave'))) // route 11 require diglet cave
-        Routes.getRoute(0,9).requirements.push(new RouteShinyRequirements(0,11)) // route 9 require route 11
-        Routes.getRoute(0,13).requirements.push(new RouteShinyRequirements(0,4)) // route 13 require route 4 (fishing)
-        Routes.getRoute(0,16).requirements = [new RouteShinyRequirements(0,15)] // route 16 only require route 15
-        Routes.getRoute(0,17).requirements = [new RouteShinyRequirements(0,16)] // route 17 only require route 16
-        Routes.getRoute(0,18).requirements = [new RouteShinyRequirements(0,17)] // route 18 only require route 17
-        TownList['Power Plant'].requirements.push(new ShinySafariRequirement()) // Power Plant require safari
-        Routes.getRoute(0,19).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Power Plant'))) // route 19 require Power Plant
-        TownList['Fuchsia City'].requirements.push(new RouteShinyRequirements(0,18)) // Fuchia city require route 18
-        Routes.getRoute(0,21).requirements.push(new ShinyDungeonRequirement(GameConstants.getDungeonIndex('Pokémon Mansion'))) // route 12 require Pokémon Mansion
-    } else {
-        setTimeout(setupShinyRequirements, 100);
     }
 }
