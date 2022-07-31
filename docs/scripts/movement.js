@@ -515,7 +515,7 @@ ChallengeRequirements.add(GymList['Rustboro City'], new ItemsRequirement(ItemLis
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 116), new GymBadgeRequirement(BadgeEnums.Stone));
 ChallengeRequirements.set(TownList['Granite Cave'], new GymBadgeRequirement(BadgeEnums.Knuckle));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 110), new DockRequirement(), new ItemsRequirement(ItemList.Linking_cord));
-ChallengeRequirements.add(GymList['Mauville City'], new ItemsSRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
+ChallengeRequirements.add(GymList['Mauville City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 117), new GymBadgeRequirement(BadgeEnums.Dynamo));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 111), new RouteShinyRequirement(GameConstants.Region.hoenn, 117), new ItemsRequirement(ItemList.Soothe_bell));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 114), new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
