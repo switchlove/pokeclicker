@@ -1,5 +1,5 @@
 {
-    "version": "0.0.13c",
+    "version": "0.0.13d",
     "files": [
         "scripts/acsrq.js",
         "scripts/movement.js",

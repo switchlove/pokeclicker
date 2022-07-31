@@ -372,12 +372,12 @@ function main(){
             document.querySelector("#phaseModal").style.display = "block";
         });
 
-        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > button");
+        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > div > button:nth-child(2)");
         phaseExport.addEventListener("click", function() {
             if(!event.detail || event.detail == 1) {
                 if (hasExported == 0) {
                     setTimeout(function(){
-                        a6export()
+                        a6export();
                     }, 2000);
                     hasExported = 1;
                 }
@@ -829,7 +829,7 @@ function a6menu(){
         var ptModalHeader = document.createElement('div');
         ptModalHeader.className = 'modal-header';
         ptModalHeader.setAttribute("role", "document");
-        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><button class="btn btn-secondary" type="button" data-toggle="collapse" style="margin-left: 25px;">Export</button>`;
+        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><div><button class="btn btn-secondary" type="button" onclick="removeAllPhases()">Remove All</button><button class="btn btn-secondary" type="button">Export</button></div>`;
 
         var ptModalBody = document.createElement('div');
         ptModalBody.className = 'modal-body';
@@ -1307,15 +1307,14 @@ function uniqueCheckAll() {
 }
 
 function uniqueCheckEvent() {
-    var eventPoke = [
-        "Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)","Bulbasaur (Rose)","Red Spearow", "Surprise Togepi"];
+    var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)"];
     var eventCaught = 0;
     for (let eP = 0; eP < eventPoke.length; eP++) {
         if ( App.game.party.alreadyCaughtPokemonByName(eventPoke[eP]) == true) {
             eventCaught++;
         }
     }
-    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/' + eventPoke.length;
+    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/27';
 }
 
 function boostedRoute() {
@@ -2088,6 +2087,14 @@ function removePhase(id){
 		}
 	}
 	phases = newArray;
+	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+	hasRun = 0;
+	a6phases();
+}
+
+function removeAllPhases(){
+	phases = [];
 	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
 	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
 	hasRun = 0;
