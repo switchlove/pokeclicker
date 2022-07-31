@@ -1,4 +1,10 @@
 {
-  "version": "0.0.12",
-  "files": ["scripts/acsrq.js","scripts/movement.js","index.html"]
+    "version": "0.0.12",
+    "files": [
+        "scripts/acsrq.js",
+        "scripts/movement.js",        
+        "scripts/modules.min.js",        
+        "scripts/script.min.js",
+        "index.html"
+    ]
 }
