@@ -368,6 +368,13 @@ Gym.prototype.isUnlocked = function () {
     }
     return contentUnlock.call(this) || this.wasUnlock;
 };
+
+const weatherProgress = WeatherRequirement.prototype.getProgress;
+WeatherRequirement.prototype.getProgress = function () {
+    return this.region
+        ? +this.weather.includes(Weather.regionalWeather[this.region]())
+        : weatherProgress.call(this);
+};
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
@@ -740,6 +747,15 @@ for (let region = 0; region < GameConstants.Region.final; region++) {
     for (let route of Routes.getRoutesByRegion(region)) {
         if (!(route.requirements[0] instanceof ChallengeRequirements)) {
             ChallengeRequirements.add(route);
+        }
+        for (let pkm of route.pokemon.special) {
+            let req = pkm.req;
+            if (req instanceof MultiRequirement) {
+                req = req.requirements.find(r => r instanceof WeatherRequirement);
+            }
+            if (req instanceof WeatherRequirement) {
+                req.region = region;
+            }
         }
     }
 }
