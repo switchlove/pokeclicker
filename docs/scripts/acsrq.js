@@ -37,154 +37,6 @@ window.addEventListener("load", function() {
             main();
         }, 500);
 
-        Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this:',
-        [
-            new SettingOption('Achievement Tracker', 'achivementTrackerContainer'),
-            new SettingOption('Battle Items', 'battleItemContainer'),
-            new SettingOption('Hatchery', 'breedingDisplay'),
-            new SettingOption('Oak Items', 'oakItemsContainer'),
-            new SettingOption('Pokémon List', 'pokemonListContainer'),
-            new SettingOption('Quests', 'questDisplayContainer'),
-            new SettingOption('Town Map', 'townMap'),
-            new SettingOption('Pokéballs', 'pokeballSelector'),
-        ], 'pokeballSelector'));
-        Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-        Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false));
-        Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
-        Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
-        Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
-        Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
-        Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
-        Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
-        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
-
-        Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
-        Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
-        Settings.add(new BooleanSetting('chestCollect', 'Open chests in dungeons', false));
-        Settings.add(new Setting('dungeOpts', 'Dungeon bot stop options:',
-        [
-            new SettingOption('None', 'dungOptN'),
-            new SettingOption('Clears', 'dungOptC'),
-            new SettingOption('Shiny Check', 'dungOptSC'),
-            new SettingOption('Dungeon Tokens Left', 'dungOptDT'),
-        ], 'dungOptN'));
-        Settings.add(new Setting('gymOpts', 'Gym bot stop options:',
-        [
-            new SettingOption('Clears', 'gymOptC'),
-            new SettingOption('None', 'gymOptN'),
-        ], 'gymOptN'));
-        Settings.add(new Setting('gymE4Opts', 'E4 Boss to fight:',
-        [
-            new SettingOption('First', '1'),
-            new SettingOption('Second', '2'),
-            new SettingOption('Third', '3'),
-            new SettingOption('Fourth', '4'),
-            new SettingOption('Fifth', '5'),
-        ], '1'));
-        Settings.add(new Setting('bfOpts', 'Battle Frontier stop options:',
-        [
-            new SettingOption('None', 'bfOptN'),
-            new SettingOption('Time', 'bfOptT'),
-            new SettingOption('Level', 'bfOptL'),
-        ], 'bfOptN'));
-        Settings.add(new Setting('maxChests', 'maxChests', [], '1'));
-        Settings.add(new Setting('maxClears', 'maxClears', [], '1000'));
-        Settings.add(new Setting('minDT', 'minDT', [], '10000'));
-        Settings.add(new Setting('maxLvl', 'maxLvl', [], '100'));
-        Settings.add(new Setting('maxTime', 'maxTime', [], '30'));
-        Settings.add(new Setting('srOpts', 'Soft Reset Type:',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Mystery Eggs', 'mys'),
-            new SettingOption('Evo Items', 'evo'),
-            new SettingOption('Fossils', 'fos'),
-            new SettingOption('Shop Mon', 'poke'),
-            new SettingOption('Regular Eggs', 'egg'),
-        ], 'none'));
-        Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item:',
-        [
-            new SettingOption('Dawn Stone', 'Dawn_stone'),
-            new SettingOption('Deepsea Scale', 'Deepsea_scale'),
-            new SettingOption('Deepsea Tooth', 'Deepsea_tooth'),
-            new SettingOption('Dragon Scale', 'Dragon_scale'),
-            new SettingOption('Dubious Disc', 'Dubious_disc'),
-            new SettingOption('Dusk Stone', 'Dusk_stone'),
-            new SettingOption('Electirizer', 'Electirizer'),
-            new SettingOption('Fire Stone', 'Fire_stone'),
-            new SettingOption('Kings Rock', 'Kings_rock'),
-            new SettingOption('Leaf Stone', 'Leaf_stone'),
-            new SettingOption('Magmarizer', 'Magmarizer'),
-            new SettingOption('Metal Coat', 'Metal_coat'),
-            new SettingOption('Moon Stone', 'Moon_stone'),
-            new SettingOption('Prism Scale', 'Prism_scale'),
-            new SettingOption('Protector', 'Protector'),
-            new SettingOption('Razor Claw', 'Razor_claw'),
-            new SettingOption('Razor Fang', 'Razor_fang'),
-            new SettingOption('Reaper Cloth', 'Reaper_cloth'),
-            new SettingOption('Sachet', 'Sachet'),
-            new SettingOption('Shiny Stone', 'Shiny_stone'),
-            new SettingOption('Soothe Bell', 'Soothe_bell'),
-            new SettingOption('Sun Stone', 'Sun_stone'),
-            new SettingOption('Thunder Stone', 'Thunder_stone'),
-            new SettingOption('Linking Cord', 'Linking_cord'),
-            new SettingOption('Upgrade', 'Upgrade'),
-            new SettingOption('Water Stone', 'Water_stone'),
-            new SettingOption('Whipped Dream', 'Whipped_dream'),
-        ], 'Water_stone'));
-        Settings.add(new Setting('breedingOpts', 'Breeding options:',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Upto Attack', 'attack'),
-            new SettingOption('Mystery Eggs', 'mystery'),
-            new SettingOption('Typed Eggs', 'typed'),
-            new SettingOption('Fossils', 'fossil'),
-        ], 'none'));
-        Settings.add(new Setting('minBreedAttack', 'minBreedAttack', [], '1000'));
-        Settings.add(new Setting('typedEggOpts', 'Typed egg to use:',
-        [
-            new SettingOption('Fire', 'fire'),
-            new SettingOption('Water', 'water'),
-            new SettingOption('Grass', 'grass'),
-            new SettingOption('Electric', 'electric'),
-            new SettingOption('Fighting', 'fighting'),
-            new SettingOption('Dragon', 'dragon'),
-        ], 'fire'));
-        Settings.add(new Setting('fossilOpts', 'Fossil to use:',
-        [
-            new SettingOption('Dome', 'dome'),
-            new SettingOption('Helix', 'helix'),
-            new SettingOption('Amber', 'amber'),
-            new SettingOption('Root', 'root'),
-            new SettingOption('Claw', 'claw'),
-            new SettingOption('Skull', 'skull'),
-            new SettingOption('Armor', 'armor'),
-            new SettingOption('Plume', 'plume'),
-            new SettingOption('Cover', 'cover'),
-            new SettingOption('Jaw', 'jaw'),
-            new SettingOption('Sail', 'sail'),
-        ], 'dome'));
-        Settings.add(new Setting('evoItemCount', 'evoItemCount', [], '1'));
-        Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Pokéball', 'pokeB'),
-            new SettingOption('Greatball', 'greatB'),
-            new SettingOption('Ultraball', 'ultraB'),
-        ], 'none'));
-        Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
-        Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
-        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
-        [
-            new SettingOption('None', 'safariOptN'),
-            new SettingOption('Shiny Check', 'safariOptSC'),
-        ], 'safariOptSC'));
-        /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
-        [
-        new SettingOption('None', 'none'),
-        new SettingOption('Boost Mulch', 'boostM'),
-        ], 'none'));*/
-
         const settingsModal = document.getElementById('settingsModal');
         const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
         const tabContent = settingsModal.getElementsByClassName('tab-content')[0];
@@ -2567,11 +2419,6 @@ async function srBot() {
             break;
         case "fos":
             var fossilSR = Settings.getSetting('fossilOpts').observableValue();
-            if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
-                fossilSR = "Old Amber";
-            } else {
-                fossilSR = fossilSR.charAt(0).toUpperCase() + fossilSR.slice(1) + ' Fossil';
-            }
             var fossilDeets = player.mineInventory().find(i => i.name == fossilSR);
             var fossilMon = GameConstants.FossilToPokemon[fossilSR];
             if ( fossilDeets.amount() >= 1 ) {
@@ -4295,11 +4142,6 @@ async function autoBreed() {
             [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
         } else if(Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
             var fossilU = Settings.getSetting('fossilOpts').observableValue();
-            if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
-                fossilU = "Old Amber";
-            } else {
-                fossilU = fossilU.charAt(0).toUpperCase() + fossilU.slice(1) + ' Fossil';
-            }
             if (player.mineInventory().find(i => i.name == fossilU).amount() >= 1) {
                 Underground.sellMineItem(player.mineInventory().find(i => i.name == fossilU).id);
             } else {
