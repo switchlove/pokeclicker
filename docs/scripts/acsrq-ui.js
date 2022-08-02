@@ -129,6 +129,15 @@ Settings.add(new Setting('safariOpts', 'Safari bot stop options', [
     new SettingOption('None', 'safariOptN'),
     new SettingOption('Shiny Check', 'safariOptSC'),
 ], 'safariOptSC'));
+//Bot state
+Settings.add(new BooleanSetting('botstate.breeding', 'Breeding Bot', false));
+Settings.add(new BooleanSetting('botstate.dungeon', 'Dungeon Bot', false));
+Settings.add(new BooleanSetting('botstate.gym', 'Gym Bot', false));
+Settings.add(new BooleanSetting('botstate.safari', 'Safari Bot', false));
+Settings.add(new BooleanSetting('botstate.bf', 'BF Bot', false));
+Settings.add(new BooleanSetting('botstate.sr', 'SR Bot', false));
+Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
+Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 //#endregion
 
 //#region Info / Bot menu
@@ -146,21 +155,32 @@ acsrqInfo = function () {
     </div>
     `);
 
-    let berries = Object.values(BerryType).filter(t => !Number.isInteger(t));
+    let berries = Object.values(BerryType).filter(t => !Number.isInteger(t)).map(b => new SettingOption(b, b));
     berries.pop(); // remove None entry
     berries.pop(); // remove Enigma entry
+
+    Settings.getSetting('botstate.mutate').options.push(...berries.slice(8));
+    Settings.getSetting('botstate.plant').options.push(...berries,
+        new SettingOption('S+C', 'S+C'),
+        new SettingOption('S+C+P','S+C+P'),
+        new SettingOption('S+L', 'S+L'),
+        new SettingOption('Perp. P', 'Perp. P')
+        // new SettingOption('S+L+P', 'S+L+P'),
+        // new SettingOption('S+L+C', 'S+L+C'),
+        // new SettingOption('S+L+C+P', 'S+L+C+P')
+    );
 
     let content = [
         '<!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->',
         '<tr><td colspan="2" class="card-header">Bots</td></tr>',
-        acsrqInfo.Checkbox('breeding', 'Breeding Bot', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
-        acsrqInfo.Checkbox('dungeon', 'Dungeon Bot', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
-        acsrqInfo.Checkbox('gym', 'Gym Bot', 'true', '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
-        acsrqInfo.Checkbox('safari', 'Safari Bot', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('bf', 'BF Bot', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
-        acsrqInfo.Checkbox('sr', 'SR Bot', 'TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
-        acsrqInfo.Select('plant', 'Planter Bot', ...berries, 'S+C', 'S+C+P', 'S+L', 'Perp. P'), //, 'S+L+P', 'S+L+C', 'S+L+C+P'),
-        acsrqInfo.Select('mutate', 'Mutate Bot', ...berries.slice(8)),
+        acsrqInfo.Checkbox('breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
+        acsrqInfo.Checkbox('dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
+        acsrqInfo.Checkbox('gym', 'true', '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
+        acsrqInfo.Checkbox('safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
+        acsrqInfo.Checkbox('bf', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
+        acsrqInfo.Checkbox('sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Select('plant'),
+        acsrqInfo.Select('mutate'),
         '<!-- /ko -->',
         '<tr><td colspan="2" class="card-header">Info</td></tr>',
         `<tr id="areaPhase">
@@ -185,22 +205,29 @@ acsrqInfo.Info = (id, label) => `
     </tr>
 `;
 
-acsrqInfo.Checkbox = (bot, label, visible = 'true', enable = 'true') => `
-    <tr id="${bot}Bot" data-bind="visible: ${visible}">
-        <td><input type="checkbox" id="${bot}Check" value=0 data-bind="enable: ${enable}"></td>
-        <td>${label}</td>
+acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
+    <tr id='${bot}Bot' data-bind="visible: ${visible}, template: {data: Settings.getSetting('botstate.${bot}')}">
+        <td class="p-2">
+            <input class="clickable" type="checkbox"
+                data-bind="checked: $data.observableValue(), attr: {name, id: '${bot}Check'}, enable: ${enable}"
+                onchange="Settings.setSettingByName(this.name, this.checked)"/>
+        </td>
+        <td class="p-2">
+            <label class="m-0" data-bind="attr: { for: 'checkbox-' + $data.name }, text: $data.displayName">
+                setting name
+            </label>
+        </td>
     </tr>
 `;
 
-acsrqInfo.Select = (bot, label, ...options) => `
-    <tr id="${bot}" data-bind="visible: App.game.farming.canAccess()">
+acsrqInfo.Select = (bot) => `
+    <tr id="${bot}Bot" data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('botstate.${bot}')}">
         <td>
-            <select id="${bot}Select">
-                <option value="N/A" default>N/A</option>
-                ${options.map(opt => `<option value="${opt}">${opt}</value>`).join('')}
+            <select id="${bot}Select" onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name}">
+                <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
             </select>
         </td>
-        <td>${label}</td>
+        <td data-bind="text: $data.displayName">setting name</td>
     </tr>
 `;
 //#endregion
