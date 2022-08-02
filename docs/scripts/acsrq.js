@@ -606,7 +606,7 @@ function a6menu(){
             td1r06submenu.text = val;
             td1r06menu.appendChild(td1r06submenu);
         }
-        td1r06menu.id = "autoPlant";
+        td1r06menu.id = "plantSelect";
         var td2r06 = document.createElement('td');
 
         var tr07 = document.createElement('tr');
@@ -623,7 +623,7 @@ function a6menu(){
             td1r07submenu.text = val;
             td1r07menu.appendChild(td1r07submenu);
         }
-        td1r07menu.id = "autoMutate";
+        td1r07menu.id = "mutateSelect";
         var td2r07 = document.createElement('td');
 
         var tr2 = document.createElement('tr');
@@ -1189,12 +1189,12 @@ async function a6settings() {
                 document.querySelector("#plantBot").removeAttribute("style");
                 document.querySelector("#mutateBot").removeAttribute("style");
                 //Planter
-                var checkAutoFarmer1 = document.querySelector("#autoPlant");
+                var checkAutoFarmer1 = document.querySelector("#plantSelect");
                 if (checkAutoFarmer1.value != "N/A"){
                     plantBot();
                 }
                 //Mutator
-                var checkAutoFarmer2 = document.querySelector("#autoMutate");
+                var checkAutoFarmer2 = document.querySelector("#mutateSelect");
                 if (checkAutoFarmer2.value != "N/A"){
                     mutateBot();
                 }
@@ -2765,7 +2765,7 @@ async function srBot() {
 }
 
 async function plantBot() {
-    var selectedBerry = document.querySelector("#autoPlant").selectedIndex - 1;
+    var selectedBerry = document.querySelector("#plantSelect").selectedIndex - 1;
     if ( selectedBerry <= 65 ) {
         if ( selectedBerry <= App.game.farming.highestUnlockedBerry() ) {
             if (App.game.farming.plotList[12].isEmpty() == true){
@@ -2902,7 +2902,7 @@ async function plantBot() {
 }
 
 async function mutateBot() {
-    var selectedBerry = document.querySelector("#autoMutate").value;
+    var selectedBerry = document.querySelector("#mutateSelect").value;
 
     switch (selectedBerry) {
         case "Persim":
