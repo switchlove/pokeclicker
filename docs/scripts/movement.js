@@ -378,7 +378,7 @@ WeatherRequirement.prototype.getProgress = function () {
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
-MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyMovement?.active() || (App.game.party.caughtPokemon.every(pokemon => pokemon.shiny) && MapHelper.isRegionCleared(player.highestRegion())));
+MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyMovement?.active() || (isPartyShiny() && MapHelper.isRegionCleared(player.highestRegion())));
 MapHelper.isRegionCleared = (region) => {
     let check = true;
     for (let i = 0; check && i <= region; i++) {
@@ -389,6 +389,12 @@ MapHelper.isRegionCleared = (region) => {
     }
     return check;
 };
+function isPartyShiny() {
+    let discord = App.game.discord.codes.map(code => code.name);
+    return App.game.party.caughtPokemon
+        .filter(p => !(discord.includes(p.name) && PokemonHelper.calcNativeRegion(p.name) > player.region))
+        .every(pokemon => pokemon.shiny);
+}
 
 // replace Pokedex by Shiny pokedex in prof oak check
 const defaultDialog = Object.getOwnPropertyDescriptor(ProfNPC.prototype, 'dialogHTML').get;
