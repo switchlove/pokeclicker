@@ -534,53 +534,6 @@ function a6menu(){
         mainHeaderTbl.appendChild(tbdy);
         mainHeader.appendChild(mainHeaderTbl);
 
-        var ptModal = document.createElement('div');
-        ptModal.className = 'modal noselect show';
-        ptModal.id = 'phaseModal';
-        ptModal.tabindex = -1;
-        ptModal.style = "z-index: 1040; display: block; padding-right: 6.9968px;";
-        ptModal.style.display = "none";
-        ptModal.ariaModal = true;
-        ptModal.setAttribute("role", "dialog");
-
-        var ptModalScroll = document.createElement('div');
-        ptModalScroll.className = 'modal-dialog modal-dialog-scrollable modal-lg';
-        ptModalScroll.setAttribute("role", "document");
-
-        var ptModalContent = document.createElement('div');
-        ptModalContent.className = 'modal-content';
-
-        var ptModalHeader = document.createElement('div');
-        ptModalHeader.className = 'modal-header';
-        ptModalHeader.setAttribute("role", "document");
-        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><div><button class="btn btn-secondary" type="button" onclick="removeAllPhases()">Remove All</button><button class="btn btn-secondary" type="button">Export</button></div>`;
-
-        var ptModalBody = document.createElement('div');
-        ptModalBody.className = 'modal-body';
-        ptModalBody.setAttribute("role", "document");
-
-        var ptModalBodyC = document.createElement('div');
-        ptModalBodyC.className = 'mainPhase';
-        ptModalBodyC.innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable"><tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr></table>`;
-
-        var ptModalFooter = document.createElement('div');
-        ptModalFooter.className = 'modal-footer';
-
-        var ptModalFooterB = document.createElement('button');
-        ptModalFooterB.className = 'btn btn-primary';
-        ptModalFooterB.dataset.dismiss = 'modal';
-        ptModalFooterB.textContent = 'Close';
-
-
-        document.body.appendChild(ptModal);
-        ptModal.appendChild(ptModalScroll);
-        ptModalScroll.appendChild(ptModalContent);
-        ptModalContent.appendChild(ptModalHeader);
-        ptModalContent.appendChild(ptModalBody);
-        ptModalBody.appendChild(ptModalBodyC);
-        ptModalContent.appendChild(ptModalFooter);
-        ptModalFooter.appendChild(ptModalFooterB);
-
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
         } else {
@@ -1671,9 +1624,7 @@ function a6phases() {
     		phases = newArray;
     	}
     	if (hasRun == 0) {
-    		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
-    		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
-    		</table>`;
+            let phaseTable = $('#phaseTable tbody')[0];
     		for(var x = 0; x < phases.length; x++){
     			var tablePhase = document.createElement('tr');
     			var phaseId = "phase" + x;
@@ -1681,9 +1632,9 @@ function a6phases() {
     			tablePhase.innerHTML = tablePhaseQuery;
     			tablePhase.style.display = "none";
     			phaseTable.append(tablePhase);
-    			var childNumber = x + 2;
+    			var childNumber = x + 1;
     			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
-    				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
+    				var displayQuery = "#phaseTable tbody > tr:nth-child(" + childNumber + ")";
     				document.querySelector(displayQuery).removeAttribute("style");
     				hasRun = 1;
     			}

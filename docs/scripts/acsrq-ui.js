@@ -1,6 +1,7 @@
 window.addEventListener('load', () => {
     acsrqSettings();
     acsrqFooter();
+    phaseModal();
     acsrqInfo();
 
     setTimeout(() => {
@@ -174,9 +175,9 @@ acsrqInfo = function () {
         acsrqInfo.Select('mutate'),
         '<!-- /ko -->',
         '<tr><td colspan="2" class="card-header">Info</td></tr>',
-        `<tr id="areaPhase">
+        `<tr>
             <td><input type="text" size=6 id="phaseCount" style="text-align: center"></td>
-            <td><a href="#">Phase</a></td>
+            <td><a href="#phaseModal" data-toggle="modal">Phase</a></td>
         </tr>`,
         acsrqInfo.Info('lastEncounterPoke', 'Last Shiny'),
         acsrqInfo.Info('areaClears', 'Clears'),
@@ -339,10 +340,53 @@ acsrqFooter = function () {
     `);
 };
 
-acsrqFooter.showLoot = ko.pureComputed(() => Settings.getSetting('showLoot').observableValue && !player?.route() && player?.town()?.dungeon);
-acsrqFooter.showShiny = ko.pureComputed(() => Settings.getSetting('showShiny').observableValue && (
+acsrqFooter.showLoot = ko.pureComputed(() => Settings.getSetting('showLoot').observableValue() && !player?.route() && player?.town()?.dungeon);
+acsrqFooter.showShiny = ko.pureComputed(() => Settings.getSetting('showShiny').observableValue() && (
     player?.route() || //is route
     player?.town()?.dungeon || //is dungeon
     player.town().content.some(content => content instanceof Shop && content.items.some(item => item instanceof PokemonItem)) //does town have shop
 ));
+//#endregion
+
+//#region Phase
+phaseModal = function() {
+    $('#logBookModal')[0].insertAdjacentHTML('afterend', `
+        <!-- Phase Tracker Modal -->
+        <div class="modal noselect fade show" id="phaseModal" tabindex="-1" role="dialog" aria-labelledby="phaseModalLabel">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style='justify-content: space-between; align-items: center'>
+                        <h5 class="modal-title">Phase Tracker</h5>
+                        <div>
+                            <button class="btn btn-secondary" type="button" onclick="removeAllPhases()">Remove All</button>
+                            <button class="btn btn-secondary" type="button">Export</button>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-body p-0">
+                        <table class="table table-striped table-hover m-0" id="phaseTable">
+                            <thead>
+                                <tr>
+                                    <td>Phase Count</td>
+                                    <td>Location</td>
+                                    <td>Encounter Type</td>
+                                    <td>Pokemon Name</td>
+                                    <td>Capture Status</td>
+                                    <td>Clear Count</td>
+                                    <td>Remove Phase?</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+};
 //#endregion
