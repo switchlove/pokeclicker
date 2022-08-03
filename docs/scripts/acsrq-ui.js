@@ -1,16 +1,12 @@
 window.addEventListener('load', () => {
-    acsrqInfo();
     acsrqSettings();
+    acsrqInfo();
 
     setTimeout(() => {
-        Settings.getSetting('menuPlace').observableValue.subscribe((value) => {
-            document.getElementById('acsrqContainer').appendAfter(document.getElementById(value));
-        });
-
+        // reset bot state when bot are disabled
         Settings.getSetting('botOptions').observableValue.subscribe((value) => {
             if (!value) {
-                document.querySelectorAll('#acsrqBody input[type=checkbox]').forEach(i => i.checked = false);
-                document.querySelectorAll('#acsrqBody select').forEach(i => i.value = 'N/A');
+                Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
             }
         });
 
@@ -36,24 +32,12 @@ window.addEventListener('load', () => {
             }
         };
         //#endregion
-    }, 1100);
+    }, 1100); // because everything is in a timeout 1s and it's need to be the last execution
 });
 
 //#region Settings
 //ACSRQ
-Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this', [
-    new SettingOption('Achievement Tracker', 'achivementTrackerContainer'),
-    new SettingOption('Battle Items', 'battleItemContainer'),
-    new SettingOption('Hatchery', 'breedingDisplay'),
-    new SettingOption('Oak Items', 'oakItemsContainer'),
-    new SettingOption('Pokémon List', 'pokemonListContainer'),
-    new SettingOption('Quests', 'questDisplayContainer'),
-    new SettingOption('Town Map', 'townMap'),
-    new SettingOption('Pokéballs', 'pokeballSelector'),
-], 'pokeballSelector')); //Obsolete
 Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false)); //Obsolete
-Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false)); //Obsolete
 Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
 Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
 Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
@@ -249,22 +233,20 @@ acsrqSettings = function () {
             ]),
         acsrqSettings.Section(
             'UI', [
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'menuPlace'),
-                acsrqSettings.Template('BooleanSettingTemplate', 'hideOak'),
-                acsrqSettings.Template('BooleanSettingTemplate', 'hideBItem'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'showLoot'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'showShiny'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'noWander'),
             ]),
         acsrqSettings.Section(
             'Phases', [
-                acsrqSettings.Template('BooleanSettingTemplate', 'noWander'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'trackPhases'),
                 acsrqSettings.Number('phaseCount'),
             ]),
     ];
+    $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item"><a class="nav-link" href="#settings-acsrq" data-toggle="tab">ACSRQ</a></li>');
+    $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq">${acsrq.join('')}</div>`);
 
     const acsrqScripting = [
-        // acsrqSettings.Section(null, [acsrqSettings.Template('BooleanSettingTemplate', 'botOptions')]),
         acsrqSettings.Section(
             'Dungeons', [
                 acsrqSettings.Template('BooleanSettingTemplate', 'botRush'),
@@ -308,10 +290,6 @@ acsrqSettings = function () {
             ], false),
         acsrqSettings.Section('Safari', [acsrqSettings.Template('MultipleChoiceSettingTemplate', 'safariOpts')], false),
     ];
-
-    $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item"><a class="nav-link" href="#settings-acsrq" data-toggle="tab">ACSRQ</a></li>');
-    $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq">${acsrq.join('')}</div>`);
-
     $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue"><a class="nav-link" href="#settings-acsrq-script" data-toggle="tab">ACSRQ Scripting</a></li>');
     $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq-script">${acsrqScripting.join('')}</div>`);
 };

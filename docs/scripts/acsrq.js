@@ -29,97 +29,12 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-window.addEventListener("load", function() {
-    setTimeout(function(){
+window.addEventListener('load', () => {
+    setTimeout(() => {
         main();
-
-        setInterval(function(){
+        setInterval(() => {
             main();
         }, 500);
-
-        const settingsModal = document.getElementById('settingsModal');
-        const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
-        const tabContent = settingsModal.getElementsByClassName('tab-content')[0];
-
-        const a6TabEl = document.createElement('div');
-        a6TabEl.className = 'tab-pane';
-        a6TabEl.id = 'settings-a6csrq';
-        a6TabEl.innerHTML = ``;
-        tabContent.appendChild(a6TabEl);
-
-        const a6Tab1 = document.createElement('li');
-        a6Tab1.className = 'nav-item';
-
-        const a6Tab1Inner = document.createElement('a');
-        a6Tab1Inner.innerText = 'ACSRQ';
-        a6Tab1Inner.className = 'nav-link';
-        a6Tab1Inner.href = '#settings-a6csrq1';
-        a6Tab1Inner.dataset.toggle = 'tab';
-
-        a6Tab1.appendChild(a6Tab1Inner);
-        tabs.appendChild(a6Tab1);
-
-        const a6Tab1El = document.createElement('div');
-        a6Tab1El.className = 'tab-pane';
-        a6Tab1El.id = 'settings-a6csrq1';
-        a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideBItem')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-        <tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
-		</tbody></table>
-        </tbody></table>`;
-        tabContent.appendChild(a6Tab1El);
-
-        const a6Tab2 = document.createElement('li');
-        a6Tab2.className = 'nav-item';
-
-        const a6Tab2Inner = document.createElement('a');
-        a6Tab2Inner.innerText = 'ACSRQ - Scripting';
-        a6Tab2Inner.className = 'nav-link';
-        a6Tab2Inner.href = '#settings-a6csrq2';
-        a6Tab2Inner.dataset.toggle = 'tab';
-
-        a6Tab2.appendChild(a6Tab2Inner);
-        tabs.appendChild(a6Tab2);
-
-        const a6Tab2El = document.createElement('div');
-        a6Tab2El.className = 'tab-pane';
-        a6Tab2El.id = 'settings-a6csrq2';
-        a6Tab2El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botOptions')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botRush')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('chestCollect')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('dungeOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymE4Opts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('bfOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Number of chests to open:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxChests" name="maxChests" data-bind="value: Settings.getSetting('maxChests').observableValue() || ''" value="1}"></td></tr>
-        <tr style="display: none"><td class="p-2">Maximum clears:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxClears" name="maxClears" data-bind="value: Settings.getSetting('maxClears').observableValue() || ''" value="1000}"></td></tr>
-        <tr style="display: none"><td class="p-2">Minimum DT to retain:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minDT" name="minDT" data-bind="value: Settings.getSetting('minDT').observableValue() || ''" value="10000"></td></tr>
-        <tr style="display: none"><td class="p-2">Battle Frontier level to stop at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxLvl" name="maxLvl" data-bind="value: Settings.getSetting('maxLvl').observableValue() || ''" value="100"></td></tr>
-        <tr style="display: none"><td class="p-2">Time remaining to quit Battle Frontier at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxTime" name="maxTime" data-bind="value: Settings.getSetting('maxTime').observableValue() || ''" value="30"></td></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('srOpts')}"></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('evoOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Evo items to use:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="evoItemCount" name="evoItemCount" data-bind="value: Settings.getSetting('evoItemCount').observableValue() || ''" value="1"></td></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('fossilOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('breedingOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Breed each Pokemon up to this attack power:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBreedAttack" name="minBreedAttack" data-bind="value: Settings.getSetting('minBreedAttack').observableValue() || ''" value="1000"></td></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('typedEggOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
-        <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
-        </tbody></table>`;
-        //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
-        tabContent.appendChild(a6Tab2El);
     }, 1000);
 
     setInterval(function(){
@@ -343,12 +258,7 @@ function a6menu(){
         mainDiv.className = 'card border-secondary mb-3';
         var testDiv = JSON.parse(localStorage.getItem(saveKey))[2];
 
-        if (Settings.getSetting('menuPlace') != null) {
-            mainDiv.appendAfter( document.querySelector( "#" + Settings.getSetting('menuPlace').observableValue() ));
-            menuPos = document.querySelector("#automationContainer").previousSibling.id;
-        } else {
-            mainDiv.appendBefore( document.querySelector("#pokeballSelector") );
-        }
+        mainDiv.appendBefore( document.querySelector("#pokeballSelector") );
 
         var mainHeader = document.createElement('div');
         mainHeader.id = 'automationContainerHeader';
@@ -709,19 +619,6 @@ function a6menu(){
         ptModalContent.appendChild(ptModalFooter);
         ptModalFooter.appendChild(ptModalFooterB);
 
-        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('hideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
-        }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
         } else {
@@ -734,11 +631,6 @@ function a6menu(){
 
     } else {
 
-        if ( document.querySelector("#automationContainer").previousSibling.id != Settings.getSetting('menuPlace').observableValue() ) {
-            document.querySelector("#automationContainer").appendAfter( document.querySelector( "#" + Settings.getSetting('menuPlace').observableValue() ));
-            menuPos = document.querySelector("#automationContainer").previousSibling.id;
-        }
-
         uniqueCheck();
         uniqueCheckAll();
         uniqueCheckEvent();
@@ -748,19 +640,6 @@ function a6menu(){
         missingShinies();
         missingLoot();
 
-        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('hideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
-        }
         if (Settings.getSetting('hideNoti').observableValue() == true) {
             document.querySelector("#toaster").style.display = 'none';
         } else {
@@ -774,90 +653,7 @@ function a6menu(){
 }
 
 async function a6settings() {
-    if (Settings.getSetting('breedingOpts') != null && Settings.getSetting('srOpts') != null){
-        if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'attack') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").removeAttribute("style");
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'fossil' || Settings.getSetting('srOpts').observableValue() == 'fos') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('srOpts').observableValue() == 'evo') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-        }
-    }
-
-    if (Settings.getSetting('chestCollect') != null) {
-        if (Settings.getSetting('chestCollect').observableValue() == true) {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").style.display = "none";
-        }
-    }
-    if (Settings.getSetting('bfOpts') != null) {
-        if (Settings.getSetting('bfOpts').observableValue() == 'bfOptL') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
-        } else if (Settings.getSetting('bfOpts').observableValue() == 'bfOptT') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
-        }
-    }
-    if (Settings.getSetting('ballBuyOpts') != null) {
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'none') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").style.display = "none";
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").removeAttribute("style");
-        }
-    }
     localStorage.setItem(settingKey, JSON.stringify(localSettings));
-
-    if (Settings.getSetting('dungeOpts') != null && Settings.getSetting('gymOpts') != null) {
-        var dunO = Settings.getSetting('dungeOpts').observableValue();
-        var gymO = Settings.getSetting('gymOpts').observableValue();
-
-        if (dunO == 'dungOptC' || gymO == 'gymOptC') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").style.display = "none";
-        }
-        if (dunO == 'dungOptDT') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").style.display = "none";
-        }
-    }
-
 
     if (Settings.getSetting('botOptions') != null) {
         if (Settings.getSetting('botOptions').observableValue() == true) {
@@ -1054,52 +850,7 @@ async function a6settings() {
                 document.querySelector("#plantBot").style.display = "none";
                 document.querySelector("#mutateBot").style.display = "none";
             }
-        } else {
-            document.querySelector("#breedingBot").style.display = "none";
-            document.querySelector("#breedingCheck").checked = false;
-            document.querySelector("#dungeonBot").style.display = "none";
-            document.querySelector("#dungeonCheck").checked = false;
-            document.querySelector("#gymBot").style.display = "none";
-            document.querySelector("#gymCheck").checked = false;
-            document.querySelector("#safariBot").style.display = "none";
-            document.querySelector("#safariCheck").checked = false;
-            document.querySelector("#plantBot").style.display = "none";
-            document.querySelector("#plantBot").value = "N/A";
-            document.querySelector("#mutateBot").style.display = "none";
-            document.querySelector("#mutateBot").value = "N/A";
-            document.querySelector("#breedingBot").style.display = "none";
-            document.querySelector("#srBot").style.display = "none";
-            document.querySelector("#srCheck").checked = false;
-            document.querySelector("#bfBot").style.display = "none";
-            document.querySelector("#bfCheck").checked = false;
-        }
-
-        if (Settings.getSetting('disEvent').observableValue() == true) {
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 0, 24, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 1, 7, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kalos, 'Vivillon (Fancy)');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 6, 6, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 6, 12, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Flying Pikachu');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 6, 18, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 6, 24, 23).getTime()) {
-                dungeonList['Cerulean Cave'].bossList = dungeonList['Cerulean Cave'].bossList.filter(boss => boss.name != 'Armored Mewtwo');
-                RoamingPokemonList.list[GameConstants.Region.kanto] = RoamingPokemonList.list[GameConstants.Region.kanto].filter(r => !['Bulbasaur (clone)', 'Charmander (clone)', 'Squirtle (clone)'].includes(r.pokemon.name));
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 10, 5, 23).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 9, 30, 1).getTime()) {
-                Routes.getRoutesByRegion(GameConstants.Region.kanto).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Spooky Bulbasaur', 'Gastly'].includes(p)));
-                Routes.getRoutesByRegion(GameConstants.Region.johto).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Spooky Togepi', 'Misdreavus'].includes(p)));
-                Routes.getRoutesByRegion(GameConstants.Region.hoenn).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Pikachu (Gengar)', 'Shuppet', 'Duskull'].includes(p)));
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 10, 16, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 10, 23, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Let\'s Go Pikachu');
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Let\'s Go Eevee');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 11, 24, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 11, 30, 23).getTime()) {
-                GameHelper.enumNumbers(GameConstants.Region).filter(i => i != GameConstants.Region.none).forEach(region => {
-                    RoamingPokemonList.remove(region, 'Santa Snorlax');
-                });
-            }
-        }
+        } 
     }
 
     if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
