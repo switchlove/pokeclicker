@@ -534,11 +534,6 @@ function a6menu(){
         mainHeaderTbl.appendChild(tbdy);
         mainHeader.appendChild(mainHeaderTbl);
 
-        if (Settings.getSetting('hideNoti').observableValue() == true) {
-            document.querySelector("#toaster").style.display = 'none';
-        } else {
-            document.querySelector("#toaster").removeAttribute("style");
-        }
         if (localSettings[2] == 1) {
             document.querySelector("#srCheck").checked = true;
             Settings.setSettingByName('disableSave', true)
@@ -555,11 +550,6 @@ function a6menu(){
         missingShinies();
         missingLoot();
 
-        if (Settings.getSetting('hideNoti').observableValue() == true) {
-            document.querySelector("#toaster").style.display = 'none';
-        } else {
-            document.querySelector("#toaster").removeAttribute("style");
-        }
         if (localSettings[2] == 1) {
             document.querySelector("#srCheck").checked = true;
             Settings.setSettingByName('disableSave', true)
@@ -1625,6 +1615,7 @@ function a6phases() {
     	}
     	if (hasRun == 0) {
             let phaseTable = $('#phaseTable tbody')[0];
+            phaseTable.innerHTML = '';
     		for(var x = 0; x < phases.length; x++){
     			var tablePhase = document.createElement('tr');
     			var phaseId = "phase" + x;

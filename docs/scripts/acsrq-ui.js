@@ -4,6 +4,8 @@ window.addEventListener('load', () => {
     phaseModal();
     acsrqInfo();
 
+    $('#toaster')[0].setAttribute('data-bind', 'hidden: Settings.getSetting(\'hideNoti\').observableValue');
+
     setTimeout(() => {
         // reset bot state when bot are disabled
         Settings.getSetting('botOptions').observableValue.subscribe((value) => {
@@ -235,6 +237,7 @@ acsrqSettings = function () {
             ]),
         acsrqSettings.Section(
             'UI', [
+                acsrqSettings.Template('BooleanSettingTemplate', 'hideNoti'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'showLoot'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'showShiny'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'noWander'),
