@@ -48,7 +48,7 @@ Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', fa
 Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
 Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
 Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
+Settings.add(new Setting('phaseCount', 'phaseCount', [], 100));
 //ACSRQ - Scripted
 Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
 Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
@@ -64,22 +64,22 @@ Settings.add(new Setting('gymOpts', 'Gym bot stop options', [
     new SettingOption('None', 'gymOptN'),
 ], 'gymOptN'));
 Settings.add(new Setting('gymE4Opts', 'E4 Boss to fight', [
-    new SettingOption('First', '1'),
-    new SettingOption('Second', '2'),
-    new SettingOption('Third', '3'),
-    new SettingOption('Fourth', '4'),
-    new SettingOption('Fifth', '5'),
-], '1'));
+    new SettingOption('First', 1),
+    new SettingOption('Second', 2),
+    new SettingOption('Third', 3),
+    new SettingOption('Fourth', 4),
+    new SettingOption('Fifth', 5),
+], 1));
 Settings.add(new Setting('bfOpts', 'Battle Frontier stop options', [
     new SettingOption('None', 'bfOptN'),
     new SettingOption('Time', 'bfOptT'),
     new SettingOption('Level', 'bfOptL'),
 ], 'bfOptN'));
-Settings.add(new Setting('maxChests', 'Number of chests to open', [], '1'));
-Settings.add(new Setting('maxClears', 'Maximum Clears', [], '1000'));
-Settings.add(new Setting('minDT', 'Minimum DT to retain', [], '10000'));
-Settings.add(new Setting('maxLvl', 'Battle Frontier stop Options', [], '100'));
-Settings.add(new Setting('maxTime', 'Time remaining to quit Battle Frontier at', [], '30'));
+Settings.add(new Setting('maxChests', 'Number of chests to open', [], 1));
+Settings.add(new Setting('maxClears', 'Maximum Clears', [], 1000));
+Settings.add(new Setting('minDT', 'Minimum DT to retain', [], 10000));
+Settings.add(new Setting('maxLvl', 'Battle Frontier stop Options', [], 100));
+Settings.add(new Setting('maxTime', 'Time remaining to quit Battle Frontier at', [], 30));
 Settings.add(new Setting('srOpts', 'Soft Reset Type', [
     new SettingOption('None', 'none'),
     new SettingOption('Mystery Eggs', 'mys'),
@@ -98,7 +98,7 @@ Settings.add(new Setting('breedingOpts', 'Breeding options',[
     new SettingOption('Typed Eggs', 'typed'),
     new SettingOption('Fossils', 'fossil'),
 ], 'none'));
-Settings.add(new Setting('minBreedAttack', 'Breed each Pokemon up to this attack power', [], '1000'));
+Settings.add(new Setting('minBreedAttack', 'Breed each Pokemon up to this attack power', [], 1000));
 Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
     new SettingOption('Fire', 'fire'),
     new SettingOption('Water', 'water'),
@@ -110,15 +110,15 @@ Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
 Settings.add(new Setting('fossilOpts', 'Fossil to use',
     UndergroundItem.list.filter(i => i.valueType == 'Mine Egg').map(f => new SettingOption(f.displayName, f.name)),
     'Dome Fossil'));
-Settings.add(new Setting('evoItemCount', 'Evo items to use', [], '1'));
+Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
     new SettingOption('None', 'none'),
     new SettingOption('Pokéball', 'pokeB'),
     new SettingOption('Greatball', 'greatB'),
     new SettingOption('Ultraball', 'ultraB'),
 ], 'none'));
-Settings.add(new Setting('minBallAmount', 'Minimum amount of Pokéballs to keep', [], '0'));
-Settings.add(new Setting('ballPurAmount', 'Amount of Pokéballs to purchase', [], '1000'));
+Settings.add(new Setting('minBallAmount', 'Minimum amount of Pokéballs to keep', [], 0));
+Settings.add(new Setting('ballPurAmount', 'Amount of Pokéballs to purchase', [], 1000));
 Settings.add(new Setting('safariOpts', 'Safari bot stop options', [
     new SettingOption('None', 'safariOptN'),
     new SettingOption('Shiny Check', 'safariOptSC'),
@@ -202,8 +202,8 @@ acsrqInfo.Info = (id, label) => `
 acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
     <tr id='${bot}Bot' data-bind="visible: ${visible}, template: {data: Settings.getSetting('botstate.${bot}')}">
         <td class="p-2">
-            <input class="clickable" type="checkbox"
-                data-bind="checked: $data.observableValue(), attr: {name, id: '${bot}Check'}, enable: ${enable}"
+            <input class="clickable" type="checkbox" id="${bot}Check"
+                data-bind="checked: $data.observableValue(), attr: {name}, enable: ${enable}"
                 onchange="Settings.setSettingByName(this.name, this.checked)"/>
         </td>
         <td class="p-2">
@@ -391,5 +391,19 @@ phaseModal = function() {
             </div>
         </div>
     `);
+
+    $('#phaseModal .modal-header button')[1].addEventListener('click', (event) => {
+        if (!event.detail || event.detail == 1) {
+            if (hasExported == 0) {
+                setTimeout(() => {
+                    a6export();
+                }, 2000);
+                hasExported = 1;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    });
 };
 //#endregion
