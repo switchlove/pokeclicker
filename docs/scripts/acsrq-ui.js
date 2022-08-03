@@ -1,11 +1,17 @@
 window.addEventListener('load', () => {
     acsrqInfo();
+    acsrqSettings();
 
     setTimeout(() => {
         Settings.getSetting('menuPlace').observableValue.subscribe((value) => {
-            document.getElementById('acsrqBody').appendAfter(document.getElementById(value));
-            document.querySelectorAll('#acsrqBody input[type=checkbox]').forEach(i => i.checked = false);
-            document.querySelectorAll('#acsrqBody select').forEach(i => i.value = 'N/A');
+            document.getElementById('acsrqContainer').appendAfter(document.getElementById(value));
+        });
+
+        Settings.getSetting('botOptions').observableValue.subscribe((value) => {
+            if (!value) {
+                document.querySelectorAll('#acsrqBody input[type=checkbox]').forEach(i => i.checked = false);
+                document.querySelectorAll('#acsrqBody select').forEach(i => i.value = 'N/A');
+            }
         });
 
         //#region Event
@@ -81,12 +87,12 @@ Settings.add(new Setting('bfOpts', 'Battle Frontier stop options', [
     new SettingOption('Time', 'bfOptT'),
     new SettingOption('Level', 'bfOptL'),
 ], 'bfOptN'));
-Settings.add(new Setting('maxChests', 'maxChests', [], '1'));
-Settings.add(new Setting('maxClears', 'maxClears', [], '1000'));
-Settings.add(new Setting('minDT', 'minDT', [], '10000'));
-Settings.add(new Setting('maxLvl', 'maxLvl', [], '100'));
-Settings.add(new Setting('maxTime', 'maxTime', [], '30'));
-Settings.add(new Setting('srOpts', 'Soft Reset Type:', [
+Settings.add(new Setting('maxChests', 'Number of chests to open', [], '1'));
+Settings.add(new Setting('maxClears', 'Maximum Clears', [], '1000'));
+Settings.add(new Setting('minDT', 'Minimum DT to retain', [], '10000'));
+Settings.add(new Setting('maxLvl', 'Battle Frontier stop Options', [], '100'));
+Settings.add(new Setting('maxTime', 'Time remaining to quit Battle Frontier at', [], '30'));
+Settings.add(new Setting('srOpts', 'Soft Reset Type', [
     new SettingOption('None', 'none'),
     new SettingOption('Mystery Eggs', 'mys'),
     new SettingOption('Evo Items', 'evo'),
@@ -104,8 +110,8 @@ Settings.add(new Setting('breedingOpts', 'Breeding options',[
     new SettingOption('Typed Eggs', 'typed'),
     new SettingOption('Fossils', 'fossil'),
 ], 'none'));
-Settings.add(new Setting('minBreedAttack', 'minBreedAttack', [], '1000'));
-Settings.add(new Setting('typedEggOpts', 'Typed egg to use:', [
+Settings.add(new Setting('minBreedAttack', 'Breed each Pokemon up to this attack power', [], '1000'));
+Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
     new SettingOption('Fire', 'fire'),
     new SettingOption('Water', 'water'),
     new SettingOption('Grass', 'grass'),
@@ -116,15 +122,15 @@ Settings.add(new Setting('typedEggOpts', 'Typed egg to use:', [
 Settings.add(new Setting('fossilOpts', 'Fossil to use',
     UndergroundItem.list.filter(i => i.valueType == 'Mine Egg').map(f => new SettingOption(f.displayName, f.name)),
     'Dome Fossil'));
-Settings.add(new Setting('evoItemCount', 'evoItemCount', [], '1'));
+Settings.add(new Setting('evoItemCount', 'Evo items to use', [], '1'));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
     new SettingOption('None', 'none'),
     new SettingOption('Pokéball', 'pokeB'),
     new SettingOption('Greatball', 'greatB'),
     new SettingOption('Ultraball', 'ultraB'),
 ], 'none'));
-Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
-Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
+Settings.add(new Setting('minBallAmount', 'Minimum amount of Pokéballs to keep', [], '0'));
+Settings.add(new Setting('ballPurAmount', 'Amount of Pokéballs to purchase', [], '1000'));
 Settings.add(new Setting('safariOpts', 'Safari bot stop options', [
     new SettingOption('None', 'safariOptN'),
     new SettingOption('Shiny Check', 'safariOptSC'),
@@ -170,7 +176,7 @@ acsrqInfo = function () {
         // new SettingOption('S+L+C+P', 'S+L+C+P')
     );
 
-    let content = [
+    const content = [
         '<!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->',
         '<tr><td colspan="2" class="card-header">Bots</td></tr>',
         acsrqInfo.Checkbox('breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
@@ -230,4 +236,103 @@ acsrqInfo.Select = (bot) => `
         <td data-bind="text: $data.displayName">setting name</td>
     </tr>
 `;
+//#endregion
+
+//#region Setting Modal
+acsrqSettings = function () {
+    const acsrq = [
+        acsrqSettings.Section(
+            null, [
+                acsrqSettings.Template('BooleanSettingTemplate', 'botOptions'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'disableSave'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'disEvent'),
+            ]),
+        acsrqSettings.Section(
+            'UI', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'menuPlace'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'hideOak'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'hideBItem'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'showLoot'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'showShiny'),
+            ]),
+        acsrqSettings.Section(
+            'Phases', [
+                acsrqSettings.Template('BooleanSettingTemplate', 'noWander'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'trackPhases'),
+                acsrqSettings.Number('phaseCount'),
+            ]),
+    ];
+
+    const acsrqScripting = [
+        // acsrqSettings.Section(null, [acsrqSettings.Template('BooleanSettingTemplate', 'botOptions')]),
+        acsrqSettings.Section(
+            'Dungeons', [
+                acsrqSettings.Template('BooleanSettingTemplate', 'botRush'),
+                acsrqSettings.Template('BooleanSettingTemplate', 'chestCollect'),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'dungeOpts'),
+                acsrqSettings.Number('maxChests', 'Settings.getSetting(\'chestCollect\').observableValue'),
+                acsrqSettings.Number('maxClears', 'Settings.getSetting(\'dungeOpts\').observableValue() === \'dungOptC\''),
+                acsrqSettings.Number('minDT', 'Settings.getSetting(\'dungeOpts\').observableValue() === \'dungOptDT\''),
+            ], false),
+        acsrqSettings.Section(
+            'Gym', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'gymOpts'),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'gymE4Opts'),
+                acsrqSettings.Number('maxClears', 'Settings.getSetting(\'gymOpts\').observableValue() === \'gymOptC\''),
+            ], false),
+        acsrqSettings.Section(
+            'BattleFrontier', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'bfOpts'),
+                acsrqSettings.Number('maxTime', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptT\''),
+                acsrqSettings.Number('maxLvl', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptL\''),
+            ], false),
+        acsrqSettings.Section(
+            'SoftReset', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'srOpts'),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'fos\''),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'evoOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
+                acsrqSettings.Number('evoItemCount', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
+            ], false),
+        acsrqSettings.Section(
+            'Breeding', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'breedingOpts'),
+                acsrqSettings.Number('minBreedAttack', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'attack\''),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'typedEggOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'typed\''),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'fossil\''),
+            ], false),
+        acsrqSettings.Section(
+            'Pokeball', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'ballBuyOpts'),
+                acsrqSettings.Number('minBallAmount', 'Settings.getSetting(\'ballBuyOpts\').observableValue() !== \'none\''),
+                acsrqSettings.Number('ballPurAmount', 'Settings.getSetting(\'ballBuyOpts\').observableValue() !== \'none\''),
+            ], false),
+        acsrqSettings.Section('Safari', [acsrqSettings.Template('MultipleChoiceSettingTemplate', 'safariOpts')], false),
+    ];
+
+    $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item"><a class="nav-link" href="#settings-acsrq" data-toggle="tab">ACSRQ</a></li>');
+    $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq">${acsrq.join('')}</div>`);
+
+    $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue"><a class="nav-link" href="#settings-acsrq-script" data-toggle="tab">ACSRQ Scripting</a></li>');
+    $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq-script">${acsrqScripting.join('')}</div>`);
+};
+
+acsrqSettings.Template = (template, setting, visible = true) => `<tr data-bind="template: { name: '${template}', data: Settings.getSetting('${setting}')}, visible: ${visible}"></tr>`;
+
+acsrqSettings.Number = (setting, visible = true) => `
+    <tr data-bind="template: { data: Settings.getSetting('${setting}') }, visible: ${visible}">
+        <td class="p-2" data-bind="text: $data.displayName + ':'">setting name</td>
+        <td class="p-0">
+            <input class="form-control" type="number" min=0 step=1
+                data-bind="value: $data.observableValue(), attr: {name}"
+                onchange="Settings.setSettingByName(this.name, this.value)"/>
+        </td>
+    </tr>
+`;
+
+acsrqSettings.Section = (title, content, showByDefault = true) => {
+    const table = `<table class="table table-striped table-hover m-0 mb-1" style="table-layout: fixed"><tbody>${content.join('')}</tbody></table>`;
+    return !title ? table : `
+        <span class="btn btn-block btn-dark clickable" data-toggle="collapse" href="#settingsAcsrq${title}" >${title}</span>
+        <div class="collapse ${showByDefault ? 'show' : ''}" id="settingsAcsrq${title}">${table}</div>`;
+};
 //#endregion
