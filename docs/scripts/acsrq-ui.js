@@ -1,5 +1,6 @@
 window.addEventListener('load', () => {
     acsrqSettings();
+    acsrqFooter();
     acsrqInfo();
 
     setTimeout(() => {
@@ -313,4 +314,35 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
         <span class="btn btn-block btn-dark clickable" data-toggle="collapse" href="#settingsAcsrq${title}" >${title}</span>
         <div class="collapse ${showByDefault ? 'show' : ''}" id="settingsAcsrq${title}">${table}</div>`;
 };
+//#endregion
+
+//#region Footer
+acsrqFooter = function () {
+    $('#battleContainer .card-footer')[0].insertAdjacentHTML('beforebegin', `
+        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot && acsrqFooter.showShiny">
+            <table width="100%" class="table table-sm m-0">
+                <colgroup>
+                    <col width="40%">
+                </colgroup>
+                <tbody>
+                    <tr id="possibleLoot" data-bind="visible: acsrqFooter.showLoot">
+                        <td>Possible Loot</td>
+                        <td></td>
+                    </tr>
+                    <tr id="missingShiny" data-bind="visible: acsrqFooter.showShiny">
+                        <td>Needed Shiny</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `);
+};
+
+acsrqFooter.showLoot = ko.pureComputed(() => Settings.getSetting('showLoot').observableValue && !player?.route() && player?.town()?.dungeon);
+acsrqFooter.showShiny = ko.pureComputed(() => Settings.getSetting('showShiny').observableValue && (
+    player?.route() || //is route
+    player?.town()?.dungeon || //is dungeon
+    player.town().content.some(content => content instanceof Shop && content.items.some(item => item instanceof PokemonItem)) //does town have shop
+));
 //#endregion
