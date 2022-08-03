@@ -66,58 +66,42 @@ window.addEventListener('load', () => {
     }, 5000);
 
     setInterval(function(){
-        if (clickEngagedD == 1){
+        if (clickEngagedD){
             if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true){
                 dungeonBot();
             }
         }
-        if (clickEngagedG == 1){
+        if (clickEngagedG){
             gymBot();
         }
-        if (clickEngagedBF == 1){
+        if (clickEngagedBF){
             bfBot();
         }
     }, 100);
 
     setInterval(function(){
-        if (clickEngagedS == 1){
+        if (clickEngagedS){
             safariBot();
         }
     }, 250);
 
     setTimeout(function(){
         setInterval(function(){
-            if (clickEngagedSR == 1){
+            if (clickEngagedSR){
                 srBot();
             }
         }, 3000);
     }, 3000);
 });
 
-function main(){
+function main() {
     var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
         a6phases();
 
-        var srCheckboxL = document.querySelector("#srCheck");
-        srCheckboxL.addEventListener('change', function() {
-            if (this.checked) {
-                clickEngagedSR = 1;
-                localSettings[2] = 1;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
-            } else {
-                clickEngagedSR = 0;
-                srCount = 0;
-                localSettings[2] = 0;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                localLocal[6][1] = '';
-                localLocal[6][2] = '';
-                localStorage.setItem(saveKey, JSON.stringify(localLocal));
-            }
-        });
-        if (srCheckboxL.checked) {
+        if (Settings.getSetting('botstate.sr').observableValue()) {
             clickEngagedSR = 1;
             localSettings[2] = 1;
             localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -142,13 +126,7 @@ function main(){
         if (localStorage.getItem('a6csrq-settings') != null) {
             if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
                 Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[1];
-
-                var pSave = JSON.parse(localStorage.getItem(`player${Save.key}`))
-                pSave._lastSeen = Date.now();
-                localStorage.setItem(`player${Save.key}`, JSON.stringify(pSave));
-
-                document.querySelector('#saveSelector').remove();
-                App.start();
+                $(`[data-key="${Save.key}"]`)[1]?.click();
             }
         }
     }
@@ -231,245 +209,108 @@ function a6menu(){
     areaClears();
     missingShinies();
     missingLoot();
-
-    if (localSettings[2] == 1) {
-        document.querySelector("#srCheck").checked = true;
-        Settings.setSettingByName('disableSave', true)
-    }
 }
 
 async function a6settings() {
     localStorage.setItem(settingKey, JSON.stringify(localSettings));
 
-    if (Settings.getSetting('botOptions') != null) {
-        if (Settings.getSetting('botOptions').observableValue() == true) {
-            var townContent = player.town().content;
+    if (Settings.getSetting('botOptions')?.observableValue()) {
+        //Breeding Bot
+        const breedingCheck = document.getElementById('checkbox-botstate.breeding');
+        if (!breedingCheck.disabled && breedingCheck.checked) {
+            autoBreed();
+        }
 
-            //Breeding Bot
-            if (App.game.breeding.canAccess() == true && App.game.party.hasMaxLevelPokemon()) {
-                document.querySelector("#breedingBot").removeAttribute("style");
-                document.querySelector("#breedingCheck").disabled = false;
-                var checkAutoBreed = document.querySelector("#breedingCheck");
-                var checkAutoBreed = document.querySelector("#breedingCheck");
-                if (checkAutoBreed.checked == true){
-                    autoBreed();
-                }
-            }
-            //Dungeon Bot
-            if (App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket) == true) {
-                document.querySelector("#dungeonBot").removeAttribute("style");
-                if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) != -1 ) {
-                    document.querySelector("#dungeonCheck").disabled = false;
-                    var checkDungeonClicker = document.querySelector("#dungeonCheck");
-                    if (checkDungeonClicker.checked == true){
-                        switch(Settings.getSetting('dungeOpts').observableValue()) {
-                            case "dungOptN":
-                                if (DungeonRunner.dungeonCompleted(player.town().dungeon) == true) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                                break;
-                            case "dungOptSC":
-                                if (DungeonRunner.dungeonCompleted(player.town().dungeon, true) != true) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                                break;
-                            case "dungOptC":
-                                if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().name)]() < Number(Settings.getSetting('maxClears').observableValue())) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                    if (App.game.gameState == 4) {
-                                        var pX = DungeonRunner.map.playerPosition().x;
-                                        var pXF = DungeonRunner.map.playerPosition().x;
-                                        var pXM = pX + 1;
-                                        DungeonRunner.map.moveRight();
-                                        if ( DungeonRunner.map.playerPosition().x == pXM ) {
-                                            await DungeonRunner.map.moveLeft();
-                                        }
-                                        pX = DungeonRunner.map.playerPosition().x;
-                                        if ( pX == pXF ) {
-                                            DungeonRunner.dungeonLeave();
-                                        }
-                                    }
-                                }
-                                break;
-                            case "dungOptDT":
-                                var setDTLim = Settings.getSetting('minDT').observableValue();
-                                var curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
-                                if (curDT >= setDTLim && curDT >= player.town().dungeon.tokenCost) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                        }
-                    }
-                    if (checkDungeonClicker.checked == false){
-                        dungeonClick(0);
-                    }
-                } else {
-                    document.querySelector("#dungeonCheck").disabled = true;
-                    document.querySelector("#dungeonCheck").checked = false;
+        //Dungeon Bot
+        const dungeonCheck = document.getElementById('checkbox-botstate.dungeon');
+        const dungeon = player.town().dungeon;
+        const curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
+        if (!dungeonCheck.disabled && dungeonCheck.checked && curDT >= dungeon.tokenCost) {
+            switch (Settings.getSetting('dungeOpts').observableValue()) {
+                case 'dungOptN':
+                    dungeonClick(1);
+                    break;
+                case 'dungOptSC':
+                    dungeonClick(!DungeonRunner.dungeonCompleted(dungeon, true));
+                    break;
+                case 'dungOptC':
+                    dungeonClick(App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon.name)]() < Settings.getSetting('maxClears').observableValue());
+                    break;
+                case 'dungOptDT':
+                    dungeonClick(curDT >= Settings.getSetting('minDT').observableValue());
+                    break;
+                default:
                     dungeonClick(0);
-                }
-            } else {
-                document.querySelector("#dungeonBot").style.display = "none";
-                document.querySelector("#dungeonCheck").checked = false;
-                dungeonClick(0);
             }
+        } else {
+            dungeonClick(0);
+        }
 
-            //Gym Bot
-            var gymFound = 0;
-            document.querySelector("#gymBot").removeAttribute("style");
-            if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) == -1 ) {
-                for (let x = 0; x < townContent.length; x++) {
-                    if (townContent[x].leaderName != undefined) {
-                        gymFound = 1;
-                        document.querySelector("#gymCheck").disabled = false;
-                        var checkGymClicker = document.querySelector("#gymCheck");
-                        if (checkGymClicker.checked == true){
-                            gymClick(1);
-                        }
-                        if (checkGymClicker.checked == false){
-                            gymClick(0);
-                        }
-                    } else {
-                        if (gymFound != 1) {
-                            document.querySelector("#gymCheck").disabled = true;
-                            document.querySelector("#gymCheck").checked = false;
-                            gymClick(0);
-                        }
-                    }
-                }
-            }
+        //Gym Bot
+        const gymCheck = document.getElementById('checkbox-botstate.gym');
+        gymClick(!gymCheck.disabled && gymCheck.checked);
 
-            //Safari Bot
-            if (Safari.canAccess() == true) {
-                document.querySelector("#safariBot").removeAttribute("style");
-                if ( Safari.inProgress() == true ) {
-                    document.querySelector("#safariCheck").disabled = false;
-                    var checkSafariClicker = document.querySelector("#safariCheck");
-                    if (checkSafariClicker.checked == true){
-                        switch(Settings.getSetting('safariOpts').observableValue()) {
-                            case "safariOptN":
-                                safariClick(1);
-                                break;
-                            case "safariOptSC":
-                                if (Safari.completed(true) != true) {
-                                    safariClick(1);
-                                } else {
-                                    Safari.closeModal();
-                                    safariClick(0);
-                                }
-                                break;
-                        }
-                    } else {
+        //Safari Bot
+        const safariCheck = document.getElementById('checkbox-botstate.safari');
+        if (!safariCheck.disabled && safariCheck.checked) {
+            if (Safari.inProgress()) {
+                switch (Settings.getSetting('safariOpts').observableValue()) {
+                    case 'safariOptN':
+                        safariClick(1);
+                        break;
+                    case 'safariOptSC':
+                        safariClick(!Safari.completed(true));
+                        break;
+                    default:
                         safariClick(0);
-                    }
-                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
-                    safariClick(0);
-                    if (document.querySelector("#safariModal").classList.contains('show')) {
-                        Safari.payEntranceFee();
-                    } else if (App.game.gameState != 5) {
-                        App.game.gameState = 5;
-                        setTimeout(() => {
-                            Safari.openModal();
-                        }, 500)
-                    }
-                } else {
-                    document.querySelector("#safariCheck").disabled = true;
-                    document.querySelector("#safariCheck").checked = false;
-                    safariClick(0);
                 }
+            } else if (!Safari.completed(true)) {
+                safariClick(0);
             }
+        } else if (safariCheck.checked && clickEngagedS && !Safari.completed(true)) {
+            if ($('#safariModal')[0].classList.contains('show')) {
+                Safari.payEntranceFee();
+            } else if (App.game.gameState != 5) {
+                App.game.gameState = 5;
+                setTimeout(() => {
+                    Safari.openModal();
+                }, 500);
+            }
+        } else {
+            safariClick(0);
+        }
 
-            //BF Bot
-            if (MapHelper.calculateTownCssClass('Battle Frontier') != "locked") {
-                document.querySelector("#bfBot").removeAttribute("style");
-                if ( player.route() == 0 && player.town().name == "Battle Frontier" ) {
-                    document.querySelector("#bfCheck").disabled = false;
-                    var checkBFClicker = document.querySelector("#bfCheck");
-                    if (checkBFClicker.checked == true){
-                        bfClick(1);
-                    }
-                    if (checkBFClicker.checked == false){
-                        bfClick(0);
-                    }
-                } else {
-                    document.querySelector("#bfCheck").disabled = true;
-                    document.querySelector("#bfCheck").checked = false;
-                    bfClick(0);
-                }
-            } else {
-                document.querySelector("#bfCheck").disabled = true;
-                document.querySelector("#bfCheck").checked = false;
-                bfClick(0);
-            }
+        //BF Bot
+        const bfCheck = document.getElementById('checkbox-botstate.bf');
+        bfClick(!bfCheck.disabled && bfCheck.checked);
 
-            //SR Bot
-            if (App.game.statistics.routeKills['kanto'][3]() >= 10) {
-                document.querySelector("#srBot").removeAttribute("style");
-                document.querySelector("#srCheck").disabled = false;
-            } else {
-                document.querySelector("#srCheck").disabled = true;
-                document.querySelector("#srCheck").checked = false;
-            }
-
-            //Farm Bots
-            if (App.game.farming.canAccess() == true) {
-                document.querySelector("#plantBot").removeAttribute("style");
-                document.querySelector("#mutateBot").removeAttribute("style");
-                //Planter
-                var checkAutoFarmer1 = document.querySelector("#plantSelect");
-                if (checkAutoFarmer1.value != "N/A"){
-                    plantBot();
-                }
-                //Mutator
-                var checkAutoFarmer2 = document.querySelector("#mutateSelect");
-                if (checkAutoFarmer2.value != "N/A"){
-                    mutateBot();
-                }
-            } else {
-                document.querySelector("#plantBot").style.display = "none";
-                document.querySelector("#mutateBot").style.display = "none";
-            }
-        } 
+        //Planter Bots
+        const plantSelect = $('#plantSelect')[0];
+        if (!plantSelect.disabled && plantSelect.value != 'N/A') {
+            plantBot();
+        }
+        //Mutator Bots
+        const mutateSelect = $('#mutateSelect')[0];
+        if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
+            plantBot();
+        }
     }
 }
 
 function dungeonClick(x) {
-    if (x == 1){
-        clickEngagedD = 1;
-    } else if (x == 0){
-        clickEngagedD = 0;
-    }
+    clickEngagedD = !!x;
 }
 
 function gymClick(x) {
-    if (x == 1){
-        clickEngagedG = 1;
-    } else if (x == 0){
-        clickEngagedG = 0;
-    }
+    clickEngagedG = !!x;
 }
 
 function safariClick(x) {
-    if (x == 1){
-        clickEngagedS = 1;
-    } else if (x == 0){
-        clickEngagedS = 0;
-    }
+    clickEngagedS = !!x;
 }
 
 function bfClick(x) {
-    if (x == 1){
-        clickEngagedBF = 1;
-    } else if (x == 0){
-        clickEngagedBF = 0;
-    }
+    clickEngagedBF = !!x;
 }
 
 function uniqueCheck() {

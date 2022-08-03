@@ -5,42 +5,9 @@ window.addEventListener('load', () => {
     acsrqInfo();
 
     $('#toaster')[0].setAttribute('data-bind', 'hidden: Settings.getSetting(\'hideNoti\').observableValue');
-
-    setTimeout(() => {
-        // reset bot state when bot are disabled
-        Settings.getSetting('botOptions').observableValue.subscribe((value) => {
-            if (!value) {
-                Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
-            }
-        });
-
-        //#region Event
-        Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
-            for (let event of SpecialEvents.events) {
-                if (disable && event.hasStarted()) {
-                    event.endFunction();
-                    event.status = 2;
-                } else if (!disable && event.hasEnded()) {
-                    event.startFunction();
-                    event.status = 1;
-                }
-            }
-        });
-
-        const eventStart = SpecialEvent.prototype.start;
-        SpecialEvent.prototype.start = function() {
-            eventStart.call(this);
-            if (Settings.getSetting('disEvent').value) {
-                this.endFunction();
-                this.status = 2;
-            }
-        };
-        //#endregion
-    }, 1100); // because everything is in a timeout 1s and it's need to be the last execution
 });
 
-//#region Settings
-//ACSRQ
+//#region ACSRQ Settings
 Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
 Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
 Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
@@ -49,7 +16,8 @@ Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
 Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
 Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
 Settings.add(new Setting('phaseCount', 'phaseCount', [], 100));
-//ACSRQ - Scripted
+//#endregion
+//#region Scriped Settings
 Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
 Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
 Settings.add(new BooleanSetting('chestCollect', 'Open chests in dungeons', false));
@@ -123,7 +91,8 @@ Settings.add(new Setting('safariOpts', 'Safari bot stop options', [
     new SettingOption('None', 'safariOptN'),
     new SettingOption('Shiny Check', 'safariOptSC'),
 ], 'safariOptSC'));
-//Bot state
+//#endregion
+//#region Bot state Settings
 Settings.add(new BooleanSetting('botstate.breeding', 'Breeding Bot', false));
 Settings.add(new BooleanSetting('botstate.dungeon', 'Dungeon Bot', false));
 Settings.add(new BooleanSetting('botstate.gym', 'Gym Bot', false));
@@ -132,6 +101,38 @@ Settings.add(new BooleanSetting('botstate.bf', 'BF Bot', false));
 Settings.add(new BooleanSetting('botstate.sr', 'SR Bot', false));
 Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
+//#endregion
+
+//#region Subscription
+//reset bot state when bot are disabled
+Settings.getSetting('botOptions').observableValue.subscribe((value) => {
+    if (!value) {
+        Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
+    }
+});
+
+//Disable/Enable event
+Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
+    for (let event of SpecialEvents.events) {
+        if (disable && event.hasStarted()) {
+            event.endFunction();
+            event.status = 2;
+        } else if (!disable && event.hasEnded()) {
+            event.startFunction();
+            event.status = 1;
+        }
+    }
+});
+
+//prevent event to start if disEvent is enabled
+const eventStart = SpecialEvent.prototype.start;
+SpecialEvent.prototype.start = function() {
+    eventStart.call(this);
+    if (Settings.getSetting('disEvent').value) {
+        this.endFunction();
+        this.status = 2;
+    }
+};
 //#endregion
 
 //#region Info / Bot menu
@@ -200,10 +201,10 @@ acsrqInfo.Info = (id, label) => `
 `;
 
 acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
-    <tr id='${bot}Bot' data-bind="visible: ${visible}, template: {data: Settings.getSetting('botstate.${bot}')}">
+    <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('botstate.${bot}')}">
         <td class="p-2">
-            <input class="clickable" type="checkbox" id="${bot}Check"
-                data-bind="checked: $data.observableValue(), attr: {name}, enable: ${enable}"
+            <input class="clickable" type="checkbox"
+                data-bind="checked: $data.observableValue(), attr: {name, id: 'checkbox-' + $data.name}, enable: ${enable}"
                 onchange="Settings.setSettingByName(this.name, this.checked)"/>
         </td>
         <td class="p-2">
@@ -215,7 +216,7 @@ acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
 `;
 
 acsrqInfo.Select = (bot) => `
-    <tr id="${bot}Bot" data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('botstate.${bot}')}">
+    <tr data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('botstate.${bot}')}">
         <td>
             <select id="${bot}Select" onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name}">
                 <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
@@ -225,7 +226,6 @@ acsrqInfo.Select = (bot) => `
     </tr>
 `;
 //#endregion
-
 //#region Setting Modal
 acsrqSettings = function () {
     const acsrq = [
@@ -319,7 +319,6 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
         <div class="collapse ${showByDefault ? 'show' : ''}" id="settingsAcsrq${title}">${table}</div>`;
 };
 //#endregion
-
 //#region Footer
 acsrqFooter = function () {
     $('#battleContainer .card-footer')[0].insertAdjacentHTML('beforebegin', `
@@ -350,7 +349,6 @@ acsrqFooter.showShiny = ko.pureComputed(() => Settings.getSetting('showShiny').o
     player.town().content.some(content => content instanceof Shop && content.items.some(item => item instanceof PokemonItem)) //does town have shop
 ));
 //#endregion
-
 //#region Phase
 phaseModal = function() {
     $('#logBookModal')[0].insertAdjacentHTML('afterend', `
