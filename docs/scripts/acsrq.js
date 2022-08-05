@@ -200,11 +200,7 @@ function a6save() {
     saveLoaded = 1;
 }
 
-function a6menu(){
-    uniqueCheck();
-    uniqueCheckAll();
-    uniqueCheckEvent();
-    boostedRoute();
+function a6menu() {
     lastPokeEncounter();
     areaClears();
 }
@@ -309,37 +305,6 @@ function safariClick(x) {
 
 function bfClick(x) {
     clickEngagedBF = !!x;
-}
-
-function uniqueCheck() {
-    var uniqC = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region).map(p => Math.floor(p.id))).size;
-    var uniqT = PokemonHelper.calcUniquePokemonsByRegion(player.region);
-    document.querySelector("#uniquePoke > td:nth-child(1)").innerHTML = uniqC + '/' + uniqT;
-}
-
-function uniqueCheckAll() {
-    var uniqS = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && p.shiny == true && PokemonHelper.calcNativeRegion(p.name) === player.region)).size;
-    var uniqT = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region)).size;
-    document.querySelector("#uniquePokeShiny > td:nth-child(1)").innerHTML = uniqS + '/' + uniqT;
-}
-
-function uniqueCheckEvent() {
-    var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)"];
-    var eventCaught = 0;
-    for (let eP = 0; eP < eventPoke.length; eP++) {
-        if ( App.game.party.alreadyCaughtPokemonByName(eventPoke[eP]) == true) {
-            eventCaught++;
-        }
-    }
-    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/27';
-}
-
-function boostedRoute() {
-    if (player.region == 6) {
-        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
-    } else {
-        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
-    }
 }
 
 function lastPokeEncounter() {

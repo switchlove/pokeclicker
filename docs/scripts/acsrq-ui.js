@@ -192,13 +192,75 @@ acsrqInfo = function () {
         acsrqInfo.Info('lastEncounterPoke', 'Last Shiny'),
         acsrqInfo.Info('areaClears', 'Clears'),
         acsrqInfo.Info('lastEncounter', 'Since Last Shiny'),
-        acsrqInfo.Info('boostedRoute', 'Boosted Route'),
-        acsrqInfo.Info('uniquePokeShiny', 'Region Shinies'),
-        acsrqInfo.Info('uniquePoke', 'Region Uniques'),
-        acsrqInfo.Info('uniquePokeEvent', 'Event Uniques'),
+        '<tr><td data-bind="text: acsrqInfo.boostedRoute"></td><td>Boosted Route</td></tr>',
+        '<tr><td data-bind="text: acsrqInfo.regionShiny"></td><td>Region Shinies</td></tr>',
+        '<tr><td data-bind="text: acsrqInfo.uniqueRegion"></td><td>Region Uniques</td></tr>',
+        '<tr><td data-bind="text: acsrqInfo.uniqueEvent"></td><td>Event Uniques</td></tr>',
     ];
     $('#acsrqBody tbody')[0].insertAdjacentHTML('beforeend', content.join(''));
 };
+
+acsrqInfo.boostedRoute = ko.pureComputed(() => {
+    return RoamingPokemonList.increasedChanceRoute[player.region]?.[player.subregion]?.().routeName
+        || RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
+});
+
+acsrqInfo.regionShiny = ko.pureComputed(() => {
+    const regionPoke = App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region)
+    const shinyPoke = regionPoke.filter(p => p.shiny);
+    return `${shinyPoke.length} / ${regionPoke.length}`;
+});
+acsrqInfo.uniqueRegion = ko.pureComputed(() => {
+    const achievement = AchievementHandler.findByName(`${GameConstants.camelCaseToString(GameConstants.Region[player.region])} Master`);
+
+    return `${achievement.getProgressText()}`;
+});
+acsrqInfo.uniqueEvent = ko.pureComputed(() => {
+    const eventPoke = [
+        //Lunar New Year
+        'Vivillon (Fancy)',
+        //Easter
+        'Surprise Togepi',
+        //Golden Week
+        'Bulbasaur (Rose)',
+        //Flying Pikachu
+        'Flying Pikachu',
+        'Red Spearow',
+        //Armored Mewtwo
+        'Armored Mewtwo',
+        'Bulbasaur (clone)',
+        'Ivysaur (clone)',
+        'Venusaur (clone)',
+        'Charmander (clone)',
+        'Charmeleon (clone)',
+        'Charizard (clone)',
+        'Squirtle (clone)',
+        'Wartortle (clone)',
+        'Blastoise (clone)',
+        //Halloween
+        'Spooky Togepi',
+        'Spooky Bulbasaur',
+        'Pikachu (Gengar)',
+        //Let's GO!
+        'Let\'s Go Pikachu',
+        'Let\'s Go Eevee',
+        //Christmas
+        'Santa Snorlax',
+        'Elf Munchlax',
+        'Grinch Celebi',
+        //Discord
+        'Unown (D)',
+        'Unown (I)',
+        'Unown (S)',
+        'Unown (C)',
+        'Unown (O)',
+        'Unown (R)',
+        'Surfing Pikachu',
+        'Rotom (discord)',
+    ];
+    const eventCaught = eventPoke.filter(p => App.game.party.alreadyCaughtPokemonByName(p));
+    return `${eventCaught.length} / ${eventPoke.length}`;
+});
 
 acsrqInfo.Info = (id, label) => `
     <tr id="${id}">
@@ -364,7 +426,7 @@ acsrqFooter.missingLoot = ko.pureComputed(() => {
         loots.push(...dungeon.lootTable[key].map(({loot}) => GameConstants.humanifyString(loot)));
     }
 
-    return [...new Set(loots)].sort().join(', ');
+    return [...new Set(loots)].join(', ');
 });
 
 acsrqFooter.missingShinies = ko.pureComputed(() => {
