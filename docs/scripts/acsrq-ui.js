@@ -5,6 +5,44 @@ window.addEventListener('load', () => {
     acsrqInfo();
 
     $('#toaster')[0].setAttribute('data-bind', 'hidden: Settings.getSetting(\'hideNoti\').observableValue');
+
+    // execute once save is fully loaded
+    const gameStart = Game.prototype.start;
+    Game.prototype.start = function() {
+        //#region Subscriptions
+        //reset bot state when bot are disabled
+        Settings.getSetting('botOptions').observableValue.subscribe((value) => {
+            if (!value) {
+                Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
+            }
+        });
+
+        //Disable/Enable event
+        Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
+            for (let event of SpecialEvents.events) {
+                if (disable && event.hasStarted()) {
+                    event.endFunction();
+                    event.status = 2;
+                } else if (!disable && event.hasEnded()) {
+                    event.startFunction();
+                    event.status = 1;
+                }
+            }
+        });
+
+        //prevent event to start if disEvent is enabled
+        const eventStart = SpecialEvent.prototype.start;
+        SpecialEvent.prototype.start = function() {
+            eventStart.call(this);
+            if (Settings.getSetting('disEvent').value) {
+                this.endFunction();
+                this.status = 2;
+            }
+        };
+        //#endregion
+
+        gameStart.call(this);
+    };
 });
 
 //#region ACSRQ Settings
@@ -103,38 +141,6 @@ Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A'
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 //#endregion
 
-//#region Subscription
-//reset bot state when bot are disabled
-Settings.getSetting('botOptions').observableValue.subscribe((value) => {
-    if (!value) {
-        Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
-    }
-});
-
-//Disable/Enable event
-Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
-    for (let event of SpecialEvents.events) {
-        if (disable && event.hasStarted()) {
-            event.endFunction();
-            event.status = 2;
-        } else if (!disable && event.hasEnded()) {
-            event.startFunction();
-            event.status = 1;
-        }
-    }
-});
-
-//prevent event to start if disEvent is enabled
-const eventStart = SpecialEvent.prototype.start;
-SpecialEvent.prototype.start = function() {
-    eventStart.call(this);
-    if (Settings.getSetting('disEvent').value) {
-        this.endFunction();
-        this.status = 2;
-    }
-};
-//#endregion
-
 //#region Info / Bot menu
 acsrqInfo = function () {
     document.getElementById('pokeballSelector').insertAdjacentHTML('afterend', `
@@ -166,16 +172,17 @@ acsrqInfo = function () {
     );
 
     const content = [
+        acsrqInfo.Checkbox('botOptions'),
         '<!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->',
         '<tr><td colspan="2" class="card-header">Bots</td></tr>',
-        acsrqInfo.Checkbox('breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
-        acsrqInfo.Checkbox('dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
-        acsrqInfo.Checkbox('gym', 'true', '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
-        acsrqInfo.Checkbox('safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('bf', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
-        acsrqInfo.Checkbox('sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
-        acsrqInfo.Select('plant'),
-        acsrqInfo.Select('mutate'),
+        acsrqInfo.Checkbox('botstate.breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
+        acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
+        acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
+        acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
+        acsrqInfo.Checkbox('botstate.bf', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
+        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Select('botstate.plant'),
+        acsrqInfo.Select('botstate.mutate'),
         '<!-- /ko -->',
         '<tr><td colspan="2" class="card-header">Info</td></tr>',
         `<tr>
@@ -200,8 +207,8 @@ acsrqInfo.Info = (id, label) => `
     </tr>
 `;
 
-acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
-    <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('botstate.${bot}')}">
+acsrqInfo.Checkbox = (bot, visible = true, enable = true) => `
+    <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('${bot}')}">
         <td class="p-2">
             <input class="clickable" type="checkbox"
                 data-bind="checked: $data.observableValue(), attr: {name, id: 'checkbox-' + $data.name}, enable: ${enable}"
@@ -216,9 +223,9 @@ acsrqInfo.Checkbox = (bot, visible = 'true', enable = 'true') => `
 `;
 
 acsrqInfo.Select = (bot) => `
-    <tr data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('botstate.${bot}')}">
+    <tr data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('${bot}')}">
         <td>
-            <select id="${bot}Select" onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name}">
+            <select onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name, id: 'select-' + $data.name}">
                 <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
             </select>
         </td>
@@ -328,13 +335,13 @@ acsrqFooter = function () {
                     <col width="40%">
                 </colgroup>
                 <tbody>
-                    <tr id="possibleLoot" data-bind="visible: acsrqFooter.showLoot">
+                    <tr data-bind="visible: acsrqFooter.showLoot">
                         <td>Possible Loot</td>
-                        <td></td>
+                        <td data-bind="text: acsrqFooter.missingLoot"></td>
                     </tr>
-                    <tr id="missingShiny" data-bind="visible: acsrqFooter.showShiny">
+                    <tr data-bind="visible: acsrqFooter.showShiny">
                         <td>Needed Shiny</td>
-                        <td></td>
+                        <td data-bind="html: acsrqFooter.missingShinies"></td>
                     </tr>
                 </tbody>
             </table>
@@ -348,6 +355,66 @@ acsrqFooter.showShiny = ko.pureComputed(() => Settings.getSetting('showShiny').o
     player?.town()?.dungeon || //is dungeon
     player.town().content.some(content => content instanceof Shop && content.items.some(item => item instanceof PokemonItem)) //does town have shop
 ));
+
+acsrqFooter.missingLoot = ko.pureComputed(() => {
+    const dungeon = player.town().dungeon;
+    let loots = [];
+
+    for (let key in dungeon?.lootTable) {
+        loots.push(...dungeon.lootTable[key].map(({loot}) => GameConstants.humanifyString(loot)));
+    }
+
+    return [...new Set(loots)].sort().join(', ');
+});
+
+acsrqFooter.missingShinies = ko.pureComputed(() => {
+    const town = player.town();
+    const route = player.route();
+    const shops = town.content.filter(c => c instanceof Shop && c.items.some(i => i instanceof PokemonItem));
+    let missing = [];
+
+    if (route) { //Route poke
+        const poke = RouteHelper.getAvailablePokemonList(route, player.region);
+        missing.push(
+            ...poke.filter(p => !App.game.party.alreadyCaughtPokemonByName(p, true)).sort()
+        );
+    } else if (shops.length) { //Shop poke
+        missing.push(
+            ...shops.map(({items}) => items
+                .filter(i => i instanceof PokemonItem && !App.game.party.alreadyCaughtPokemonByName(i.name, true))
+                .map(({name}) => name)
+            ).flat()
+        );
+    } else if (town.dungeon) { //Dungeon poke
+        const poke = town.dungeon.allAvailablePokemon();
+        missing.push(
+            ...poke.filter(p => !App.game.party.alreadyCaughtPokemonByName(p, true))
+        );
+
+        for (let key in town.dungeon.lootTable) {
+            for (let {loot} of town.dungeon.lootTable[key]) {
+                if (PokemonHelper.getPokemonByName(loot).id && !App.game.party.alreadyCaughtPokemonByName(loot, true)) {
+                    missing.push(`<span style="line-height: normal; color:#D4AC0D;">${loot}</span>`);
+                }
+            }
+        }
+
+        missing.sort((a, b) => {
+            if (a.startsWith('<')) {
+                a = a.replace(/<[^\>]*>/g, '');
+            }
+            if (b.startsWith('<')) {
+                b = b.replace(/<[^\>]*>/g, '');
+            }
+            return a.localeCompare(b);
+        });
+    }
+
+    return missing.length
+        ? [...new Set(missing)].join(', ')
+        : 'N/A';
+});
+
 //#endregion
 //#region Phase
 phaseModal = function() {
