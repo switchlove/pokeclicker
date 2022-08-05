@@ -172,9 +172,18 @@ acsrqInfo = function () {
     );
 
     const content = [
-        acsrqInfo.Checkbox('botOptions'),
+        // acsrqInfo.Checkbox('botOptions'),
         '<!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->',
-        '<tr><td colspan="2" class="card-header">Bots</td></tr>',
+        `<tr>
+            <td colspan="2" class="card-header" style="position: relative">
+                Bots
+                <button type="button" class="btn btn-info" 
+                    style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
+                    data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq-script\\']').tab('show') }">
+                    ⏣
+                </button>
+            </td>
+        </tr>`,
         acsrqInfo.Checkbox('botstate.breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
@@ -184,7 +193,16 @@ acsrqInfo = function () {
         acsrqInfo.Select('botstate.plant'),
         acsrqInfo.Select('botstate.mutate'),
         '<!-- /ko -->',
-        '<tr><td colspan="2" class="card-header">Info</td></tr>',
+        `<tr>
+            <td colspan="2" class="card-header" style="position: relative">
+                Info
+                <button type="button" class="btn btn-info" 
+                    style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
+                    data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq\\']').tab('show') }">
+                    ⏣
+                </button>
+            </td>
+        </tr>`,
         `<tr>
             <td><input type="text" size=6 id="phaseCount" style="text-align: center"></td>
             <td><a href="#phaseModal" data-toggle="modal">Phase</a></td>
