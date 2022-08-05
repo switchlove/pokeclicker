@@ -224,7 +224,7 @@ acsrqInfo.boostedRoute = ko.pureComputed(() => {
 });
 
 acsrqInfo.regionShiny = ko.pureComputed(() => {
-    const regionPoke = App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region)
+    const regionPoke = App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region);
     const shinyPoke = regionPoke.filter(p => p.shiny);
     return `${shinyPoke.length} / ${regionPoke.length}`;
 });
@@ -550,5 +550,55 @@ phaseModal = function() {
             return false;
         }
     });
+};
+//#endregion
+
+//#region Dungeon Shortcut
+const dungeonInit = DungeonRunner.initializeDungeon;
+DungeonRunner.initializeDungeon = function(dungeon) {
+    dungeonInit.call(this, dungeon);
+    setTimeout(() => {
+        const chestSpan =  $('#dungeonMap img[title^=\'Chests\'] ~ span')[0];
+        ko.applyBindingsToNode(chestSpan, { hidden: Settings.getSetting('botOptions').observableValue });
+        chestSpan.insertAdjacentHTML('afterend', `
+            <button type="button" 
+                class="btn badge badge-pill"
+                style="margin-top: 8px;font-size: 100%;margin-left: 2px;"
+                title='<chest opened>/<chest to open>/<chest in dungeon>'
+            ></button>
+        `);
+
+        ko.applyBindingsToNode($('#dungeonMap img[title^=\'Chests\'] ~ button')[0], {
+            visible: Settings.getSetting('botOptions').observableValue,
+            click: () => Settings.getSetting('chestCollect').toggle(),
+            class: ko.pureComputed(() => Settings.getSetting('chestCollect').observableValue() ? 'btn-outline-success' : 'btn-outline-danger'),
+            text: ko.pureComputed(() => {
+                chestToOpen = Settings.getSetting('chestCollect').observableValue()
+                    ? Settings.getSetting('maxChests').observableValue()
+                    : 0;
+                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.size}`;
+            }),
+        });
+
+        $('#dungeonMap img[title^=\'Encounter\'] ~ span')[0].insertAdjacentHTML('afterend', `
+            <img type="button" src="assets/images/dungeons/boss.svg" height="25px">
+        `);
+        ko.applyBindingsToNode($('#dungeonMap img[title^=\'Encounter\'] ~ img')[0], {
+            visible: Settings.getSetting('botOptions').observableValue,
+            click: () => Settings.getSetting('botRush').toggle(),
+            attr: {
+                title:  ko.pureComputed(() => Settings.getSetting('botRush').observableValue()
+                    ? 'BossRush - enabled'
+                    : 'BossRush - disabled'
+                ),
+            },
+            style: {
+                filter: ko.pureComputed(() => Settings.getSetting('botRush').observableValue()
+                    ? 'invert(44%) sepia(21%) saturate(1163%) hue-rotate(235deg) brightness(93%) contrast(100%)'
+                    : 'invert(14%) sepia(5%) saturate(8%) hue-rotate(314deg) brightness(93%) contrast(81%)'
+                ),
+            },
+        });
+    }, 1);
 };
 //#endregion
