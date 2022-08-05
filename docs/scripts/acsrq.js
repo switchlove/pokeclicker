@@ -1520,25 +1520,25 @@ async function srBot() {
 }
 
 async function plantBot() {
-    var selectedBerry = document.querySelector("#plantSelect").selectedIndex - 1;
-    if ( selectedBerry <= 65 ) {
-        if ( selectedBerry <= App.game.farming.highestUnlockedBerry() ) {
-            if (App.game.farming.plotList[12].isEmpty() == true){
-                if (App.game.farming.berryList[selectedBerry]() > 1) {
-                    if (App.game.farming.plotList[12].isEmpty() == true) {
-                        FarmController.selectedBerry(selectedBerry);
-                        App.game.farming.plantAll(FarmController.selectedBerry());
-                    } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[b].growthTime[3]) {
-                        App.game.farming.harvestAll();
-                    }
+    var selectedBerry = Settings.getSetting('botstate.plant').value;
+    var berryId = BerryType[selectedBerry];
+    
+    if (berryId >= 0 && App.game.farming.unlockedBerries[berryId]()) {
+        if (App.game.farming.plotList[12].isEmpty() == true){
+            if (App.game.farming.berryList[berryId]() > 1) {
+                if (App.game.farming.plotList[12].isEmpty() == true) {
+                    FarmController.selectedBerry(berryId);
+                    App.game.farming.plantAll(FarmController.selectedBerry());
+                } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[b].growthTime[3]) {
+                    App.game.farming.harvestAll();
                 }
-            } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
-                App.game.farming.harvestAll();
             }
+        } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
+            App.game.farming.harvestAll();
         }
     } else if ( selectedBerry > 65 ) {
         switch(selectedBerry) {
-            case 66:
+            case 'S+C':
                 //Starf 65 + Chople 40
                 if (App.game.farming.plotList[5].berry == -1) {
                     App.game.farming.plant(5,65)
@@ -1576,7 +1576,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 67:
+            case 'S+C+P':
                 //Starf 65 + Chople 40 + Petaya 62
                 if (App.game.farming.plotList[5].berry == -1) {
                     App.game.farming.plant(5,65);
@@ -1614,7 +1614,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 68:
+            case 'S+L':
                 //Starf 65 + Lum 19
                 if (App.game.farming.plotList[5].berry == -1) {
                     [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,65));
@@ -1628,7 +1628,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 69:
+            case 'S+L+P':
                 //Starf 65 + Lum 19 + Petaya 62
                 if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
                     App.game.farming.harvest(7);
@@ -1647,17 +1647,17 @@ async function plantBot() {
                     App.game.farming.plant(17,62);
                 }
                 break;
-            case 70:
+            case 'S+L+C':
                 //Starf 65 + Lum 19 + Chople 40
                 break;
-            case 71:
+            case 'S+L+C+P':
                 //Starf 65 + Lum 19 + Chople 40 + Petaya 62
         }
     }
 }
 
 async function mutateBot() {
-    var selectedBerry = document.querySelector("#mutateSelect").value;
+    var selectedBerry = Settings.getSetting('botstate.mutate').value;
 
     switch (selectedBerry) {
         case "Persim":

@@ -177,7 +177,7 @@ acsrqInfo = function () {
         `<tr>
             <td colspan="2" class="card-header" style="position: relative">
                 Bots
-                <button type="button" class="btn btn-info" 
+                <button type="button" class="btn btn-primary" 
                     style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
                     data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq-script\\']').tab('show') }">
                     ⏣
@@ -196,7 +196,7 @@ acsrqInfo = function () {
         `<tr>
             <td colspan="2" class="card-header" style="position: relative">
                 Info
-                <button type="button" class="btn btn-info" 
+                <button type="button" class="btn btn-primary" 
                     style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
                     data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq\\']').tab('show') }">
                     ⏣
