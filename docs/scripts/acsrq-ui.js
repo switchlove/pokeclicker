@@ -145,11 +145,26 @@ Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/
 acsrqInfo = function () {
     document.getElementById('pokeballSelector').insertAdjacentHTML('afterend', `
     <div id="acsrqContainer" class="card sortable border-secondary mb-3">
-        <div class="card-header p-0" data-toggle="collapse" href="#acsrqBody">
-            <span>ACSRQ</span>
+        <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue">
+            <span>ACSRQ - Scripts</span>
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq-script\\']').tab('show') }">
+                ⏣
+            </button>
         </div>
-        <div id="acsrqBody" class="card-body p-0 show table-responsive">
-            <table id="acsrqTable" class="table table-sm m-0">
+        <div id="acsrqScriptingBody" class="card-body p-0 collapse show" style="">
+            <table class="table table-bordered m-0">
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="card-header p-0" data-toggle="collapse" href="#acsrqInfoBody" style="position: relative">
+            <span>ACSRQ - Info</span>
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq\\']').tab('show') }">
+                ⏣
+            </button>
+        </div>
+        <div id="acsrqInfoBody" class="card-body p-0 collapse show" style="">
+            <table class="table table-bordered m-0">
                 <tbody></tbody>
             </table>
         </div>
@@ -171,19 +186,7 @@ acsrqInfo = function () {
         // new SettingOption('S+L+C+P', 'S+L+C+P')
     );
 
-    const content = [
-        // acsrqInfo.Checkbox('botOptions'),
-        '<!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->',
-        `<tr>
-            <td colspan="2" class="card-header" style="position: relative">
-                Bots
-                <button type="button" class="btn btn-primary" 
-                    style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
-                    data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq-script\\']').tab('show') }">
-                    ⏣
-                </button>
-            </td>
-        </tr>`,
+    const scriptingBody = [
         acsrqInfo.Checkbox('botstate.breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
@@ -192,30 +195,20 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
         acsrqInfo.Select('botstate.plant'),
         acsrqInfo.Select('botstate.mutate'),
-        '<!-- /ko -->',
-        `<tr>
-            <td colspan="2" class="card-header" style="position: relative">
-                Info
-                <button type="button" class="btn btn-primary" 
-                    style="position: absolute; right: 0px; top: 0px; width: auto; height: 31px; padding: 4px;" 
-                    data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq\\']').tab('show') }">
-                    ⏣
-                </button>
-            </td>
-        </tr>`,
-        `<tr>
-            <td><input type="text" size=6 id="phaseCount" style="text-align: center"></td>
-            <td><a href="#phaseModal" data-toggle="modal">Phase</a></td>
-        </tr>`,
-        acsrqInfo.Info('lastEncounterPoke', 'Last Shiny'),
-        acsrqInfo.Info('areaClears', 'Clears'),
-        acsrqInfo.Info('lastEncounter', 'Since Last Shiny'),
-        '<tr><td data-bind="text: acsrqInfo.boostedRoute"></td><td>Boosted Route</td></tr>',
-        '<tr><td data-bind="text: acsrqInfo.regionShiny"></td><td>Region Shinies</td></tr>',
-        '<tr><td data-bind="text: acsrqInfo.uniqueRegion"></td><td>Region Uniques</td></tr>',
-        '<tr><td data-bind="text: acsrqInfo.uniqueEvent"></td><td>Event Uniques</td></tr>',
     ];
-    $('#acsrqBody tbody')[0].insertAdjacentHTML('beforeend', content.join(''));
+    $('#acsrqScriptingBody tbody')[0].insertAdjacentHTML('beforeend', scriptingBody.join(''));
+
+    const infoBody = [
+        `<tr>${acsrqInfo.Row('<a class="btn btn-link p-0 border-0" href="#phaseModal" data-toggle="modal">Phase</a>', '<input type="text" size=7 id="phaseCount" style="text-align: center;height: 100%">')}</tr>`,
+        `<tr id="lastEncounterPoke">${acsrqInfo.Row('Last Shiny')}</tr>`,
+        `<tr id="areaClears">${acsrqInfo.Row('Clears')}</tr>`,
+        `<tr id="lastEncounter">${acsrqInfo.Row('Since Last Shiny')}</tr>`,
+        `<tr>${acsrqInfo.Row('Boosted Route', '<knockout data-bind="text: acsrqInfo.boostedRoute"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Region Shinies', '<knockout data-bind="text: acsrqInfo.regionShiny"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Region Uniques', '<knockout data-bind="text: acsrqInfo.uniqueRegion"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Event Uniques', '<knockout data-bind="text: acsrqInfo.uniqueEvent"></knockout>')}</tr>`,
+    ];
+    $('#acsrqInfoBody tbody')[0].insertAdjacentHTML('beforeend', infoBody.join(''));
 };
 
 acsrqInfo.boostedRoute = ko.pureComputed(() => {
@@ -280,36 +273,31 @@ acsrqInfo.uniqueEvent = ko.pureComputed(() => {
     return `${eventCaught.length} / ${eventPoke.length}`;
 });
 
-acsrqInfo.Info = (id, label) => `
-    <tr id="${id}">
-        <td></td>
-        <td>${label}</td>
-    </tr>
+acsrqInfo.Row = (label, item = '') => `
+    <td class="p-0 align-middle">${item}</td>
+    <td class="p-1">${label}</td>
 `;
 
 acsrqInfo.Checkbox = (bot, visible = true, enable = true) => `
     <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('${bot}')}">
-        <td class="p-2">
-            <input class="clickable" type="checkbox"
+    ${acsrqInfo.Row(
+        `<label class="m-0" data-bind="attr: { for: 'checkbox-' + $data.name }, text: $data.displayName">
+            </label>`,
+        `<input class="clickable" type="checkbox"
                 data-bind="checked: $data.observableValue(), attr: {name, id: 'checkbox-' + $data.name}, enable: ${enable}"
-                onchange="Settings.setSettingByName(this.name, this.checked)"/>
-        </td>
-        <td class="p-2">
-            <label class="m-0" data-bind="attr: { for: 'checkbox-' + $data.name }, text: $data.displayName">
-                setting name
-            </label>
-        </td>
+                onchange="Settings.setSettingByName(this.name, this.checked)"/>`
+    )}
     </tr>
 `;
 
 acsrqInfo.Select = (bot) => `
     <tr data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('${bot}')}">
-        <td>
-            <select onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name, id: 'select-' + $data.name}">
-                <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
-            </select>
-        </td>
-        <td data-bind="text: $data.displayName">setting name</td>
+    ${acsrqInfo.Row(
+        '<knockout data-bind="text: $data.displayName"></knockout>',
+        `<select onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name, id: 'select-' + $data.name}">
+            <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
+        </select>`
+    )}
     </tr>
 `;
 //#endregion
@@ -510,7 +498,7 @@ phaseModal = function() {
                             <button class="btn btn-secondary" type="button">Export</button>
                         </div>
                     </div>
-                    
+
                     <div class="modal-body p-0">
                         <table class="table table-striped table-hover m-0" id="phaseTable">
                             <thead>
@@ -528,7 +516,7 @@ phaseModal = function() {
                             </tbody>
                         </table>
                     </div>
-                
+
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                     </div>
@@ -561,7 +549,7 @@ DungeonRunner.initializeDungeon = function(dungeon) {
         const chestSpan =  $('#dungeonMap img[title^=\'Chests\'] ~ span')[0];
         ko.applyBindingsToNode(chestSpan, { hidden: Settings.getSetting('botOptions').observableValue });
         chestSpan.insertAdjacentHTML('afterend', `
-            <button type="button" 
+            <button type="button"
                 class="btn badge badge-pill"
                 style="margin-top: 8px;font-size: 100%;margin-left: 2px;"
                 title='<chest opened>/<chest to open>/<chest in dungeon>'
