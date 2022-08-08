@@ -3077,7 +3077,7 @@ async function ballBot() {
         return;
 
     let shop;
-    if (App.game.badgeCase.hasBadge(26) == true) {
+    if (App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Champion Lance')]()) {
         shop = pokeMartShop;
     } else {
         switch (player.region) {
@@ -3105,11 +3105,21 @@ async function ballBot() {
         }
     }
     
+    console.log(shop);
     if (shop.isUnlocked() && (!shop.parent || shop.parent?.isUnlocked())) {
-        ShopHandler.showShop(shop);
-        const item = ShopHandler.shopObservable().items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
-        if (item && item.price() == item.basePrice) {
-            item.buy(purAmount);
+        let item = shop.items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
+
+        if (!(item && item.isAvailable()  && item.price() == item.basePrice)) {
+            return;
         }
+
+        ShopHandler.showShop(shop);
+        ShopHandler.setSelected(shop.items.indexOf(item));
+        ShopHandler.amount(purAmount);
+
+        if (!App.game.wallet.hasAmount(new Amount(item.totalPrice(ShopHandler.amount()), item.currency))) {
+            ShopHandler.maxAmount();
+        }
+        ShopHandler.buyItem();
     }
 }
