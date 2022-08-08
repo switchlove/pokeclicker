@@ -281,8 +281,7 @@ acsrqInfo.Row = (label, item = '') => `
 acsrqInfo.Checkbox = (bot, visible = true, enable = true) => `
     <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('${bot}')}">
     ${acsrqInfo.Row(
-        `<label class="m-0" data-bind="attr: { for: 'checkbox-' + $data.name }, text: $data.displayName">
-            </label>`,
+        '<label class="m-0" style="font-size: 14px;" data-bind="attr: { for: \'checkbox-\' + $data.name }, text: $data.displayName"></label>',
         `<input class="clickable" type="checkbox"
                 data-bind="checked: $data.observableValue(), attr: {name, id: 'checkbox-' + $data.name}, enable: ${enable}"
                 onchange="Settings.setSettingByName(this.name, this.checked)"/>`
