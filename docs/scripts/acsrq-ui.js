@@ -218,7 +218,6 @@ acsrqInfo = function () {
                 'foreach: Settings.getSetting(\'ballBuyOpts\').options.map(({value}) => App.game.pokeballs.pokeballs[value]).filter(_=>_) -->'
             )
     );
-    console.log(pokeballSelectorModal);
 
     const selectedPokeballDisplayTemplate = $('#selectedPokeballDisplayTemplate')[0];
     selectedPokeballDisplayTemplate.insertAdjacentHTML('afterend',
@@ -227,7 +226,6 @@ acsrqInfo = function () {
             .replace('pokeballSelector', 'autoBuyPokeballSelector')
             .replace('<img class', '<img style="height: 27px" class')
     );
-
     //#endregion
 
     const scriptingBody = [

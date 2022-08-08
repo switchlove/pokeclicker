@@ -3104,8 +3104,7 @@ async function ballBot() {
                 break;
         }
     }
-    
-    console.log(shop);
+
     if (shop.isUnlocked() && (!shop.parent || shop.parent?.isUnlocked())) {
         let item = shop.items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
 
