@@ -114,7 +114,7 @@ Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
     new SettingOption('Dragon', 'dragon'),
 ], 'fire'));
 Settings.add(new Setting('fossilOpts', 'Fossil to use',
-    UndergroundItem.list.filter(i => i.valueType == 'Mine Egg').map(f => new SettingOption(f.displayName, f.name)),
+    UndergroundItems.list.filter(i => i.valueType == 'Mine Egg').map(f => new SettingOption(f.displayName, f.name)),
     'Dome Fossil'));
 Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
