@@ -211,13 +211,14 @@ acsrqInfo = function () {
     const pokeballSelectorModal = $('#pokeballSelectorModal')[0];
     pokeballSelectorModal.insertAdjacentHTML('afterend',
         pokeballSelectorModal.outerHTML
-            .replace('pokeballSelector', 'autoBuyPokeballSelector')
-            .replace('App.game.pokeballs.selectedSelection()', 'Settings.getSetting(\'ballBuyOpts\').observableValue')
+            .replace(/pokeballSelector/g, 'autoBuyPokeballSelector')
+            .replace(/App\.game\.pokeballs\.selectedSelection\(\)\(/g, 'Settings.setSettingByName(\'ballBuyOpts\', ')
             .replace(
                 'foreach: App.game.pokeballs.pokeballs -->',
                 'foreach: Settings.getSetting(\'ballBuyOpts\').options.map(({value}) => App.game.pokeballs.pokeballs[value]).filter(_=>_) -->'
             )
     );
+    console.log(pokeballSelectorModal);
 
     const selectedPokeballDisplayTemplate = $('#selectedPokeballDisplayTemplate')[0];
     selectedPokeballDisplayTemplate.insertAdjacentHTML('afterend',
