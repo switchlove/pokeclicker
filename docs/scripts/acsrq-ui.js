@@ -145,7 +145,8 @@ Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/
 acsrqInfo = function () {
     document.getElementById('pokeballSelector').insertAdjacentHTML('afterend', `
     <div id="acsrqContainer" class="card sortable border-secondary mb-3">
-        <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue">
+        <!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->
+        <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative">
             <span>ACSRQ - Scripts</span>
             <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" 
                 data-bind="click: (_,e) => {
@@ -159,6 +160,7 @@ acsrqInfo = function () {
                 <tbody></tbody>
             </table>
         </div>
+        <!-- /ko -->
 
         <div class="card-header p-0" data-toggle="collapse" href="#acsrqInfoBody" style="position: relative">
             <span>ACSRQ - Info</span>

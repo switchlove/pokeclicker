@@ -3069,83 +3069,47 @@ async function autoBreed() {
 }
 
 async function ballBot() {
-    var purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
-    var minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
+    const buyOpts = Settings.getSetting('ballBuyOpts').observableValue();
+    const purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
+    const minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
 
+    if (buyOpts == -1 || App.game.pokeballs.pokeballs[buyOpts].quantity() > minAmount)
+        return;
+
+    let shop;
     if (App.game.badgeCase.hasBadge(26) == true) {
-        ShopHandler.showShop(pokeMartShop);
-        ShopHandler.shopObservable().items;
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-            if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                ShopHandler.shopObservable().items[0].buy(purAmount);
-            }
-        }
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-            if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                ShopHandler.shopObservable().items[1].buy(purAmount);
-            }
-        }
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
-            if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                ShopHandler.shopObservable().items[2].buy(purAmount);
-            }
-        }
+        shop = pokeMartShop;
     } else {
         switch (player.region) {
-            case 0:
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-                    if (MapHelper.accessToTown('Viridian City') == true) {
-                        ShopHandler.showShop(ViridianCityShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-                    if (MapHelper.accessToTown('Lavender Town') == true) {
-                        ShopHandler.showShop(LavenderTownShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[1].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
-                    if (MapHelper.accessToTown('Fuchsia City') == true) {
-                        ShopHandler.showShop(FuchsiaCityShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                            ShopHandler.shopObservable().items[2].buy(purAmount);
-                        }
-                    }
-                }
+            case GameConstants.Region.kanto:
+                shop = [ViridianCityShop, LavenderTownShop, FuchsiaCityShop][buyOpts];
                 break;
-            case 1:
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-                    if (MapHelper.accessToTown('New Bark Town') == true) {
-                        ShopHandler.showShop(NewBarkTownShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB' || Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
-                    if (MapHelper.accessToTown('Goldenrod City') == true) {
-                        ShopHandler.showShop(GoldenrodDepartmentStoreShop);
-                        ShopHandler.shopObservable().items;
-                        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-                            if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                                ShopHandler.shopObservable().items[1].buy(purAmount);
-                            }
-                        } else if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
-                            if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                                ShopHandler.shopObservable().items[2].buy(purAmount);
-                            }
-                        }
-                    }
-                }
+            case GameConstants.Region.johto:
+                shop = [NewBarkTownShop, GoldenrodDepartmentStoreShop, GoldenrodDepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.hoenn:
+                shop = [OldaleTownShop, SlateportCityShop, FortreeCityShop][buyOpts];
+                break;
+            case GameConstants.Region.sinnoh:
+                shop = [SandgemTownShop, HearthomeCityShop, DepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.unova:
+                shop = [FloccesyTownShop, VirbankCityShop, MistraltonCityShop][buyOpts];
+                break;
+            case GameConstants.Region.kalos:
+                shop = [AquacordeTownShop, DepartmentStoreShop, DepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.alola:
+                shop = [HauoliCityShop, HeaheaCityShop, DepartmentStoreShop][buyOpts];
+                break;
+        }
+    }
+    
+    if (shop.isUnlocked() && (!shop.parent || shop.parent?.isUnlocked())) {
+        ShopHandler.showShop(shop);
+        const item = ShopHandler.shopObservable().items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
+        if (item && item.price() == item.basePrice) {
+            item.buy(purAmount);
         }
     }
 }
