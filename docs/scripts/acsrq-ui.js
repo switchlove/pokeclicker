@@ -220,8 +220,9 @@ acsrqInfo = function () {
     const selectedPokeballDisplayTemplate = $('#selectedPokeballDisplayTemplate')[0];
     selectedPokeballDisplayTemplate.insertAdjacentHTML('afterend',
         selectedPokeballDisplayTemplate.outerHTML
-            .replace('pokeballSelector', 'autoBuyPokeballSelector')
             .replace('selectedPokeballDisplayTemplate', 'autoBuyPokeballDisplayTemplate')
+            .replace('pokeballSelector', 'autoBuyPokeballSelector')
+            .replace('<img class', '<img style="height: 27px" class')
     );
 
     //#endregion
