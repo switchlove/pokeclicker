@@ -1036,7 +1036,7 @@ async function gymBot() {
             if (townContent[gymAtX].isUnlocked() == true) {
                 switch(Settings.getSetting('gymOpts').observableValue()) {
                     case "gymOptC":
-                        if (townContent[gymAtX].clears() < Number(Settings.getSetting('maxClears').observableValue())) {
+                        if ((townContent[gymAtX].clears() || 0) < Number(Settings.getSetting('maxClears').observableValue())) {
                             GymRunner.startGym(townContent[gymAtX]);
                         }
                         break;
