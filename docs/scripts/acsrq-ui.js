@@ -227,26 +227,26 @@ acsrqInfo = function () {
     //#endregion
 
     const scriptingBody = [
+        acsrqInfo.Checkbox('botstate.bf', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
         acsrqInfo.Checkbox('botstate.breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
         acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('botstate.bf', 'TownList[\'Battle Frontier\'].isUnlocked()', '!player.route() && player.town().name === \'Battle Frontier\''),
         acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
-        acsrqInfo.Select('botstate.plant'),
-        acsrqInfo.Select('botstate.mutate'),
         `<tr>${acsrqInfo.Row(
             'Pokeball',
             `<knockout data-bind="
-                template: {
-                    name: 'autoBuyPokeballDisplayTemplate',
-                    data: { 
-                        'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
-                        'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
-                        'title': 'Auto Buy Pokéball'
-                    }
-                }"></knockout>`
+            template: {
+                name: 'autoBuyPokeballDisplayTemplate',
+                data: { 
+                    'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
+                    'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
+                    'title': 'Auto Buy Pokéball'
+                }
+            }"></knockout>`
         )}</tr>`,
+        acsrqInfo.Select('botstate.mutate'),
+        acsrqInfo.Select('botstate.plant'),
     ];
     $('#acsrqScriptingBody tbody')[0].insertAdjacentHTML('beforeend', scriptingBody.join(''));
 };
@@ -367,6 +367,19 @@ acsrqSettings = function () {
 
     const acsrqScripting = [
         acsrqSettings.Section(
+            'BattleFrontier', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'bfOpts'),
+                acsrqSettings.Number('maxTime', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptT\''),
+                acsrqSettings.Number('maxLvl', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptL\''),
+            ], false),
+        acsrqSettings.Section(
+            'Breeding', [
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'breedingOpts'),
+                acsrqSettings.Number('minBreedAttack', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'attack\''),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'typedEggOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'typed\''),
+                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'fossil\''),
+            ], false),
+        acsrqSettings.Section(
             'Dungeons', [
                 acsrqSettings.Template('BooleanSettingTemplate', 'botRush'),
                 acsrqSettings.Template('BooleanSettingTemplate', 'chestCollect'),
@@ -382,11 +395,11 @@ acsrqSettings = function () {
                 acsrqSettings.Number('maxClears', 'Settings.getSetting(\'gymOpts\').observableValue() === \'gymOptC\''),
             ], false),
         acsrqSettings.Section(
-            'BattleFrontier', [
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'bfOpts'),
-                acsrqSettings.Number('maxTime', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptT\''),
-                acsrqSettings.Number('maxLvl', 'Settings.getSetting(\'bfOpts\').observableValue() === \'bfOptL\''),
+            'Pokeball', [
+                acsrqSettings.Number('minBallAmount'),
+                acsrqSettings.Number('ballPurAmount'),
             ], false),
+        acsrqSettings.Section('Safari', [acsrqSettings.Template('MultipleChoiceSettingTemplate', 'safariOpts')], false),
         acsrqSettings.Section(
             'SoftReset', [
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'srOpts'),
@@ -394,19 +407,6 @@ acsrqSettings = function () {
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'evoOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
                 acsrqSettings.Number('evoItemCount', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
             ], false),
-        acsrqSettings.Section(
-            'Breeding', [
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'breedingOpts'),
-                acsrqSettings.Number('minBreedAttack', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'attack\''),
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'typedEggOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'typed\''),
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'breedingOpts\').observableValue() === \'fossil\''),
-            ], false),
-        acsrqSettings.Section(
-            'Pokeball', [
-                acsrqSettings.Number('minBallAmount'),
-                acsrqSettings.Number('ballPurAmount'),
-            ], false),
-        acsrqSettings.Section('Safari', [acsrqSettings.Template('MultipleChoiceSettingTemplate', 'safariOpts')], false),
     ];
     $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue"><a class="nav-link" href="#settings-acsrq-script" data-toggle="tab">ACSRQ Scripting</a></li>');
     $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq-script">${acsrqScripting.join('')}</div>`);
