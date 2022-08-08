@@ -118,11 +118,11 @@ Settings.add(new Setting('fossilOpts', 'Fossil to use',
     'Dome Fossil'));
 Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
-    new SettingOption('None', 'none'),
-    new SettingOption('Pokéball', 'pokeB'),
-    new SettingOption('Greatball', 'greatB'),
-    new SettingOption('Ultraball', 'ultraB'),
-], 'none'));
+    new SettingOption('None', GameConstants.Pokeball.None),
+    new SettingOption('Pokeball', GameConstants.Pokeball.Pokeball),
+    new SettingOption('Greatball', GameConstants.Pokeball.Greatball),
+    new SettingOption('Ultraball', GameConstants.Pokeball.Ultraball),
+], GameConstants.Pokeball.None));
 Settings.add(new Setting('minBallAmount', 'Minimum amount of Pokéballs to keep', [], 0));
 Settings.add(new Setting('ballPurAmount', 'Amount of Pokéballs to purchase', [], 1000));
 Settings.add(new Setting('safariOpts', 'Safari bot stop options', [
@@ -147,9 +147,12 @@ acsrqInfo = function () {
     <div id="acsrqContainer" class="card sortable border-secondary mb-3">
         <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue">
             <span>ACSRQ - Scripts</span>
-            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq-script\\']').tab('show') }">
-                ⏣
-            </button>
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" 
+                data-bind="click: (_,e) => {
+                    $('#settingsModal').modal('show'); 
+                    $('a[href=\\'#settings-acsrq-script\\']').tab('show');
+                    e.stopPropagation();
+                }">⏣</button>
         </div>
         <div id="acsrqScriptingBody" class="card-body p-0 collapse show" style="">
             <table class="table table-bordered m-0">
@@ -159,9 +162,12 @@ acsrqInfo = function () {
 
         <div class="card-header p-0" data-toggle="collapse" href="#acsrqInfoBody" style="position: relative">
             <span>ACSRQ - Info</span>
-            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" data-bind="click: () => { $('#settingsModal').modal('show'); $('a[href=\\'#settings-acsrq\\']').tab('show') }">
-                ⏣
-            </button>
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;"
+                data-bind="click: (_,e) => {
+                    $('#settingsModal').modal('show'); 
+                    $('a[href=\\'#settings-acsrq\\']').tab('show');
+                    e.stopPropagation();
+                }">⏣</button>
         </div>
         <div id="acsrqInfoBody" class="card-body p-0 collapse show" style="">
             <table class="table table-bordered m-0">
@@ -171,6 +177,19 @@ acsrqInfo = function () {
     </div>
     `);
 
+    const infoBody = [
+        `<tr>${acsrqInfo.Row('<a class="btn btn-link p-0 border-0" href="#phaseModal" data-toggle="modal">Phase</a>', '<input type="text" size=7 id="phaseCount" style="text-align: center;height: 100%">')}</tr>`,
+        `<tr id="lastEncounterPoke">${acsrqInfo.Row('Last Shiny')}</tr>`,
+        `<tr id="areaClears">${acsrqInfo.Row('Clears')}</tr>`,
+        `<tr id="lastEncounter">${acsrqInfo.Row('Since Last Shiny')}</tr>`,
+        `<tr>${acsrqInfo.Row('Boosted Route', '<knockout data-bind="text: acsrqInfo.boostedRoute"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Region Shinies', '<knockout data-bind="text: acsrqInfo.regionShiny"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Region Uniques', '<knockout data-bind="text: acsrqInfo.uniqueRegion"></knockout>')}</tr>`,
+        `<tr>${acsrqInfo.Row('Event Uniques', '<knockout data-bind="text: acsrqInfo.uniqueEvent"></knockout>')}</tr>`,
+    ];
+    $('#acsrqInfoBody tbody')[0].insertAdjacentHTML('beforeend', infoBody.join(''));
+
+    //#region Farm Bot
     let berries = Object.values(BerryType).filter(t => !Number.isInteger(t)).map(b => new SettingOption(b, b));
     berries.pop(); // remove None entry
     berries.pop(); // remove Enigma entry
@@ -185,6 +204,27 @@ acsrqInfo = function () {
         // new SettingOption('S+L+C', 'S+L+C'),
         // new SettingOption('S+L+C+P', 'S+L+C+P')
     );
+    //#endregion
+    //#region Pokeball Modal
+    const pokeballSelectorModal = $('#pokeballSelectorModal')[0];
+    pokeballSelectorModal.insertAdjacentHTML('afterend',
+        pokeballSelectorModal.outerHTML
+            .replace('pokeballSelector', 'autoBuyPokeballSelector')
+            .replace('App.game.pokeballs.selectedSelection()', 'Settings.getSetting(\'ballBuyOpts\').observableValue')
+            .replace(
+                'foreach: App.game.pokeballs.pokeballs -->',
+                'foreach: Settings.getSetting(\'ballBuyOpts\').options.map(({value}) => App.game.pokeballs.pokeballs[value]).filter(_=>_) -->'
+            )
+    );
+
+    const selectedPokeballDisplayTemplate = $('#selectedPokeballDisplayTemplate')[0];
+    selectedPokeballDisplayTemplate.insertAdjacentHTML('afterend',
+        selectedPokeballDisplayTemplate.outerHTML
+            .replace('pokeballSelector', 'autoBuyPokeballSelector')
+            .replace('selectedPokeballDisplayTemplate', 'autoBuyPokeballDisplayTemplate')
+    );
+
+    //#endregion
 
     const scriptingBody = [
         acsrqInfo.Checkbox('botstate.breeding', 'App.game.breeding.canAccess() && App.game.party.hasMaxLevelPokemon()'),
@@ -195,20 +235,20 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
         acsrqInfo.Select('botstate.plant'),
         acsrqInfo.Select('botstate.mutate'),
+        `<tr>${acsrqInfo.Row(
+            'Pokeball',
+            `<knockout data-bind="
+                template: {
+                    name: 'autoBuyPokeballDisplayTemplate',
+                    data: { 
+                        'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
+                        'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
+                        'title': 'Auto Buy Pokéball'
+                    }
+                }"></knockout>`
+        )}</tr>`,
     ];
     $('#acsrqScriptingBody tbody')[0].insertAdjacentHTML('beforeend', scriptingBody.join(''));
-
-    const infoBody = [
-        `<tr>${acsrqInfo.Row('<a class="btn btn-link p-0 border-0" href="#phaseModal" data-toggle="modal">Phase</a>', '<input type="text" size=7 id="phaseCount" style="text-align: center;height: 100%">')}</tr>`,
-        `<tr id="lastEncounterPoke">${acsrqInfo.Row('Last Shiny')}</tr>`,
-        `<tr id="areaClears">${acsrqInfo.Row('Clears')}</tr>`,
-        `<tr id="lastEncounter">${acsrqInfo.Row('Since Last Shiny')}</tr>`,
-        `<tr>${acsrqInfo.Row('Boosted Route', '<knockout data-bind="text: acsrqInfo.boostedRoute"></knockout>')}</tr>`,
-        `<tr>${acsrqInfo.Row('Region Shinies', '<knockout data-bind="text: acsrqInfo.regionShiny"></knockout>')}</tr>`,
-        `<tr>${acsrqInfo.Row('Region Uniques', '<knockout data-bind="text: acsrqInfo.uniqueRegion"></knockout>')}</tr>`,
-        `<tr>${acsrqInfo.Row('Event Uniques', '<knockout data-bind="text: acsrqInfo.uniqueEvent"></knockout>')}</tr>`,
-    ];
-    $('#acsrqInfoBody tbody')[0].insertAdjacentHTML('beforeend', infoBody.join(''));
 };
 
 acsrqInfo.boostedRoute = ko.pureComputed(() => {
@@ -363,9 +403,8 @@ acsrqSettings = function () {
             ], false),
         acsrqSettings.Section(
             'Pokeball', [
-                acsrqSettings.Template('MultipleChoiceSettingTemplate', 'ballBuyOpts'),
-                acsrqSettings.Number('minBallAmount', 'Settings.getSetting(\'ballBuyOpts\').observableValue() !== \'none\''),
-                acsrqSettings.Number('ballPurAmount', 'Settings.getSetting(\'ballBuyOpts\').observableValue() !== \'none\''),
+                acsrqSettings.Number('minBallAmount'),
+                acsrqSettings.Number('ballPurAmount'),
             ], false),
         acsrqSettings.Section('Safari', [acsrqSettings.Template('MultipleChoiceSettingTemplate', 'safariOpts')], false),
     ];
