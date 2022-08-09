@@ -1,7 +1,8 @@
 {
-    "version": "0.0.13d",
+    "version": "0.0.13e",
     "files": [
-        "scripts/acsrq.js",
+        "scripts/acsrq.js",        
+        "scripts/acsrq-ui.js",
         "scripts/movement.js",        
         "scripts/modules.min.js",        
         "scripts/script.min.js",
