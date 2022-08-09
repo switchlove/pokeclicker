@@ -29,245 +29,12 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-window.addEventListener("load", function() {
-    setTimeout(function(){
+window.addEventListener('load', () => {
+    setTimeout(() => {
         main();
-
-        setInterval(function(){
+        setInterval(() => {
             main();
         }, 500);
-
-        Settings.add(new Setting('menuPlace', 'Place ACSRQ window after this:',
-        [
-            new SettingOption('Achievement Tracker', 'achivementTrackerContainer'),
-            new SettingOption('Battle Items', 'battleItemContainer'),
-            new SettingOption('Hatchery', 'breedingDisplay'),
-            new SettingOption('Oak Items', 'oakItemsContainer'),
-            new SettingOption('Pokémon List', 'pokemonListContainer'),
-            new SettingOption('Quests', 'questDisplayContainer'),
-            new SettingOption('Town Map', 'townMap'),
-            new SettingOption('Pokéballs', 'pokeballSelector'),
-        ], 'pokeballSelector'));
-        Settings.add(new BooleanSetting('hideNoti', 'Hide all notifications', false));
-        Settings.add(new BooleanSetting('hideBItem', 'Hide Battle Item window', false));
-        Settings.add(new BooleanSetting('hideOak', 'Hide Oak Item window', false));
-        Settings.add(new BooleanSetting('disableSave', 'Prevent AutoSave', false));
-        Settings.add(new BooleanSetting('disEvent', 'Disable special events', false));
-        Settings.add(new BooleanSetting('noWander', 'Hide normal Wander log entries', false));
-        Settings.add(new BooleanSetting('showShiny', 'Show needed shinies', false));
-        Settings.add(new BooleanSetting('showLoot', 'Show possible dungeon loot', false));
-        Settings.add(new BooleanSetting('trackPhases', 'Track shiny phases and display below', false));
-		Settings.add(new Setting('phaseCount', 'phaseCount', [], '100'));
-
-        Settings.add(new BooleanSetting('botOptions', 'Enable bot options', false));
-        Settings.add(new BooleanSetting('botRush', 'Boss rush in dungeons', false));
-        Settings.add(new BooleanSetting('chestCollect', 'Open chests in dungeons', false));
-        Settings.add(new Setting('dungeOpts', 'Dungeon bot stop options:',
-        [
-            new SettingOption('None', 'dungOptN'),
-            new SettingOption('Clears', 'dungOptC'),
-            new SettingOption('Shiny Check', 'dungOptSC'),
-            new SettingOption('Dungeon Tokens Left', 'dungOptDT'),
-        ], 'dungOptN'));
-        Settings.add(new Setting('gymOpts', 'Gym bot stop options:',
-        [
-            new SettingOption('Clears', 'gymOptC'),
-            new SettingOption('None', 'gymOptN'),
-        ], 'gymOptN'));
-        Settings.add(new Setting('gymE4Opts', 'E4 Boss to fight:',
-        [
-            new SettingOption('First', '1'),
-            new SettingOption('Second', '2'),
-            new SettingOption('Third', '3'),
-            new SettingOption('Fourth', '4'),
-            new SettingOption('Fifth', '5'),
-        ], '1'));
-        Settings.add(new Setting('bfOpts', 'Battle Frontier stop options:',
-        [
-            new SettingOption('None', 'bfOptN'),
-            new SettingOption('Time', 'bfOptT'),
-            new SettingOption('Level', 'bfOptL'),
-        ], 'bfOptN'));
-        Settings.add(new Setting('maxChests', 'maxChests', [], '1'));
-        Settings.add(new Setting('maxClears', 'maxClears', [], '1000'));
-        Settings.add(new Setting('minDT', 'minDT', [], '10000'));
-        Settings.add(new Setting('maxLvl', 'maxLvl', [], '100'));
-        Settings.add(new Setting('maxTime', 'maxTime', [], '30'));
-        Settings.add(new Setting('srOpts', 'Soft Reset Type:',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Mystery Eggs', 'mys'),
-            new SettingOption('Evo Items', 'evo'),
-            new SettingOption('Fossils', 'fos'),
-            new SettingOption('Shop Mon', 'poke'),
-            new SettingOption('Regular Eggs', 'egg'),
-        ], 'none'));
-        Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item:',
-        [
-            new SettingOption('Dawn Stone', 'Dawn_stone'),
-            new SettingOption('Deepsea Scale', 'Deepsea_scale'),
-            new SettingOption('Deepsea Tooth', 'Deepsea_tooth'),
-            new SettingOption('Dragon Scale', 'Dragon_scale'),
-            new SettingOption('Dubious Disc', 'Dubious_disc'),
-            new SettingOption('Dusk Stone', 'Dusk_stone'),
-            new SettingOption('Electirizer', 'Electirizer'),
-            new SettingOption('Fire Stone', 'Fire_stone'),
-            new SettingOption('Kings Rock', 'Kings_rock'),
-            new SettingOption('Leaf Stone', 'Leaf_stone'),
-            new SettingOption('Magmarizer', 'Magmarizer'),
-            new SettingOption('Metal Coat', 'Metal_coat'),
-            new SettingOption('Moon Stone', 'Moon_stone'),
-            new SettingOption('Prism Scale', 'Prism_scale'),
-            new SettingOption('Protector', 'Protector'),
-            new SettingOption('Razor Claw', 'Razor_claw'),
-            new SettingOption('Razor Fang', 'Razor_fang'),
-            new SettingOption('Reaper Cloth', 'Reaper_cloth'),
-            new SettingOption('Sachet', 'Sachet'),
-            new SettingOption('Shiny Stone', 'Shiny_stone'),
-            new SettingOption('Soothe Bell', 'Soothe_bell'),
-            new SettingOption('Sun Stone', 'Sun_stone'),
-            new SettingOption('Thunder Stone', 'Thunder_stone'),
-            new SettingOption('Linking Cord', 'Linking_cord'),
-            new SettingOption('Upgrade', 'Upgrade'),
-            new SettingOption('Water Stone', 'Water_stone'),
-            new SettingOption('Whipped Dream', 'Whipped_dream'),
-        ], 'Water_stone'));
-        Settings.add(new Setting('breedingOpts', 'Breeding options:',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Upto Attack', 'attack'),
-            new SettingOption('Mystery Eggs', 'mystery'),
-            new SettingOption('Typed Eggs', 'typed'),
-            new SettingOption('Fossils', 'fossil'),
-        ], 'none'));
-        Settings.add(new Setting('minBreedAttack', 'minBreedAttack', [], '1000'));
-        Settings.add(new Setting('typedEggOpts', 'Typed egg to use:',
-        [
-            new SettingOption('Fire', 'fire'),
-            new SettingOption('Water', 'water'),
-            new SettingOption('Grass', 'grass'),
-            new SettingOption('Electric', 'electric'),
-            new SettingOption('Fighting', 'fighting'),
-            new SettingOption('Dragon', 'dragon'),
-        ], 'fire'));
-        Settings.add(new Setting('fossilOpts', 'Fossil to use:',
-        [
-            new SettingOption('Dome', 'dome'),
-            new SettingOption('Helix', 'helix'),
-            new SettingOption('Amber', 'amber'),
-            new SettingOption('Root', 'root'),
-            new SettingOption('Claw', 'claw'),
-            new SettingOption('Skull', 'skull'),
-            new SettingOption('Armor', 'armor'),
-            new SettingOption('Plume', 'plume'),
-            new SettingOption('Cover', 'cover'),
-            new SettingOption('Jaw', 'jaw'),
-            new SettingOption('Sail', 'sail'),
-        ], 'dome'));
-        Settings.add(new Setting('evoItemCount', 'evoItemCount', [], '1'));
-        Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?',
-        [
-            new SettingOption('None', 'none'),
-            new SettingOption('Pokéball', 'pokeB'),
-            new SettingOption('Greatball', 'greatB'),
-            new SettingOption('Ultraball', 'ultraB'),
-        ], 'none'));
-        Settings.add(new Setting('minBallAmount', 'minBallAmount', [], '0'));
-        Settings.add(new Setting('ballPurAmount', 'ballPurAmount', [], '1000'));
-        Settings.add(new Setting('safariOpts', 'Safari bot stop options:',
-        [
-            new SettingOption('None', 'safariOptN'),
-            new SettingOption('Shiny Check', 'safariOptSC'),
-        ], 'safariOptSC'));
-        /*Settings.add(new Setting('mutateMulch', 'Use Mulch with Mutate bot?',
-        [
-        new SettingOption('None', 'none'),
-        new SettingOption('Boost Mulch', 'boostM'),
-        ], 'none'));*/
-
-        const settingsModal = document.getElementById('settingsModal');
-        const tabs = settingsModal.getElementsByClassName('nav-tabs')[0];
-        const tabContent = settingsModal.getElementsByClassName('tab-content')[0];
-
-        const a6TabEl = document.createElement('div');
-        a6TabEl.className = 'tab-pane';
-        a6TabEl.id = 'settings-a6csrq';
-        a6TabEl.innerHTML = ``;
-        tabContent.appendChild(a6TabEl);
-
-        const a6Tab1 = document.createElement('li');
-        a6Tab1.className = 'nav-item';
-
-        const a6Tab1Inner = document.createElement('a');
-        a6Tab1Inner.innerText = 'ACSRQ';
-        a6Tab1Inner.className = 'nav-link';
-        a6Tab1Inner.href = '#settings-a6csrq1';
-        a6Tab1Inner.dataset.toggle = 'tab';
-
-        a6Tab1.appendChild(a6Tab1Inner);
-        tabs.appendChild(a6Tab1);
-
-        const a6Tab1El = document.createElement('div');
-        a6Tab1El.className = 'tab-pane';
-        a6Tab1El.id = 'settings-a6csrq1';
-        a6Tab1El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('menuPlace')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideNoti')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideBItem')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('hideOak')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disableSave')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('disEvent')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('noWander')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showShiny')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('showLoot')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('trackPhases')}"></tr>
-        <tr><td class="p-2">Amount of phases to keep track of:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value); hasRun = 0; a6phases();" id="phaseCount" name="phaseCount" data-bind="value: Settings.getSetting('phaseCount').observableValue() || ''" value="100"></td></tr>
-		</tbody></table>
-        </tbody></table>`;
-        tabContent.appendChild(a6Tab1El);
-
-        const a6Tab2 = document.createElement('li');
-        a6Tab2.className = 'nav-item';
-
-        const a6Tab2Inner = document.createElement('a');
-        a6Tab2Inner.innerText = 'ACSRQ - Scripting';
-        a6Tab2Inner.className = 'nav-link';
-        a6Tab2Inner.href = '#settings-a6csrq2';
-        a6Tab2Inner.dataset.toggle = 'tab';
-
-        a6Tab2.appendChild(a6Tab2Inner);
-        tabs.appendChild(a6Tab2);
-
-        const a6Tab2El = document.createElement('div');
-        a6Tab2El.className = 'tab-pane';
-        a6Tab2El.id = 'settings-a6csrq2';
-        a6Tab2El.innerHTML = `<table class="table table-striped table-hover m-0"><tbody>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botOptions')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('botRush')}"></tr>
-        <tr data-bind="template: { name: 'BooleanSettingTemplate', data: Settings.getSetting('chestCollect')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('dungeOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('gymE4Opts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('bfOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Number of chests to open:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxChests" name="maxChests" data-bind="value: Settings.getSetting('maxChests').observableValue() || ''" value="1}"></td></tr>
-        <tr style="display: none"><td class="p-2">Maximum clears:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxClears" name="maxClears" data-bind="value: Settings.getSetting('maxClears').observableValue() || ''" value="1000}"></td></tr>
-        <tr style="display: none"><td class="p-2">Minimum DT to retain:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minDT" name="minDT" data-bind="value: Settings.getSetting('minDT').observableValue() || ''" value="10000"></td></tr>
-        <tr style="display: none"><td class="p-2">Battle Frontier level to stop at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxLvl" name="maxLvl" data-bind="value: Settings.getSetting('maxLvl').observableValue() || ''" value="100"></td></tr>
-        <tr style="display: none"><td class="p-2">Time remaining to quit Battle Frontier at:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="maxTime" name="maxTime" data-bind="value: Settings.getSetting('maxTime').observableValue() || ''" value="30"></td></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('srOpts')}"></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('evoOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Evo items to use:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="evoItemCount" name="evoItemCount" data-bind="value: Settings.getSetting('evoItemCount').observableValue() || ''" value="1"></td></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('fossilOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('breedingOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Breed each Pokemon up to this attack power:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBreedAttack" name="minBreedAttack" data-bind="value: Settings.getSetting('minBreedAttack').observableValue() || ''" value="1000"></td></tr>
-        <tr style="display: none" data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('typedEggOpts')}"></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('ballBuyOpts')}"></tr>
-        <tr style="display: none"><td class="p-2">Minimum amount of Pokéballs to keep:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="minBallAmount" name="minBallAmount" data-bind="value: Settings.getSetting('minBallAmount').observableValue() || ''" value="0"></td></tr>
-        <tr style="display: none"><td class="p-2">Amount of Pokéballs to purchase:</td><td class="p-2"><input class="form-control" onchange="Settings.setSettingByName(this.name, this.value)" id="ballPurAmount" name="ballPurAmount" data-bind="value: Settings.getSetting('ballPurAmount').observableValue() || ''" value="0"></td></tr>
-        <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('safariOpts')}"></tr>
-        </tbody></table>`;
-        //      <tr data-bind="template: { name: 'MultipleChoiceSettingTemplate', data: Settings.getSetting('mutateMulch')}"></tr>
-        tabContent.appendChild(a6Tab2El);
     }, 1000);
 
     setInterval(function(){
@@ -299,58 +66,42 @@ window.addEventListener("load", function() {
     }, 5000);
 
     setInterval(function(){
-        if (clickEngagedD == 1){
+        if (clickEngagedD){
             if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true){
                 dungeonBot();
             }
         }
-        if (clickEngagedG == 1){
+        if (clickEngagedG){
             gymBot();
         }
-        if (clickEngagedBF == 1){
+        if (clickEngagedBF){
             bfBot();
         }
     }, 100);
 
     setInterval(function(){
-        if (clickEngagedS == 1){
+        if (clickEngagedS){
             safariBot();
         }
     }, 250);
 
     setTimeout(function(){
         setInterval(function(){
-            if (clickEngagedSR == 1){
+            if (clickEngagedSR){
                 srBot();
             }
         }, 3000);
     }, 3000);
 });
 
-function main(){
+function main() {
     var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
     if (CharCard == null && App.game != undefined) {
         a6save();
         a6menu();
         a6phases();
 
-        var srCheckboxL = document.querySelector("#srCheck");
-        srCheckboxL.addEventListener('change', function() {
-            if (this.checked) {
-                clickEngagedSR = 1;
-                localSettings[2] = 1;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
-            } else {
-                clickEngagedSR = 0;
-                srCount = 0;
-                localSettings[2] = 0;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                localLocal[6][1] = '';
-                localLocal[6][2] = '';
-                localStorage.setItem(saveKey, JSON.stringify(localLocal));
-            }
-        });
-        if (srCheckboxL.checked) {
+        if (Settings.getSetting('botstate.sr').observableValue()) {
             clickEngagedSR = 1;
             localSettings[2] = 1;
             localStorage.setItem(settingKey, JSON.stringify(localSettings));
@@ -364,34 +115,6 @@ function main(){
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
 
-        var phaseLink = document.querySelector("#areaPhase > td:nth-child(2) > a");
-        phaseLink.addEventListener("click", function() {
-            if (event.shiftKey) {
-                event.preventDefault();
-            }
-            document.querySelector("#phaseModal").style.display = "block";
-        });
-
-        var phaseExport = document.querySelector("#phaseModal > div > div > div.modal-header > div > button:nth-child(2)");
-        phaseExport.addEventListener("click", function() {
-            if(!event.detail || event.detail == 1) {
-                if (hasExported == 0) {
-                    setTimeout(function(){
-                        a6export();
-                    }, 2000);
-                    hasExported = 1;
-                }
-                return true;
-            } else {
-                return false;
-            }
-        });
-
-        var phaseClose = document.querySelector("#phaseModal > div > div > div.modal-footer > button");
-        phaseClose.addEventListener("click", function() {
-            document.querySelector("#phaseModal").style.display = "none";
-        });
-
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
         }
@@ -403,13 +126,7 @@ function main(){
         if (localStorage.getItem('a6csrq-settings') != null) {
             if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
                 Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[1];
-
-                var pSave = JSON.parse(localStorage.getItem(`player${Save.key}`))
-                pSave._lastSeen = Date.now();
-                localStorage.setItem(`player${Save.key}`, JSON.stringify(pSave));
-
-                document.querySelector('#saveSelector').remove();
-                App.start();
+                $(`[data-key="${Save.key}"]`)[1]?.click();
             }
         }
     }
@@ -483,849 +200,111 @@ function a6save() {
     saveLoaded = 1;
 }
 
-function a6menu(){
-    var myContainer = document.querySelector("#automationContainer");
-    if (myContainer === null) {
-        var mainDiv = document.createElement('div');
-        mainDiv.id = 'automationContainer';
-        mainDiv.className = 'card border-secondary mb-3';
-        var testDiv = JSON.parse(localStorage.getItem(saveKey))[2];
-
-        if (Settings.getSetting('menuPlace') != null) {
-            mainDiv.appendAfter( document.querySelector( "#" + Settings.getSetting('menuPlace').observableValue() ));
-            menuPos = document.querySelector("#automationContainer").previousSibling.id;
-        } else {
-            mainDiv.appendBefore( document.querySelector("#pokeballSelector") );
-        }
-
-        var mainHeader = document.createElement('div');
-        mainHeader.id = 'automationContainerHeader';
-        mainHeader.className = 'card-header p-0';
-        mainHeader.dataset.toggle = 'collapse';
-        document.querySelector("#automationContainer").append(mainHeader);
-
-        var mainHeaderText = document.createElement('span');
-        mainHeaderText.textContent = 'ACSRQ Info';
-        document.querySelector("#automationContainerHeader").append(mainHeaderText);
-
-        var mainHeaderTbl = document.createElement('table');
-        mainHeaderTbl.id = 'autoPokeTable';
-        mainHeaderTbl.style.width = '100%';
-        mainHeaderTbl.setAttribute('border', '1');
-        var tbdy = document.createElement('tbody');
-
-        var tr00 = document.createElement('tr');
-        tr00.id = 'breedingBot';
-        tr00.style.display = "none";
-        var td1r00 = document.createElement('td');
-        td1r00.style.paddingTop = '5px';
-        td1r00.style.paddingBottom = '3px';
-        var td1r00checkbox = document.createElement('input');
-        td1r00checkbox.type = "checkbox";
-        td1r00checkbox.value = "0";
-        td1r00checkbox.id = "breedingCheck";
-        td1r00checkbox.disabled = true;
-        var td2r00 = document.createElement('td');
-
-        var tr01 = document.createElement('tr');
-        tr01.id = 'dungeonBot';
-        tr01.style.display = "none";
-        var td1r01 = document.createElement('td');
-        td1r01.style.paddingTop = '5px';
-        td1r01.style.paddingBottom = '3px';
-        var td1r01checkbox = document.createElement('input');
-        td1r01checkbox.type = "checkbox";
-        td1r01checkbox.value = "0";
-        td1r01checkbox.id = "dungeonCheck";
-        td1r01checkbox.disabled = true;
-        var td2r01 = document.createElement('td');
-
-        var tr02 = document.createElement('tr');
-        tr02.id = 'gymBot';
-        tr02.style.display = "none";
-        var td1r02 = document.createElement('td');
-        td1r02.style.paddingTop = '5px';
-        td1r02.style.paddingBottom = '3px';
-        var td1r02checkbox = document.createElement('input');
-        td1r02checkbox.type = "checkbox";
-        td1r02checkbox.value = "0";
-        td1r02checkbox.id = "gymCheck";
-        td1r02checkbox.disabled = true;
-        var td2r02 = document.createElement('td');
-
-        var tr03 = document.createElement('tr');
-        tr03.id = 'safariBot';
-        tr03.style.display = "none";
-        var td1r03 = document.createElement('td');
-        td1r03.style.paddingTop = '5px';
-        td1r03.style.paddingBottom = '3px';
-        var td1r03checkbox = document.createElement('input');
-        td1r03checkbox.type = "checkbox";
-        td1r03checkbox.value = "0";
-        td1r03checkbox.id = "safariCheck";
-        td1r03checkbox.disabled = true;
-        var td2r03 = document.createElement('td');
-
-        var tr04 = document.createElement('tr');
-        tr04.id = 'bfBot';
-        tr04.style.display = "none";
-        var td1r04 = document.createElement('td');
-        td1r04.style.paddingTop = '5px';
-        td1r04.style.paddingBottom = '3px';
-        var td1r04checkbox = document.createElement('input');
-        td1r04checkbox.type = "checkbox";
-        td1r04checkbox.value = "0";
-        td1r04checkbox.id = "bfCheck";
-        td1r04checkbox.disabled = true;
-        var td2r04 = document.createElement('td');
-
-        var tr05 = document.createElement('tr');
-        tr05.id = 'srBot';
-        tr05.style.display = "none";
-        var td1r05 = document.createElement('td');
-        td1r05.style.paddingTop = '5px';
-        td1r05.style.paddingBottom = '3px';
-        var td1r05checkbox = document.createElement('input');
-        td1r05checkbox.type = "checkbox";
-        td1r05checkbox.value = "0";
-        td1r05checkbox.id = "srCheck";
-        td1r05checkbox.disabled = true;
-        var td2r05 = document.createElement('td');
-
-        var tr06 = document.createElement('tr');
-        tr06.id = 'plantBot';
-        tr06.style.display = "none";
-        var td1r06 = document.createElement('td');
-        td1r06.style.padding = '5px';
-        td1r06.style.paddingBottom = '5px';
-        var td1r06menuVals = ["N/A", "Cheri", "Chesto", "Pecha", "Rawst", "Aspear", "Leppa", "Oran", "Sitrus", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf", "S+C", "S+C+P", "S+L", "Perp. P"];//, "S+L+P", "S+L+C", "S+L+C+P"];
-        var td1r06menu = document.createElement('select');
-        for (const val of td1r06menuVals) {
-            var td1r06submenu = document.createElement("option");
-            td1r06submenu.value = val;
-            td1r06submenu.text = val;
-            td1r06menu.appendChild(td1r06submenu);
-        }
-        td1r06menu.id = "autoPlant";
-        var td2r06 = document.createElement('td');
-
-        var tr07 = document.createElement('tr');
-        tr07.id = 'mutateBot';
-        tr07.style.display = "none";
-        var td1r07 = document.createElement('td');
-        td1r07.style.padding = '5px';
-        td1r07.style.paddingBottom = '5px';
-        var td1r07menuVals = ["N/A", "Persim", "Razz", "Bluk", "Nanab", "Wepear", "Pinap", "Figy", "Wiki", "Mago", "Aguav", "Iapapa", "Lum", "Pomeg", "Kelpsy", "Qualot", "Hondew", "Grepa", "Tamato", "Cornn", "Magost", "Rabuta", "Nomel", "Spelon", "Pamtre", "Watmel", "Durin", "Belue", "Occa", "Passho", "Wacan", "Rindo", "Yache", "Chople", "Kebia", "Shuca", "Coba", "Payapa", "Tanga", "Charti", "Kasib", "Haban", "Colbur", "Babiri", "Chilan", "Roseli", "Micle", "Custap", "Jaboca", "Rowap", "Kee", "Maranga", "Liechi", "Ganlon", "Salac", "Petaya", "Apicot", "Lansat", "Starf"];
-        var td1r07menu = document.createElement('select');
-        for (const val of td1r07menuVals) {
-            var td1r07submenu = document.createElement("option");
-            td1r07submenu.value = val;
-            td1r07submenu.text = val;
-            td1r07menu.appendChild(td1r07submenu);
-        }
-        td1r07menu.id = "autoMutate";
-        var td2r07 = document.createElement('td');
-
-        var tr2 = document.createElement('tr');
-        tr2.id = 'areaPhase';
-        var td1r2 = document.createElement('td');
-        var td1r2textbox = document.createElement('input');
-        td1r2textbox.type = "text";
-        td1r2textbox.size = "6";
-        td1r2textbox.id = "phaseCount";
-        td1r2textbox.style.textAlign = "center";
-        var td2r2 = document.createElement('td');
-        td2r2.innerHTML = '<a href="#">Phase</a>';
-
-        var tr3 = document.createElement('tr');
-        tr3.id = 'lastEncounterPoke';
-        var td1r3 = document.createElement('td');
-        td1r3.style.paddingTop = '5px';
-        td1r3.style.paddingBottom = '3px';
-        var td2r3 = document.createElement('td');
-
-        var tr4 = document.createElement('tr');
-        tr4.id = 'areaClears';
-        var td1r4 = document.createElement('td');
-        td1r4.style.paddingTop = '5px';
-        td1r4.style.paddingBottom = '3px';
-        var td2r4 = document.createElement('td');
-
-        var tr5 = document.createElement('tr');
-        tr5.id = 'lastEncounter';
-        var td1r5 = document.createElement('td');
-        td1r5.style.paddingTop = '5px';
-        td1r5.style.paddingBottom = '3px';
-        var td2r5 = document.createElement('td');
-
-        var tr7 = document.createElement('tr');
-        tr7.id = 'boostedRoute';
-        var td1r7 = document.createElement('td');
-        td1r7.style.paddingTop = '5px';
-        td1r7.style.paddingBottom = '3px';
-        var td2r7 = document.createElement('td');
-
-        var tr8 = document.createElement('tr');
-        tr8.id = 'uniquePokeShiny';
-        var td1r8 = document.createElement('td');
-        td1r8.style.paddingTop = '5px';
-        td1r8.style.paddingBottom = '3px';
-        var td2r8 = document.createElement('td');
-
-        var tr9 = document.createElement('tr');
-        tr9.id = 'uniquePoke';
-        var td1r9 = document.createElement('td');
-        td1r9.style.paddingTop = '5px';
-        td1r9.style.paddingBottom = '3px';
-        var td2r9 = document.createElement('td');
-
-        var tr10 = document.createElement('tr');
-        tr10.id = 'uniquePokeEvent';
-        var td1r10 = document.createElement('td');
-        td1r10.style.paddingTop = '5px';
-        td1r10.style.paddingBottom = '3px';
-        var td2r10 = document.createElement('td');
-
-        td1r00.appendChild(td1r00checkbox);
-        td2r00.appendChild(document.createTextNode('Breeding Bot'));
-        td1r01.appendChild(td1r01checkbox);
-        td2r01.appendChild(document.createTextNode('Dungeon Bot'));
-        td1r02.appendChild(td1r02checkbox);
-        td2r02.appendChild(document.createTextNode('Gym Bot'));
-        td1r03.appendChild(td1r03checkbox);
-        td2r03.appendChild(document.createTextNode('Safari Bot'));
-        td1r04.appendChild(td1r04checkbox);
-        td2r04.appendChild(document.createTextNode('BF Bot'));
-        td1r05.appendChild(td1r05checkbox);
-        td2r05.appendChild(document.createTextNode('SR Bot'));
-        td1r06.appendChild(td1r06menu);
-        td2r06.appendChild(document.createTextNode('Planter Bot'));
-        td1r07.appendChild(td1r07menu);
-        td2r07.appendChild(document.createTextNode('Mutate Bot'));
-        td1r2.appendChild(td1r2textbox);
-        //td2r2.appendChild(document.createTextNode('Phase'));
-        td1r3.appendChild(document.createTextNode(''));
-        td2r3.appendChild(document.createTextNode('Last Shiny'));
-        td1r4.appendChild(document.createTextNode(''));
-        td2r4.appendChild(document.createTextNode('Clears'));
-        td1r5.appendChild(document.createTextNode(''));
-        td2r5.appendChild(document.createTextNode('Since Last Shiny'));
-        td1r7.appendChild(document.createTextNode(''));
-        td2r7.appendChild(document.createTextNode('Boosted Route'));
-        td1r8.appendChild(document.createTextNode(''));
-        td2r8.appendChild(document.createTextNode('Region Shinies'));
-        td1r9.appendChild(document.createTextNode(''));
-        td2r9.appendChild(document.createTextNode('Region Uniques'));
-        td1r10.appendChild(document.createTextNode(''));
-        td2r10.appendChild(document.createTextNode('Event Uniques'));
-
-        tr00.appendChild(td1r00);
-        tr00.appendChild(td2r00);
-        tr01.appendChild(td1r01);
-        tr01.appendChild(td2r01);
-        tr02.appendChild(td1r02);
-        tr02.appendChild(td2r02);
-        tr03.appendChild(td1r03);
-        tr03.appendChild(td2r03);
-        tr04.appendChild(td1r04);
-        tr04.appendChild(td2r04);
-        tr05.appendChild(td1r05);
-        tr05.appendChild(td2r05);
-        tr06.appendChild(td1r06);
-        tr06.appendChild(td2r06);
-        tr07.appendChild(td1r07);
-        tr07.appendChild(td2r07);
-        tr2.appendChild(td1r2);
-        tr2.appendChild(td2r2);
-        tr3.appendChild(td1r3);
-        tr3.appendChild(td2r3);
-        tr4.appendChild(td1r4);
-        tr4.appendChild(td2r4);
-        tr5.appendChild(td1r5);
-        tr5.appendChild(td2r5);
-        tr7.appendChild(td1r7);
-        tr7.appendChild(td2r7);
-        tr8.appendChild(td1r8);
-        tr8.appendChild(td2r8);
-        tr9.appendChild(td1r9);
-        tr9.appendChild(td2r9);
-        tr10.appendChild(td1r10);
-        tr10.appendChild(td2r10);
-
-        tbdy.appendChild(tr00);
-        tbdy.appendChild(tr01);
-        tbdy.appendChild(tr02);
-        tbdy.appendChild(tr03);
-        tbdy.appendChild(tr04);
-        tbdy.appendChild(tr05);
-        tbdy.appendChild(tr06);
-        tbdy.appendChild(tr07);
-        tbdy.appendChild(tr2);
-        tbdy.appendChild(tr3);
-        tbdy.appendChild(tr4);
-        tbdy.appendChild(tr5);
-        tbdy.appendChild(tr7);
-        tbdy.appendChild(tr8);
-        tbdy.appendChild(tr9);
-        tbdy.appendChild(tr10);
-
-        mainHeaderTbl.appendChild(tbdy);
-        mainHeader.appendChild(mainHeaderTbl);
-
-        var sFoot = document.createElement('div');
-        sFoot.id = 'shinyFooter';
-        sFoot.className = 'card-footer p-0';
-        sFoot.appendBefore( document.querySelector("#battleContainer > div.card-footer.p-0") );
-        sFoot.style.display = "none";
-
-        var sFootTbl = document.createElement('table');
-        sFootTbl.id = 'shinyFooterTbl';
-        sFootTbl.style.width = '100%';
-        var fbdy = document.createElement('tbody');
-
-        var fr00 = document.createElement('tr');
-        fr00.id = 'possibleLoot';
-        var fd1r00 = document.createElement('td');
-        fd1r00.style.width = '50%';
-        var fd2r00 = document.createElement('td');
-        fd2r00.style.width = '50%';
-
-        var fr01 = document.createElement('tr');
-        fr01.id = 'missingShiny';
-        var fd1r01 = document.createElement('td');
-        fd1r01.style.width = '50%';
-        var fd2r01 = document.createElement('td');
-        fd2r01.style.width = '50%';
-
-        fd1r00.appendChild(document.createTextNode('Possible Loot'));
-        fd2r00.appendChild(document.createTextNode(''));
-        fd1r01.appendChild(document.createTextNode('Needed Shiny'));
-        fd2r01.appendChild(document.createTextNode(''));
-        fr00.appendChild(fd1r00);
-        fr00.appendChild(fd2r00);
-        fr01.appendChild(fd1r01);
-        fr01.appendChild(fd2r01);
-        fbdy.appendChild(fr00);
-        fbdy.appendChild(fr01);
-        sFootTbl.appendChild(fbdy);
-        sFoot.appendChild(sFootTbl);
-
-        var ptModal = document.createElement('div');
-        ptModal.className = 'modal noselect show';
-        ptModal.id = 'phaseModal';
-        ptModal.tabindex = -1;
-        ptModal.style = "z-index: 1040; display: block; padding-right: 6.9968px;";
-        ptModal.style.display = "none";
-        ptModal.ariaModal = true;
-        ptModal.setAttribute("role", "dialog");
-
-        var ptModalScroll = document.createElement('div');
-        ptModalScroll.className = 'modal-dialog modal-dialog-scrollable modal-lg';
-        ptModalScroll.setAttribute("role", "document");
-
-        var ptModalContent = document.createElement('div');
-        ptModalContent.className = 'modal-content';
-
-        var ptModalHeader = document.createElement('div');
-        ptModalHeader.className = 'modal-header';
-        ptModalHeader.setAttribute("role", "document");
-        ptModalHeader.innerHTML = `<h4 style="margin-bottom: 0px;">Phase Tracker</h4><div><button class="btn btn-secondary" type="button" onclick="removeAllPhases()">Remove All</button><button class="btn btn-secondary" type="button">Export</button></div>`;
-
-        var ptModalBody = document.createElement('div');
-        ptModalBody.className = 'modal-body';
-        ptModalBody.setAttribute("role", "document");
-
-        var ptModalBodyC = document.createElement('div');
-        ptModalBodyC.className = 'mainPhase';
-        ptModalBodyC.innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable"><tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr></table>`;
-
-        var ptModalFooter = document.createElement('div');
-        ptModalFooter.className = 'modal-footer';
-
-        var ptModalFooterB = document.createElement('button');
-        ptModalFooterB.className = 'btn btn-primary';
-        ptModalFooterB.dataset.dismiss = 'modal';
-        ptModalFooterB.textContent = 'Close';
-
-
-        document.body.appendChild(ptModal);
-        ptModal.appendChild(ptModalScroll);
-        ptModalScroll.appendChild(ptModalContent);
-        ptModalContent.appendChild(ptModalHeader);
-        ptModalContent.appendChild(ptModalBody);
-        ptModalBody.appendChild(ptModalBodyC);
-        ptModalContent.appendChild(ptModalFooter);
-        ptModalFooter.appendChild(ptModalFooterB);
-
-        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('hideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
-        }
-        if (Settings.getSetting('hideNoti').observableValue() == true) {
-            document.querySelector("#toaster").style.display = 'none';
-        } else {
-            document.querySelector("#toaster").removeAttribute("style");
-        }
-        if (localSettings[2] == 1) {
-            document.querySelector("#srCheck").checked = true;
-            Settings.setSettingByName('disableSave', true)
-        }
-
-    } else {
-
-        if ( document.querySelector("#automationContainer").previousSibling.id != Settings.getSetting('menuPlace').observableValue() ) {
-            document.querySelector("#automationContainer").appendAfter( document.querySelector( "#" + Settings.getSetting('menuPlace').observableValue() ));
-            menuPos = document.querySelector("#automationContainer").previousSibling.id;
-        }
-
-        uniqueCheck();
-        uniqueCheckAll();
-        uniqueCheckEvent();
-        boostedRoute();
-        lastPokeEncounter();
-        areaClears();
-        missingShinies();
-        missingLoot();
-
-        // Ignore hideOak and hideBItem if hideChallengeRelatedModules already true
-        if (Settings.getSetting('hideChallengeRelatedModules').observableValue() == false) {
-            if (Settings.getSetting('hideOak').observableValue() == true) {
-                document.querySelector("#oakItemsContainer").style.display = 'none';
-            } else {
-                document.querySelector("#oakItemsContainer").removeAttribute("style");
-            }
-            if (Settings.getSetting('hideBItem').observableValue() == true) {
-                document.querySelector("#battleItemContainer").style.display = 'none';
-            } else {
-                document.querySelector("#battleItemContainer").removeAttribute("style");
-            }
-        }
-        if (Settings.getSetting('hideNoti').observableValue() == true) {
-            document.querySelector("#toaster").style.display = 'none';
-        } else {
-            document.querySelector("#toaster").removeAttribute("style");
-        }
-        if (localSettings[2] == 1) {
-            document.querySelector("#srCheck").checked = true;
-            Settings.setSettingByName('disableSave', true)
-        }
-    }
+function a6menu() {
+    lastPokeEncounter();
+    areaClears();
 }
 
 async function a6settings() {
-    if (Settings.getSetting('breedingOpts') != null && Settings.getSetting('srOpts') != null){
-        if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'attack') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").removeAttribute("style");
-        }
-        if (Settings.getSetting('breedingOpts').observableValue() == 'fossil' || Settings.getSetting('srOpts').observableValue() == 'fos') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(16)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(18)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(19)").style.display = "none";
-        }
-        if (Settings.getSetting('srOpts').observableValue() == 'evo') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(14)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(15)").style.display = "none";
-        }
-    }
-
-    if (Settings.getSetting('chestCollect') != null) {
-        if (Settings.getSetting('chestCollect').observableValue() == true) {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(8)").style.display = "none";
-        }
-    }
-    if (Settings.getSetting('bfOpts') != null) {
-        if (Settings.getSetting('bfOpts').observableValue() == 'bfOptL') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
-        } else if (Settings.getSetting('bfOpts').observableValue() == 'bfOptT') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(11)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(12)").style.display = "none";
-        }
-    }
-    if (Settings.getSetting('ballBuyOpts') != null) {
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'none') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").style.display = "none";
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").style.display = "none";
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(21)").removeAttribute("style");
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(22)").removeAttribute("style");
-        }
-    }
     localStorage.setItem(settingKey, JSON.stringify(localSettings));
 
-    if (Settings.getSetting('dungeOpts') != null && Settings.getSetting('gymOpts') != null) {
-        var dunO = Settings.getSetting('dungeOpts').observableValue();
-        var gymO = Settings.getSetting('gymOpts').observableValue();
-
-        if (dunO == 'dungOptC' || gymO == 'gymOptC') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(9)").style.display = "none";
+    if (Settings.getSetting('botOptions')?.observableValue()) {
+        //Breeding Bot
+        const breedingCheck = document.getElementById('checkbox-botstate.breeding');
+        if (!breedingCheck.disabled && breedingCheck.checked) {
+            autoBreed();
         }
-        if (dunO == 'dungOptDT') {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").removeAttribute("style");
-        } else {
-            document.querySelector("#settings-a6csrq2 > table > tbody > tr:nth-child(10)").style.display = "none";
-        }
-    }
 
-
-    if (Settings.getSetting('botOptions') != null) {
-        if (Settings.getSetting('botOptions').observableValue() == true) {
-            var townContent = player.town().content;
-
-            //Breeding Bot
-            if (App.game.breeding.canAccess() == true && App.game.party.hasMaxLevelPokemon()) {
-                document.querySelector("#breedingBot").removeAttribute("style");
-                document.querySelector("#breedingCheck").disabled = false;
-                var checkAutoBreed = document.querySelector("#breedingCheck");
-                var checkAutoBreed = document.querySelector("#breedingCheck");
-                if (checkAutoBreed.checked == true){
-                    autoBreed();
-                }
-            }
-            //Dungeon Bot
-            if (App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket) == true) {
-                document.querySelector("#dungeonBot").removeAttribute("style");
-                if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) != -1 ) {
-                    document.querySelector("#dungeonCheck").disabled = false;
-                    var checkDungeonClicker = document.querySelector("#dungeonCheck");
-                    if (checkDungeonClicker.checked == true){
-                        switch(Settings.getSetting('dungeOpts').observableValue()) {
-                            case "dungOptN":
-                                if (DungeonRunner.dungeonCompleted(player.town().dungeon) == true) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                                break;
-                            case "dungOptSC":
-                                if (DungeonRunner.dungeonCompleted(player.town().dungeon, true) != true) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                                break;
-                            case "dungOptC":
-                                if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().name)]() < Number(Settings.getSetting('maxClears').observableValue())) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                    if (App.game.gameState == 4) {
-                                        var pX = DungeonRunner.map.playerPosition().x;
-                                        var pXF = DungeonRunner.map.playerPosition().x;
-                                        var pXM = pX + 1;
-                                        DungeonRunner.map.moveRight();
-                                        if ( DungeonRunner.map.playerPosition().x == pXM ) {
-                                            await DungeonRunner.map.moveLeft();
-                                        }
-                                        pX = DungeonRunner.map.playerPosition().x;
-                                        if ( pX == pXF ) {
-                                            DungeonRunner.dungeonLeave();
-                                        }
-                                    }
-                                }
-                                break;
-                            case "dungOptDT":
-                                var setDTLim = Settings.getSetting('minDT').observableValue();
-                                var curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
-                                if (curDT >= setDTLim && curDT >= player.town().dungeon.tokenCost) {
-                                    dungeonClick(1);
-                                } else {
-                                    dungeonClick(0);
-                                }
-                        }
-                    }
-                    if (checkDungeonClicker.checked == false){
-                        dungeonClick(0);
-                    }
-                } else {
-                    document.querySelector("#dungeonCheck").disabled = true;
-                    document.querySelector("#dungeonCheck").checked = false;
+        //Dungeon Bot
+        const dungeonCheck = document.getElementById('checkbox-botstate.dungeon');
+        const dungeon = player.town().dungeon;
+        const curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
+        if (!dungeonCheck.disabled && dungeonCheck.checked && curDT >= dungeon.tokenCost) {
+            switch (Settings.getSetting('dungeOpts').observableValue()) {
+                case 'dungOptN':
+                    dungeonClick(1);
+                    break;
+                case 'dungOptSC':
+                    dungeonClick(!DungeonRunner.dungeonCompleted(dungeon, true));
+                    break;
+                case 'dungOptC':
+                    dungeonClick(App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon.name)]() < Settings.getSetting('maxClears').observableValue());
+                    break;
+                case 'dungOptDT':
+                    dungeonClick(curDT >= Settings.getSetting('minDT').observableValue());
+                    break;
+                default:
                     dungeonClick(0);
-                }
-            } else {
-                document.querySelector("#dungeonBot").style.display = "none";
-                document.querySelector("#dungeonCheck").checked = false;
-                dungeonClick(0);
-            }
-
-            //Gym Bot
-            var gymFound = 0;
-            document.querySelector("#gymBot").removeAttribute("style");
-            if ( player.route() == 0 && GameConstants.getDungeonIndex(player.town().name) == -1 ) {
-                for (let x = 0; x < townContent.length; x++) {
-                    if (townContent[x].leaderName != undefined) {
-                        gymFound = 1;
-                        document.querySelector("#gymCheck").disabled = false;
-                        var checkGymClicker = document.querySelector("#gymCheck");
-                        if (checkGymClicker.checked == true){
-                            gymClick(1);
-                        }
-                        if (checkGymClicker.checked == false){
-                            gymClick(0);
-                        }
-                    } else {
-                        if (gymFound != 1) {
-                            document.querySelector("#gymCheck").disabled = true;
-                            document.querySelector("#gymCheck").checked = false;
-                            gymClick(0);
-                        }
-                    }
-                }
-            }
-
-            //Safari Bot
-            if (Safari.canAccess() == true) {
-                document.querySelector("#safariBot").removeAttribute("style");
-                if ( Safari.inProgress() == true ) {
-                    document.querySelector("#safariCheck").disabled = false;
-                    var checkSafariClicker = document.querySelector("#safariCheck");
-                    if (checkSafariClicker.checked == true){
-                        switch(Settings.getSetting('safariOpts').observableValue()) {
-                            case "safariOptN":
-                                safariClick(1);
-                                break;
-                            case "safariOptSC":
-                                if (Safari.completed(true) != true) {
-                                    safariClick(1);
-                                } else {
-                                    Safari.closeModal();
-                                    safariClick(0);
-                                }
-                                break;
-                        }
-                    } else {
-                        safariClick(0);
-                    }
-                } else if ( document.querySelector("#safariCheck").checked == true && Safari.completed(true) != true)  {
-                    safariClick(0);
-                    if (document.querySelector("#safariModal").classList.contains('show')) {
-                        Safari.payEntranceFee();
-                    } else if (App.game.gameState != 5) {
-                        App.game.gameState = 5;
-                        setTimeout(() => {
-                            Safari.openModal();
-                        }, 500)
-                    }
-                } else {
-                    document.querySelector("#safariCheck").disabled = true;
-                    document.querySelector("#safariCheck").checked = false;
-                    safariClick(0);
-                }
-            }
-
-            //BF Bot
-            if (MapHelper.calculateTownCssClass('Battle Frontier') != "locked") {
-                document.querySelector("#bfBot").removeAttribute("style");
-                if ( player.route() == 0 && player.town().name == "Battle Frontier" ) {
-                    document.querySelector("#bfCheck").disabled = false;
-                    var checkBFClicker = document.querySelector("#bfCheck");
-                    if (checkBFClicker.checked == true){
-                        bfClick(1);
-                    }
-                    if (checkBFClicker.checked == false){
-                        bfClick(0);
-                    }
-                } else {
-                    document.querySelector("#bfCheck").disabled = true;
-                    document.querySelector("#bfCheck").checked = false;
-                    bfClick(0);
-                }
-            } else {
-                document.querySelector("#bfCheck").disabled = true;
-                document.querySelector("#bfCheck").checked = false;
-                bfClick(0);
-            }
-
-            //SR Bot
-            if (App.game.statistics.routeKills['kanto'][3]() >= 10) {
-                document.querySelector("#srBot").removeAttribute("style");
-                document.querySelector("#srCheck").disabled = false;
-            } else {
-                document.querySelector("#srCheck").disabled = true;
-                document.querySelector("#srCheck").checked = false;
-            }
-
-            //Farm Bots
-            if (App.game.farming.canAccess() == true) {
-                document.querySelector("#plantBot").removeAttribute("style");
-                document.querySelector("#mutateBot").removeAttribute("style");
-                //Planter
-                var checkAutoFarmer1 = document.querySelector("#autoPlant");
-                if (checkAutoFarmer1.value != "N/A"){
-                    plantBot();
-                }
-                //Mutator
-                var checkAutoFarmer2 = document.querySelector("#autoMutate");
-                if (checkAutoFarmer2.value != "N/A"){
-                    mutateBot();
-                }
-            } else {
-                document.querySelector("#plantBot").style.display = "none";
-                document.querySelector("#mutateBot").style.display = "none";
             }
         } else {
-            document.querySelector("#breedingBot").style.display = "none";
-            document.querySelector("#breedingCheck").checked = false;
-            document.querySelector("#dungeonBot").style.display = "none";
-            document.querySelector("#dungeonCheck").checked = false;
-            document.querySelector("#gymBot").style.display = "none";
-            document.querySelector("#gymCheck").checked = false;
-            document.querySelector("#safariBot").style.display = "none";
-            document.querySelector("#safariCheck").checked = false;
-            document.querySelector("#plantBot").style.display = "none";
-            document.querySelector("#plantBot").value = "N/A";
-            document.querySelector("#mutateBot").style.display = "none";
-            document.querySelector("#mutateBot").value = "N/A";
-            document.querySelector("#breedingBot").style.display = "none";
-            document.querySelector("#srBot").style.display = "none";
-            document.querySelector("#srCheck").checked = false;
-            document.querySelector("#bfBot").style.display = "none";
-            document.querySelector("#bfCheck").checked = false;
+            dungeonClick(0);
         }
 
-        if (Settings.getSetting('disEvent').observableValue() == true) {
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 0, 24, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 1, 7, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kalos, 'Vivillon (Fancy)');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 6, 6, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 6, 12, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Flying Pikachu');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 6, 18, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 6, 24, 23).getTime()) {
-                dungeonList['Cerulean Cave'].bossList = dungeonList['Cerulean Cave'].bossList.filter(boss => boss.name != 'Armored Mewtwo');
-                RoamingPokemonList.list[GameConstants.Region.kanto] = RoamingPokemonList.list[GameConstants.Region.kanto].filter(r => !['Bulbasaur (clone)', 'Charmander (clone)', 'Squirtle (clone)'].includes(r.pokemon.name));
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 10, 5, 23).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 9, 30, 1).getTime()) {
-                Routes.getRoutesByRegion(GameConstants.Region.kanto).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Spooky Bulbasaur', 'Gastly'].includes(p)));
-                Routes.getRoutesByRegion(GameConstants.Region.johto).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Spooky Togepi', 'Misdreavus'].includes(p)));
-                Routes.getRoutesByRegion(GameConstants.Region.hoenn).forEach(route => route.pokemon.land = route.pokemon.land.filter(p => !['Pikachu (Gengar)', 'Shuppet', 'Duskull'].includes(p)));
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 10, 16, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 10, 23, 23).getTime()) {
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Let\'s Go Pikachu');
-                RoamingPokemonList.remove(GameConstants.Region.kanto, 'Let\'s Go Eevee');
-            }
-            if (new Date().getTime() <= new Date(new Date().getFullYear(), 11, 24, 1).getTime() && new Date().getTime() >= new Date(new Date().getFullYear(), 11, 30, 23).getTime()) {
-                GameHelper.enumNumbers(GameConstants.Region).filter(i => i != GameConstants.Region.none).forEach(region => {
-                    RoamingPokemonList.remove(region, 'Santa Snorlax');
-                });
-            }
-        }
-    }
+        //Gym Bot
+        const gymCheck = document.getElementById('checkbox-botstate.gym');
+        gymClick(!gymCheck.disabled && gymCheck.checked);
 
-    if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
-        document.querySelector("#shinyFooter").style.display = "none";
-    } else if (player.route() != 0) {
-        document.querySelector("#shinyFooter").style.display = "block";
-    } else if (player.town().dungeon != undefined) {
-        document.querySelector("#shinyFooter").style.display = "block";
-    } else if (player.town().shops != undefined) {
-        if (player.town().shops.length != 0) {
-            document.querySelector("#shinyFooter").style.display = "block";
+        //Safari Bot
+        const safariCheck = document.getElementById('checkbox-botstate.safari');
+        if (!safariCheck.disabled && safariCheck.checked) {
+            if (Safari.inProgress()) {
+                switch (Settings.getSetting('safariOpts').observableValue()) {
+                    case 'safariOptN':
+                        safariClick(1);
+                        break;
+                    case 'safariOptSC':
+                        safariClick(!Safari.completed(true));
+                        break;
+                    default:
+                        safariClick(0);
+                }
+            } else if (!Safari.completed(true)) {
+                safariClick(0);
+            }
+        } else if (safariCheck.checked && clickEngagedS && !Safari.completed(true)) {
+            if ($('#safariModal')[0].classList.contains('show')) {
+                Safari.payEntranceFee();
+            } else if (App.game.gameState != 5) {
+                App.game.gameState = 5;
+                setTimeout(() => {
+                    Safari.openModal();
+                }, 500);
+            }
+        } else {
+            safariClick(0);
         }
-    } else {
-        document.querySelector("#shinyFooter").style.display = "none";
+
+        //BF Bot
+        const bfCheck = document.getElementById('checkbox-botstate.bf');
+        bfClick(!bfCheck.disabled && bfCheck.checked);
+
+        //Planter Bots
+        const plantSelect = document.getElementById('select-botstate.plant');
+        if (!plantSelect.disabled && plantSelect.value != 'N/A') {
+            plantBot();
+        }
+        //Mutator Bots
+        const mutateSelect = document.getElementById('select-botstate.mutate');
+        if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
+            plantBot();
+        }
     }
 }
 
 function dungeonClick(x) {
-    if (x == 1){
-        clickEngagedD = 1;
-    } else if (x == 0){
-        clickEngagedD = 0;
-    }
+    clickEngagedD = !!x;
 }
 
 function gymClick(x) {
-    if (x == 1){
-        clickEngagedG = 1;
-    } else if (x == 0){
-        clickEngagedG = 0;
-    }
+    clickEngagedG = !!x;
 }
 
 function safariClick(x) {
-    if (x == 1){
-        clickEngagedS = 1;
-    } else if (x == 0){
-        clickEngagedS = 0;
-    }
+    clickEngagedS = !!x;
 }
 
 function bfClick(x) {
-    if (x == 1){
-        clickEngagedBF = 1;
-    } else if (x == 0){
-        clickEngagedBF = 0;
-    }
-}
-
-function uniqueCheck() {
-    var uniqC = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region).map(p => Math.floor(p.id))).size;
-    var uniqT = PokemonHelper.calcUniquePokemonsByRegion(player.region);
-    document.querySelector("#uniquePoke > td:nth-child(1)").innerHTML = uniqC + '/' + uniqT;
-}
-
-function uniqueCheckAll() {
-    var uniqS = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && p.shiny == true && PokemonHelper.calcNativeRegion(p.name) === player.region)).size;
-    var uniqT = new Set(App.game.party.caughtPokemon.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === player.region)).size;
-    document.querySelector("#uniquePokeShiny > td:nth-child(1)").innerHTML = uniqS + '/' + uniqT;
-}
-
-function uniqueCheckEvent() {
-    var eventPoke = ["Flying Pikachu","Surfing Pikachu","Armored Mewtwo","Santa Snorlax","Spooky Togepi","Spooky Bulbasaur","Pikachu (Gengar)","Let's Go Pikachu","Let's Go Eevee","Bulbasaur (clone)","Ivysaur (clone)","Venusaur (clone)","Charmander (clone)","Charmeleon (clone)","Charizard (clone)","Squirtle (clone)","Wartortle (clone)","Blastoise (clone)","Unown (C)","Unown (D)","Unown (I)","Unown (O)","Unown (R)","Unown (S)","Grinch Celebi","Elf Munchlax","Vivillon (Fancy)","Rotom (discord)"];
-    var eventCaught = 0;
-    for (let eP = 0; eP < eventPoke.length; eP++) {
-        if ( App.game.party.alreadyCaughtPokemonByName(eventPoke[eP]) == true) {
-            eventCaught++;
-        }
-    }
-    document.querySelector("#uniquePokeEvent > td:nth-child(1)").innerHTML = eventCaught + '/27';
-}
-
-function boostedRoute() {
-    if (player.region == 6) {
-        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
-    } else {
-        document.querySelector("#boostedRoute > td:nth-child(1)").innerHTML = RoamingPokemonList.increasedChanceRoute[player.region][player.subregion]().routeName;
-    }
+    clickEngagedBF = !!x;
 }
 
 function lastPokeEncounter() {
@@ -1343,224 +322,6 @@ function lastPokeEncounter() {
     } else {
         var pkName = PokemonHelper.getPokemonById(lastPoke).name.split(" ")[0];
         document.querySelector("#lastEncounterPoke > td:nth-child(1)").innerHTML = lastPokeType + pkName;
-    }
-}
-
-async function missingLoot() {
-    if (Settings.getSetting('showLoot') != null) {
-        if (Settings.getSetting('showLoot').observableValue() == true) {
-            if (player.town().dungeon != undefined && player.route() == 0) {
-                document.querySelector("#possibleLoot").removeAttribute("style");
-                var dLoot1 = player.town().dungeon.lootTable.common;
-                var dLoot2 = player.town().dungeon.lootTable.epic;
-                var dLoot3 = player.town().dungeon.lootTable.mythic;
-                var dLootA = [];
-                if (dLoot1 != undefined) {
-                    for (let x = 0; x < dLoot1.length; x++) {
-                        var lootI = GameConstants.humanifyString(dLoot1[x].loot);
-                        dLootA.push( lootI );
-                    }
-                }
-                if (dLoot2 != undefined) {
-                    for (let x = 0; x < dLoot2.length; x++) {
-                        var lootI = GameConstants.humanifyString(dLoot2[x].loot);
-                        dLootA.push( lootI );
-                    }
-                }
-                if (dLoot3 != undefined) {
-                    for (let x = 0; x < dLoot3.length; x++) {
-                        var lootI = GameConstants.humanifyString(dLoot3[x].loot);
-                        dLootA.push( lootI );
-                    }
-                }
-                dLootA = [ ...new Set(dLootA) ].sort().join(', ');
-                document.querySelector("#possibleLoot > td:nth-child(2)").innerText = dLootA;
-            } else {
-                document.querySelector("#possibleLoot").style.display = "none";
-            }
-        } else {
-            document.querySelector("#possibleLoot").style.display = "none";
-        }
-    }
-}
-
-async function missingShinies() {
-    if (Settings.getSetting('showShiny') != null) {
-        if (Settings.getSetting('showShiny').observableValue() == true) {
-            document.querySelector("#missingShiny").removeAttribute("style");
-            //Route poke
-            if (player.route() != 0) {
-                missS = RouteHelper.getAvailablePokemonList(player.route(), player.region);
-                var missC = [];
-                for (let x = 0; x < missS.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(missS[x], true) == true) {
-                        missC.push(missS[x])
-                    }
-                }
-                missS = missS.filter( ( el ) => !missC.includes( el ) );
-                if ( missS.length == 0) {
-                    missS = 'N/A';
-                } else if ( missS.length == 1) {
-                    missS = missS[0];
-                } else if (missS.length > 1) {
-                    missS = missS.sort().join(', ');
-                }
-                document.querySelector("#missingShiny > td:nth-child(2)").innerText = missS;
-                document.querySelector("#possibleLoot").style.display = "none";
-            }
-            //Dungeon Poke
-            if (player.town().dungeon != undefined && player.route() == 0) {
-                var neededS = '';
-                var missTemp = [];
-                var missDP = player.town().dungeon.pokemonList;
-                var missDBP = player.town().dungeon.bossPokemonList;
-                var missDBPa = player.town().dungeon.bossEncounterList;
-                var ultraArr = ['Nihilego', 'Buzzwole', 'Pheromosa', 'Xurkitree', 'Kartana', 'Celesteela', 'Blacephalon', 'Stakataka', 'Guzzlord', 'Poipole', 'Naganadel',];
-
-                for (let x = 0; x < missDP.length; x++) {
-                    if ( App.game.quests.getQuestLine('Ultra Beast Hunt').state() == 1) {
-                        if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon != undefined) {
-                            if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().pokemon.name == missDP[x]) {
-                                if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
-                                    missTemp.push(missDP[x])
-                                }
-                            }
-                        } else if ( App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests != undefined ) {
-                            var cQuests = App.game.quests.getQuestLine('Ultra Beast Hunt').curQuestObject().quests;
-                            for (let y = 0; y < cQuests.length; y++) {
-                                if ( cQuests[y].pokemon.name == missDP[x]) {
-                                    if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
-                                        missTemp.push(missDP[x])
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if(ultraArr.indexOf(missDP[x]) === -1) {
-                            if ( App.game.party.alreadyCaughtPokemonByName(missDP[x], true) != true ) {
-                                missTemp.push(missDP[x])
-                            }
-                        }
-                    }
-                }
-                if (player.region < 6) {
-                    for (let x = 0; x < missDBP.length; x++) {
-                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
-                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
-                            npID = npID.split('.')[0];
-                            for (let y = 0; y < missDBPa.length; y++) {
-                                var image = Number(missDBPa[y].image.split('/').pop().split('.')[0]);
-                                if (npID == image) {
-                                    if ( missDBPa[y].lock != true ) {
-                                        missTemp.push(missDBP[x]);
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-                } else if (player.region == 6) {
-                    for (let x = 0; x < missDBP.length; x++) {
-                        if ( App.game.party.alreadyCaughtPokemonByName(missDBP[x], true) != true ) {
-                            var npID = String(PokemonHelper.getPokemonByName(missDBP[x]).id);
-                            for (let y = 0; y < missDBPa.length; y++) {
-                                var image = missDBPa[y].image.split('/').pop().split('.png')[0];
-                                if (npID == image) {
-                                    if ( missDBPa[y].lock != true ) {
-                                        missTemp.push(missDBP[x]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if ( missTemp.length == 0) {
-                    neededS = 'N/A';
-                } else if ( missTemp.length == 1) {
-                    neededS = missTemp[0];
-                } else if (missTemp.length > 1) {
-                    neededS = missTemp.join(', ');
-                }
-                document.querySelector("#missingShiny > td:nth-child(2)").innerText = neededS;
-                //Dungeon Chest Poke
-                var lootA = [];
-                var lootR = [];
-                //var lootL = player.town().dungeon.itemList;
-                var lootIC = player.town().dungeon.lootTable.common
-                var lootIE = player.town().dungeon.lootTable.epic
-                var lootIL = player.town().dungeon.lootTable.mythic
-
-                lootA.concat(lootIC);
-                lootA.concat(lootIE);
-                lootA.concat(lootIL);
-
-                for (let x = 0; x < lootA.length; x++) {
-                    if ( PokemonHelper.getPokemonByName(lootL[x].loot).id != 0) {
-                        lootR.push('<span style="color:#D4AC0D;">' + lootL[x].loot + '</span>');
-                    }
-                }
-                var lootC = [];
-                for (let x = 0; x < lootR.length; x++) {
-                    if ( App.game.party.alreadyCaughtPokemonByName(lootR[x], true) == true) {
-                        lootC.push(lootR[x])
-                    }
-                }
-                lootR = lootR.filter( ( el ) => !lootC.includes( el ) );
-                if (missTemp.length >= 1 && lootR.length >= 1) {
-                    missTemp = missTemp.concat(lootR);
-                    missTemp = missTemp.sort().join(', ');
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = missTemp;
-                } else if (missTemp.length == 0) {
-                    if ( lootR.length == 0) {
-                        lootR = 'N/A';
-                    } else if ( lootR.length == 1) {
-                        lootR = lootR[0];
-                    } else if (lootR.length > 1) {
-                        lootR = lootR.sort().join(', ');
-                    }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerHTML = lootR;
-                }
-            }
-            //Shop Poke
-            if (player.town().shops != undefined) {
-                if (player.town().shops.length != 0 && player.route() == 0) {
-                    var shopS = player.town().shops;
-                    var shopA = [];
-
-                    for (let x = 0; x < shopS.length; x++) {
-                        for (let y = 0; y < shopS[x].items.length; y++) {
-                            shopA.push(shopS[x].items[y].name);
-                        }
-                    }
-                    for( var i = 0; i < shopA.length; i++){
-                        if ( PokemonHelper.getPokemonByName(shopA[i]).id == 0) {
-                            shopA.splice(i, 1);
-                            i--;
-                        }
-                    }
-                    for( var i = 0; i < shopA.length; i++){
-                        if ( App.game.party.alreadyCaughtPokemonByName(shopA[i], true) == true) {
-                            shopA.splice(i, 1);
-                            i--;
-                        }
-                    }
-                    if ( shopA.length == 0) {
-                        shopA = 'N/A';
-                    } else if ( shopA.length == 1) {
-                        shopA = shopA[0];
-                    } else if (shopA.length > 1) {
-                        shopA = shopA.sort().join(', ');
-                    }
-                    document.querySelector("#missingShiny > td:nth-child(2)").innerText = shopA;
-
-                    if (player.town().dungeon == undefined) {
-                        document.querySelector("#possibleLoot").style.display = "none";
-                    }
-                }
-            }
-        } else {
-            document.querySelector("#missingShiny").style.display = "none";
-        }
     }
 }
 
@@ -2134,9 +895,8 @@ function a6phases() {
     		phases = newArray;
     	}
     	if (hasRun == 0) {
-    		document.querySelector("#phaseTable").innerHTML = `<table class="table table-striped table-hover m-0" id="phaseTable">
-    		<tr><td>Phase Count</td><td>Location</td><td>Encounter Type</td><td>Pokemon Name</td><td>Capture Status</td><td>Clear Count</td><td>Remove Phase?</td></tr>
-    		</table>`;
+            let phaseTable = $('#phaseTable tbody')[0];
+            phaseTable.innerHTML = '';
     		for(var x = 0; x < phases.length; x++){
     			var tablePhase = document.createElement('tr');
     			var phaseId = "phase" + x;
@@ -2144,9 +904,9 @@ function a6phases() {
     			tablePhase.innerHTML = tablePhaseQuery;
     			tablePhase.style.display = "none";
     			phaseTable.append(tablePhase);
-    			var childNumber = x + 2;
+    			var childNumber = x + 1;
     			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
-    				var displayQuery = "#phaseTable > tr:nth-child(" + childNumber + ")";
+    				var displayQuery = "#phaseTable tbody > tr:nth-child(" + childNumber + ")";
     				document.querySelector(displayQuery).removeAttribute("style");
     				hasRun = 1;
     			}
@@ -2276,7 +1036,7 @@ async function gymBot() {
             if (townContent[gymAtX].isUnlocked() == true) {
                 switch(Settings.getSetting('gymOpts').observableValue()) {
                     case "gymOptC":
-                        if (townContent[gymAtX].clears() <= Number(Settings.getSetting('maxClears').observableValue())) {
+                        if ((townContent[gymAtX].clears() || 0) < Number(Settings.getSetting('maxClears').observableValue())) {
                             GymRunner.startGym(townContent[gymAtX]);
                         }
                         break;
@@ -2567,11 +1327,6 @@ async function srBot() {
             break;
         case "fos":
             var fossilSR = Settings.getSetting('fossilOpts').observableValue();
-            if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
-                fossilSR = "Old Amber";
-            } else {
-                fossilSR = fossilSR.charAt(0).toUpperCase() + fossilSR.slice(1) + ' Fossil';
-            }
             var fossilDeets = player.mineInventory().find(i => i.name == fossilSR);
             var fossilMon = GameConstants.FossilToPokemon[fossilSR];
             if ( fossilDeets.amount() >= 1 ) {
@@ -2765,25 +1520,25 @@ async function srBot() {
 }
 
 async function plantBot() {
-    var selectedBerry = document.querySelector("#autoPlant").selectedIndex - 1;
-    if ( selectedBerry <= 65 ) {
-        if ( selectedBerry <= App.game.farming.highestUnlockedBerry() ) {
-            if (App.game.farming.plotList[12].isEmpty() == true){
-                if (App.game.farming.berryList[selectedBerry]() > 1) {
-                    if (App.game.farming.plotList[12].isEmpty() == true) {
-                        FarmController.selectedBerry(selectedBerry);
-                        App.game.farming.plantAll(FarmController.selectedBerry());
-                    } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[b].growthTime[3]) {
-                        App.game.farming.harvestAll();
-                    }
+    var selectedBerry = Settings.getSetting('botstate.plant').value;
+    var berryId = BerryType[selectedBerry];
+    
+    if (berryId >= 0 && App.game.farming.unlockedBerries[berryId]()) {
+        if (App.game.farming.plotList[12].isEmpty() == true){
+            if (App.game.farming.berryList[berryId]() > 1) {
+                if (App.game.farming.plotList[12].isEmpty() == true) {
+                    FarmController.selectedBerry(berryId);
+                    App.game.farming.plantAll(FarmController.selectedBerry());
+                } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[b].growthTime[3]) {
+                    App.game.farming.harvestAll();
                 }
-            } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
-                App.game.farming.harvestAll();
             }
+        } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
+            App.game.farming.harvestAll();
         }
     } else if ( selectedBerry > 65 ) {
         switch(selectedBerry) {
-            case 66:
+            case 'S+C':
                 //Starf 65 + Chople 40
                 if (App.game.farming.plotList[5].berry == -1) {
                     App.game.farming.plant(5,65)
@@ -2821,7 +1576,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 67:
+            case 'S+C+P':
                 //Starf 65 + Chople 40 + Petaya 62
                 if (App.game.farming.plotList[5].berry == -1) {
                     App.game.farming.plant(5,65);
@@ -2859,7 +1614,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 68:
+            case 'S+L':
                 //Starf 65 + Lum 19
                 if (App.game.farming.plotList[5].berry == -1) {
                     [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,65));
@@ -2873,7 +1628,7 @@ async function plantBot() {
                     }
                 }
                 break;
-            case 69:
+            case 'S+L+P':
                 //Starf 65 + Lum 19 + Petaya 62
                 if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
                     App.game.farming.harvest(7);
@@ -2892,17 +1647,17 @@ async function plantBot() {
                     App.game.farming.plant(17,62);
                 }
                 break;
-            case 70:
+            case 'S+L+C':
                 //Starf 65 + Lum 19 + Chople 40
                 break;
-            case 71:
+            case 'S+L+C+P':
                 //Starf 65 + Lum 19 + Chople 40 + Petaya 62
         }
     }
 }
 
 async function mutateBot() {
-    var selectedBerry = document.querySelector("#autoMutate").value;
+    var selectedBerry = Settings.getSetting('botstate.mutate').value;
 
     switch (selectedBerry) {
         case "Persim":
@@ -4295,11 +3050,6 @@ async function autoBreed() {
             [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
         } else if(Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
             var fossilU = Settings.getSetting('fossilOpts').observableValue();
-            if (Settings.getSetting('fossilOpts').observableValue() == 'amber') {
-                fossilU = "Old Amber";
-            } else {
-                fossilU = fossilU.charAt(0).toUpperCase() + fossilU.slice(1) + ' Fossil';
-            }
             if (player.mineInventory().find(i => i.name == fossilU).amount() >= 1) {
                 Underground.sellMineItem(player.mineInventory().find(i => i.name == fossilU).id);
             } else {
@@ -4319,83 +3069,56 @@ async function autoBreed() {
 }
 
 async function ballBot() {
-    var purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
-    var minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
+    const buyOpts = Settings.getSetting('ballBuyOpts').observableValue();
+    const purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
+    const minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
 
-    if (App.game.badgeCase.hasBadge(26) == true) {
-        ShopHandler.showShop(pokeMartShop);
-        ShopHandler.shopObservable().items;
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-            if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                ShopHandler.shopObservable().items[0].buy(purAmount);
-            }
-        }
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-            if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                ShopHandler.shopObservable().items[1].buy(purAmount);
-            }
-        }
-        if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
-            if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                ShopHandler.shopObservable().items[2].buy(purAmount);
-            }
-        }
+    if (buyOpts == -1 || App.game.pokeballs.pokeballs[buyOpts].quantity() > minAmount)
+        return;
+
+    let shop;
+    if (App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Champion Lance')]()) {
+        shop = pokeMartShop;
     } else {
         switch (player.region) {
-            case 0:
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-                    if (MapHelper.accessToTown('Viridian City') == true) {
-                        ShopHandler.showShop(ViridianCityShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-                    if (MapHelper.accessToTown('Lavender Town') == true) {
-                        ShopHandler.showShop(LavenderTownShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                            ShopHandler.shopObservable().items[1].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB' ) {
-                    if (MapHelper.accessToTown('Fuchsia City') == true) {
-                        ShopHandler.showShop(FuchsiaCityShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                            ShopHandler.shopObservable().items[2].buy(purAmount);
-                        }
-                    }
-                }
+            case GameConstants.Region.kanto:
+                shop = [ViridianCityShop, LavenderTownShop, FuchsiaCityShop][buyOpts];
                 break;
-            case 1:
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'pokeB') {
-                    if (MapHelper.accessToTown('New Bark Town') == true) {
-                        ShopHandler.showShop(NewBarkTownShop);
-                        ShopHandler.shopObservable().items;
-                        if (App.game.pokeballs.pokeballs[0].quantity() <= minAmount) {
-                            ShopHandler.shopObservable().items[0].buy(purAmount);
-                        }
-                    }
-                }
-                if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB' || Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
-                    if (MapHelper.accessToTown('Goldenrod City') == true) {
-                        ShopHandler.showShop(GoldenrodDepartmentStoreShop);
-                        ShopHandler.shopObservable().items;
-                        if (Settings.getSetting('ballBuyOpts').observableValue() == 'greatB') {
-                            if (App.game.pokeballs.pokeballs[1].quantity() <= minAmount && ShopHandler.shopObservable().items[1].price() == ShopHandler.shopObservable().items[1].basePrice) {
-                                ShopHandler.shopObservable().items[1].buy(purAmount);
-                            }
-                        } else if (Settings.getSetting('ballBuyOpts').observableValue() == 'ultraB') {
-                            if (App.game.pokeballs.pokeballs[2].quantity() <= minAmount && ShopHandler.shopObservable().items[2].price() == ShopHandler.shopObservable().items[2].basePrice) {
-                                ShopHandler.shopObservable().items[2].buy(purAmount);
-                            }
-                        }
-                    }
-                }
+            case GameConstants.Region.johto:
+                shop = [NewBarkTownShop, GoldenrodDepartmentStoreShop, GoldenrodDepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.hoenn:
+                shop = [OldaleTownShop, SlateportCityShop, FortreeCityShop][buyOpts];
+                break;
+            case GameConstants.Region.sinnoh:
+                shop = [SandgemTownShop, HearthomeCityShop, DepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.unova:
+                shop = [FloccesyTownShop, VirbankCityShop, MistraltonCityShop][buyOpts];
+                break;
+            case GameConstants.Region.kalos:
+                shop = [AquacordeTownShop, DepartmentStoreShop, DepartmentStoreShop][buyOpts];
+                break;
+            case GameConstants.Region.alola:
+                shop = [HauoliCityShop, HeaheaCityShop, DepartmentStoreShop][buyOpts];
+                break;
         }
+    }
+
+    if (shop.isUnlocked() && (!shop.parent || shop.parent?.isUnlocked())) {
+        let item = shop.items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
+
+        if (!(item && item.isAvailable()  && item.price() == item.basePrice)) {
+            return;
+        }
+
+        ShopHandler.showShop(shop);
+        ShopHandler.setSelected(shop.items.indexOf(item));
+        ShopHandler.amount(purAmount);
+
+        if (!App.game.wallet.hasAmount(new Amount(item.totalPrice(ShopHandler.amount()), item.currency))) {
+            ShopHandler.maxAmount();
+        }
+        ShopHandler.buyItem();
     }
 }
