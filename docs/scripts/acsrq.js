@@ -1522,7 +1522,7 @@ async function srBot() {
 async function plantBot() {
     var selectedBerry = Settings.getSetting('botstate.plant').value;
     var berryId = BerryType[selectedBerry];
-    
+
     if (berryId >= 0 && App.game.farming.unlockedBerries[berryId]()) {
         if (App.game.farming.plotList[12].isEmpty() == true){
             if (App.game.farming.berryList[berryId]() > 1) {
@@ -3085,7 +3085,7 @@ async function ballBot() {
                 shop = [ViridianCityShop, LavenderTownShop, FuchsiaCityShop][buyOpts];
                 break;
             case GameConstants.Region.johto:
-                shop = [NewBarkTownShop, GoldenrodDepartmentStoreShop, GoldenrodDepartmentStoreShop][buyOpts];
+                shop = [CherrygroveCityShop, GoldenrodDepartmentStoreShop, GoldenrodDepartmentStoreShop][buyOpts];
                 break;
             case GameConstants.Region.hoenn:
                 shop = [OldaleTownShop, SlateportCityShop, FortreeCityShop][buyOpts];
