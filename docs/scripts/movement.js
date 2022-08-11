@@ -375,6 +375,14 @@ WeatherRequirement.prototype.getProgress = function () {
         ? +this.weather.includes(Weather.regionalWeather[this.region]())
         : weatherProgress.call(this);
 };
+
+const gymProtectedOnclick = Gym.prototype.protectedOnclick;
+Gym.prototype.protectedOnclick = function() {
+    if (this.isVisible() && this.clears()) {
+        this.onclick();
+    }
+    gymProtectedOnclick.call(this);
+};
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
