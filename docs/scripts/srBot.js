@@ -111,7 +111,7 @@ srBot.fos = function() {
 srBot.visible = eval(`(${
     BreedingController.visible.toString()
         .replace('visible', 'function')
-        .replace(' !== BreedingFilters.shinyStatus.value()', ' !== 0')
+        .replace(/BreedingFilters\.shinyStatus\.value\(\)/g, '0')
 })`);
 /** srBot option shiny breeding */
 srBot.egg = function () {
