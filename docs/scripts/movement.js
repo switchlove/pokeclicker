@@ -368,10 +368,25 @@ Gym.prototype.isUnlocked = function () {
     }
     return contentUnlock.call(this) || this.wasUnlock;
 };
+
+const weatherProgress = WeatherRequirement.prototype.getProgress;
+WeatherRequirement.prototype.getProgress = function () {
+    return this.region
+        ? +this.weather.includes(Weather.regionalWeather[this.region]())
+        : weatherProgress.call(this);
+};
+
+const gymProtectedOnclick = Gym.prototype.protectedOnclick;
+Gym.prototype.protectedOnclick = function() {
+    if (this.isVisible() && this.clears()) {
+        this.onclick();
+    }
+    gymProtectedOnclick.call(this);
+};
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
-MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyMovement?.active() || (App.game.party.caughtPokemon.every(pokemon => pokemon.shiny) && MapHelper.isRegionCleared(player.highestRegion())));
+MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyMovement?.active() || (isPartyShiny() && MapHelper.isRegionCleared(player.highestRegion())));
 MapHelper.isRegionCleared = (region) => {
     let check = true;
     for (let i = 0; check && i <= region; i++) {
@@ -382,6 +397,12 @@ MapHelper.isRegionCleared = (region) => {
     }
     return check;
 };
+function isPartyShiny() {
+    let discord = App.game.discord.codes.map(code => code.name);
+    return App.game.party.caughtPokemon
+        .filter(p => !(discord.includes(p.name) && PokemonHelper.calcNativeRegion(p.name) > player.region))
+        .every(pokemon => pokemon.shiny);
+}
 
 // replace Pokedex by Shiny pokedex in prof oak check
 const defaultDialog = Object.getOwnPropertyDescriptor(ProfNPC.prototype, 'dialogHTML').get;
@@ -740,6 +761,15 @@ for (let region = 0; region < GameConstants.Region.final; region++) {
     for (let route of Routes.getRoutesByRegion(region)) {
         if (!(route.requirements[0] instanceof ChallengeRequirements)) {
             ChallengeRequirements.add(route);
+        }
+        for (let pkm of route.pokemon.special) {
+            let req = pkm.req;
+            if (req instanceof MultiRequirement) {
+                req = req.requirements.find(r => r instanceof WeatherRequirement);
+            }
+            if (req instanceof WeatherRequirement) {
+                req.region = region;
+            }
         }
     }
 }
