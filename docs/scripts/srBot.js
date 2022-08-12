@@ -2,16 +2,30 @@
 var srCount;
 window.addEventListener('load', () => setTimeout(() => srBot.interval = setInterval(srBot, 3000), 3000));
 
+//#region LocalSettings
+const settingKey = 'a6csrq-settings';
+const localSettings = ko.observable(JSON.parse(localStorage.getItem(settingKey)) ?? {key: '', state: 0});
+localSettings.subscribe(() => localStorage.setItem(settingKey, ko.toJSON(localSettings)));
+window.addEventListener('storage', (e) => {
+    if (e.key == settingKey) {
+        if (JSON.parse(e.oldValue)?.state != JSON.parse(e.newValue)?.state) {
+            location.reload();
+        }
+        localSettings(JSON.parse(e.newValue) ?? {key: '', state: 0});
+    }
+});
+//#endregion
+
 function srBot() {
     if (!clickEngagedSR) {
         return;
     }
 
-    localSettings[1] = Save.key;
-    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-
     srCount = localLocal[6][2] ?? 0;
-    return srBot[Settings.getSetting('srOpts').value]?.();
+    srBot[Settings.getSetting('srOpts').value]?.();
+
+    localSettings({...localSettings()});
+    Settings.getSetting('botstate.sr').value = !!localSettings().state;
 }
 
 /** srBot option Pokemon shop */
@@ -36,6 +50,7 @@ srBot.poke = function () {
         }
     }
 
+    localSettings().state = smnUsed;
     if (!smnUsed) {
         return;
     }
@@ -58,6 +73,7 @@ srBot.evo = function () {
         )
     );
 
+    localSettings().state = needed.length;
     if (!needed.length) {
         return;
     }
@@ -132,7 +148,7 @@ srBot.wasWaiting = false;
 srBot.hatch = function () {
     const egg = App.game.breeding.eggList[0]();
     if (egg.type < 0) {
-        return;
+        return  localSettings().state = 0;
     }
 
     const shiny = App.game.party.alreadyCaughtPokemonByName(egg.pokemon, true);
@@ -146,6 +162,7 @@ srBot.hatch = function () {
         Save.store(player);
     }
 
+    localSettings().state = 1;
     console.log(`Hatching - ${egg.pokemon} - Shiny: ${shiny}`);
     localLocal[6][1] = egg.pokemon;
     localStorage.setItem(saveKey, JSON.stringify(localLocal));
@@ -163,16 +180,18 @@ srBot.log = function (pokeName, ...msgs) {
         ...msgs,
     ].join(' :: ');
 
+    console.log(log);
+    localSettings({
+        key: Save.key,
+        state: Math.max(0, localSettings().state - shiny),
+    });
+
     if (shiny) {
-        console.log(log);
         localLocal[6] = [,'', 0];
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-        localSettings[2] = 0;
-        localStorage.setItem(settingKey, JSON.stringify(localSettings));
         Save.store(player);
     } else {
         localLocal[6][2] = ++srCount;
-        console.log(log);
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         clearInterval(srBot.interval); // safe guard in case off lag.
         location.reload();

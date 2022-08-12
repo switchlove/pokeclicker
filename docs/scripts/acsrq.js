@@ -93,33 +93,16 @@ function main() {
         a6menu();
         a6phases();
 
-        if (Settings.getSetting('botstate.sr').observableValue()) {
-            clickEngagedSR = 1;
-            localSettings[2] = 1;
-            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-        } else {
-            clickEngagedSR = 0;
-            srCount = 0;
-            localSettings[2] = 0;
-            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-            localLocal[6][1] = '';
-            localLocal[6][2] = '';
-            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-        }
-
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
         }
 
-        setTimeout(function(){
+        setTimeout(() => {
             a6settings();
         }, 1500);
     } else {
-        if (localStorage.getItem('a6csrq-settings') != null) {
-            if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
-                Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[1];
-                $(`[data-key="${Save.key}"]`)[1]?.click();
-            }
+        if (localSettings().state) {
+            $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
 }
@@ -166,20 +149,6 @@ function a6save() {
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
 
-    localSettings = ['','','',''];
-    settingKey = "a6csrq-settings";
-
-    if ( localStorage.getItem(settingKey) == null ) {
-        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-    } else {
-        localSettings = JSON.parse(localStorage.getItem(settingKey));
-    }
-
-    if (localSettings.length == 14) {
-        localSettings = localSettings.splice(9,1)[0];
-        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-    }
-
     phases = [];
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -198,8 +167,6 @@ function a6menu() {
 }
 
 async function a6settings() {
-    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-
     if (Settings.getSetting('botOptions')?.observableValue()) {
         //Breeding Bot
         const breedingCheck = document.getElementById('checkbox-botstate.breeding');

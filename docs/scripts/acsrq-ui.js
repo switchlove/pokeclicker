@@ -9,15 +9,7 @@ window.addEventListener('load', () => {
     // execute once save is fully loaded
     const gameStart = Game.prototype.start;
     Game.prototype.start = function() {
-        //#region Subscriptions
-        //reset bot state when bot are disabled
-        Settings.getSetting('botOptions').observableValue.subscribe((value) => {
-            if (!value) {
-                Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
-            }
-        });
-
-        //Disable/Enable event
+        //Disable/Enable event - need game to be fully loaded before triggering
         Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
             for (let event of SpecialEvents.events) {
                 if (disable && event.hasStarted()) {
@@ -39,7 +31,6 @@ window.addEventListener('load', () => {
                 this.status = 2;
             }
         };
-        //#endregion
 
         gameStart.call(this);
     };
@@ -144,6 +135,28 @@ Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A'
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 //#endregion
 
+//#region Settings Subscriptions
+//reset bot state when bot are disabled
+Settings.getSetting('botOptions').observableValue.subscribe((value) => {
+    if (!value) {
+        Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
+    }
+});
+
+//srBot
+Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
+    clickEngagedSR = +value;
+    localStorage.setItem(`settings${Save.key}`, JSON.stringify(Settings.toJSON()));
+
+    if (!value) {
+        localLocal[6][1] = '';
+        localLocal[6][2] = '';
+        localStorage.setItem(saveKey, JSON.stringify(localLocal));
+        localSettings({...localSettings(), state: 0});
+    }
+});
+//#endregion
+
 //#region Info / Bot menu
 acsrqInfo = function () {
     document.getElementById('pokeballSelector').insertAdjacentHTML('afterend', `
@@ -237,7 +250,7 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
         acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked() || App.game.breeding.canAccess()'),
         `<tr>${acsrqInfo.Row(
             'Pokeball',
             `<knockout data-bind="
