@@ -114,7 +114,7 @@ Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
     new SettingOption('Dragon', 'dragon'),
 ], 'fire'));
 Settings.add(new Setting('fossilOpts', 'Fossil to use',
-    UndergroundItems.list.filter(i => i.valueType == 'Mine Egg').map(f => new SettingOption(f.displayName, f.name)),
+    UndergroundItems.list.filter(i => i.valueType == UndergroundItemValueType.Fossil).map(f => new SettingOption(f.displayName, f.name)),
     'Dome Fossil'));
 Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
@@ -148,9 +148,9 @@ acsrqInfo = function () {
         <!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->
         <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative">
             <span>ACSRQ - Scripts</span>
-            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" 
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;"
                 data-bind="click: (_,e) => {
-                    $('#settingsModal').modal('show'); 
+                    $('#settingsModal').modal('show');
                     $('a[href=\\'#settings-acsrq-script\\']').tab('show');
                     e.stopPropagation();
                 }">⏣</button>
@@ -166,7 +166,7 @@ acsrqInfo = function () {
             <span>ACSRQ - Info</span>
             <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;"
                 data-bind="click: (_,e) => {
-                    $('#settingsModal').modal('show'); 
+                    $('#settingsModal').modal('show');
                     $('a[href=\\'#settings-acsrq\\']').tab('show');
                     e.stopPropagation();
                 }">⏣</button>
@@ -240,7 +240,7 @@ acsrqInfo = function () {
             `<knockout data-bind="
             template: {
                 name: 'autoBuyPokeballDisplayTemplate',
-                data: { 
+                data: {
                     'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
                     'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
                     'title': 'Auto Buy Pokéball'
