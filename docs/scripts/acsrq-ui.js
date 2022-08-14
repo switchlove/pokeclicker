@@ -201,10 +201,10 @@ acsrqInfo = function () {
         new SettingOption('S+C', 'S+C'),
         new SettingOption('S+C+P','S+C+P'),
         new SettingOption('S+L', 'S+L'),
-        new SettingOption('Perp. P', 'Perp. P')
-        // new SettingOption('S+L+P', 'S+L+P'),
-        // new SettingOption('S+L+C', 'S+L+C'),
-        // new SettingOption('S+L+C+P', 'S+L+C+P')
+        new SettingOption('S+L+P', 'S+L+P'),
+        new SettingOption('S+L+C', 'S+L+C'),
+        new SettingOption('S+L+C+P', 'S+L+C+P')
+        // new SettingOption('Perp. P', 'Perp. P')
     );
     //#endregion
     //#region Pokeball Modal
