@@ -1526,7 +1526,7 @@ function plantLayout(layout) {
         if (App.game.farming.plotList[layout[berrieOrder[i]][0]].berry == -1) {
             if (i > 0) {
                 const plot = App.game.farming.plotList[layout[berrieOrder[0]][0]];
-                if (plot?.berryData.growthTime[3] - plot?.age > App.game.farming.berryData[berrieOrder[i]].growthTime[3]) {
+                if (plot?.berryData?.growthTime[3] - plot?.age > App.game.farming.berryData[berrieOrder[i]]?.growthTime[3]) {
                     continue;
                 }
             }
@@ -1573,17 +1573,31 @@ async function plantBot() {
         }
 
         if (selectedBerry.endsWith('+P')) {
-            if (App.game.farming.plotList[7].berry == -1 || App.game.farming.plotList[7].age >= App.game.farming.plotList[7].berryData?.growthTime[4] - 5) {
+            const tp = App.game.farming.plotList[7];
+            const bp = App.game.farming.plotList[17];
+
+            if (tp.berry == -1 || bp.berry == BerryType.Petaya && bp.age >= bp.berryData.growthTime[4] - 10 - bp.berryData?.growthTime[3]  && tp.berry != BerryType.Petaya) {
                 App.game.farming.harvest(7);
                 App.game.farming.plant(7,BerryType.Petaya);
+            } else if (tp.berry == BerryType.Petaya && tp.age > tp.berryData.growthTime[4] - 10) {
+                App.game.farming.harvest(7);
+                App.game.farming.plant(7,BerryType.Starf);
+            }
+
+            if (tp.berry == BerryType.Petaya && tp.age >= tp.berryData.growthTime[4] - 10 - tp.berryData?.growthTime[3] && bp.berry != BerryType.Petaya) {
+                App.game.farming.harvest(17);
+                App.game.farming.plant(17,BerryType.Petaya);
+            } else if (bp.berry == -1 || bp.berry == BerryType.Petaya && bp.age > bp.berryData.growthTime[4] - 10) {
+                App.game.farming.harvest(17);
+                App.game.farming.plant(17,BerryType.Starf);
             }
         }
 
         plantLayout(layouts[selectedBerry.replace('+P', '')]);
-    }
-
-    if (App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
-        App.game.farming.harvestAll();
+        if (!App.game.farming.berryInFarm(BerryType.Petaya, PlotStage.Berry, true)
+        && App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
+            App.game.farming.harvestAll();
+        }
     }
 }
 
