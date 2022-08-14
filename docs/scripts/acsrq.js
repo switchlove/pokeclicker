@@ -1519,6 +1519,23 @@ async function srBot() {
     }
 }
 
+function plantLayout(layout) {
+    const berrieOrder = Object.keys(layout).sort((a, b) =>  App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3])
+
+    for (let i = 0; i < berrieOrder.length; i++) {
+        if (App.game.farming.plotList[layout[berrieOrder[i]][0]].berry == -1) {
+            if (i > 0) {
+                const plot = App.game.farming.plotList[layout[berrieOrder[0]][0]];
+                if (plot?.berryData.growthTime[3] - plot?.age > App.game.farming.berryData[berrieOrder[i]].growthTime[3]) {
+                    continue;
+                }
+            }
+
+            layout[berrieOrder[i]].forEach(plot => App.game.farming.plant(plot, berrieOrder[i]))
+        }
+    }
+}
+
 async function plantBot() {
     var selectedBerry = Settings.getSetting('botstate.plant').value;
     var berryId = BerryType[selectedBerry];
@@ -1539,63 +1556,32 @@ async function plantBot() {
             App.game.farming.harvestAll();
         }
     } else {
-        switch(selectedBerry) {
-            case 'S+C+P':
-                if (App.game.farming.plotList[7].berry == -1 || App.game.farming.plotList[7].age >= App.game.farming.plotList[7].berryData.growthTime[4] - 5) {
-                    App.game.farming.harvest(7);
-                    App.game.farming.plant(7,BerryType.Petaya);
-                }
-            case 'S+C':
-                if (App.game.farming.plotList[5].berry == -1) {
-                    [5,6,7,8,9,15,16,17,18,19].forEach(s => App.game.farming.plant(s,BerryType.Starf))
-                }
-                if (App.game.farming.plotList[0].berry == -1 &&
-                    App.game.farming.plotList[5]?.berryData.growthTime[3] - App.game.farming.plotList[5]?.age > App.game.farming.berryData[BerryType.Chople].growthTime[3]) {
-                        [0,1,2,3,4,10,11,12,13,14,20,21,22,23].forEach(s => App.game.farming.plant(s,BerryType.Chople));
-                }
-                break;
-            case 'S+L+P':
-                if(App.game.farming.plotList[17].berry == 62 
-                    && App.game.farming.plotList[17].age < 90000 
-                    && App.game.farming.plotList[17].age >= 86400 
-                    && App.game.farming.plotList[7].berry == 62 
-                    && App.game.farming.plotList[7].age >= 340000){
-                    App.game.farming.harvest(7);
-                    App.game.farming.plant(7,65);
-                }
-                else if(App.game.farming.plotList[7].berry == 62 
-                    && App.game.farming.plotList[7].age < 90000 
-                    && App.game.farming.plotList[7].age >= 86400 
-                    && App.game.farming.plotList[17].berry == 62 
-                    && App.game.farming.plotList[17].age >= 340000){
-                    App.game.farming.harvest(17);
-                    App.game.farming.plant(17,65);
-                }
-                else if(App.game.farming.plotList[17].age >= 340000){
-                    App.game.farming.harvest(7);
-                    App.game.farming.plant(7,62);
-                }
-                else if(App.game.farming.plotList[7].age >= 340000){
-                    App.game.farming.harvest(17);
-                    App.game.farming.plant(17,62);
-                }
-            case 'S+L':
-                if (App.game.farming.plotList[5].berry == -1) {
-                    [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(s => App.game.farming.plant(s,BerryType.Starf))
-                }
-                if (App.game.farming.plotList[6].berry == -1 &&
-                    App.game.farming.plotList[5]?.berryData.growthTime[3] - App.game.farming.plotList[5]?.age > App.game.farming.berryData[BerryType.Lum].growthTime[3]) {
-                        [6,8,16,18].forEach(s => App.game.farming.plant(s,BerryType.Lum));
-                }
-                break;
-            case 'S+L+C+P':
-                //Starf 65 + Lum 19 + Chople 40 + Petaya 62
-            case 'S+L+C':
-                //Starf 65 + Lum 19 + Chople 40
-                break;
+        const layouts = {
+            "S+C": {
+                65: [5,6,7,8,9,15,16,17,18,19],
+                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24]
+            },
+            "S+L": {
+                65: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
+                19: [6,8,16,18]
+            },
+            "S+L+C": {
+                65: [5,7,9,15,17,19],
+                19: [6,8,16,18],
+                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24]
+            }
         }
+
+        if (selectedBerry.endsWith('+P')) {
+            if (App.game.farming.plotList[7].berry == -1 || App.game.farming.plotList[7].age >= App.game.farming.plotList[7].berryData?.growthTime[4] - 5) {
+                App.game.farming.harvest(7);
+                App.game.farming.plant(7,BerryType.Petaya);
+            }
+        }
+
+        plantLayout(layouts[selectedBerry.replace('+P', '')]);
     }
-        
+
     if (App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
         App.game.farming.harvestAll();
     }
@@ -1665,22 +1651,7 @@ async function mutateBot() {
     }
 
     const selectedBerry = Settings.getSetting('botstate.mutate').value;
-    const selectedLayout = mutationLayouts[selectedBerry];
-
-    const berrieOrder = Object.keys(selectedLayout).sort((a, b) =>  App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3])
-
-    for (let i = 0; i < berrieOrder.length; i++) {
-        if (App.game.farming.plotList[selectedLayout[berrieOrder[i]][0]].berry == -1) {
-            if (i > 0) {
-                const plot = App.game.farming.plotList[selectedLayout[berrieOrder[0]][0]];
-                if (plot?.berryData.growthTime[3] - plot?.age > App.game.farming.berryData[berrieOrder[i]].growthTime[3]) {
-                    continue;
-                }
-            }
-
-            selectedLayout[berrieOrder[i]].forEach(plot => App.game.farming.plant(plot, berrieOrder[i]))
-        }
-    }
+    plantLayout(mutationLayouts[selectedBerry]);
 
     if (App.game.farming.plotList.some(p => p.berry != -1 && 
         (p.age >  p.berryData.growthTime[4] - 5 || p.berry == BerryType[selectedBerry] &&  p.age > p.berryData.growthTime[3])
