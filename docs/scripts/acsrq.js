@@ -1533,108 +1533,41 @@ async function plantBot() {
                     App.game.farming.harvestAll();
                 }
             }
-        } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
+        }
+
+        if (App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[3]))) {
             App.game.farming.harvestAll();
         }
-    } else if ( selectedBerry > 65 ) {
+    } else {
         switch(selectedBerry) {
-            case 'S+C':
-                //Starf 65 + Chople 40
-                if (App.game.farming.plotList[5].berry == -1) {
-                    App.game.farming.plant(5,65)
-                    App.game.farming.plant(6,65)
-                    App.game.farming.plant(7,65)
-                    App.game.farming.plant(8,65)
-                    App.game.farming.plant(9,65)
-                    App.game.farming.plant(15,65)
-                    App.game.farming.plant(16,65)
-                    App.game.farming.plant(17,65)
-                    App.game.farming.plant(18,65)
-                    App.game.farming.plant(19,65)
-
-                    setTimeout(() => {
-                        App.game.farming.plant(0,40);
-                        App.game.farming.plant(1,40);
-                        App.game.farming.plant(2,40);
-                        App.game.farming.plant(3,40);
-                        App.game.farming.plant(4,40);
-                        App.game.farming.plant(10,40);
-                        App.game.farming.plant(11,40);
-                        App.game.farming.plant(12,40);
-                        App.game.farming.plant(13,40);
-                        App.game.farming.plant(14,40);
-                        App.game.farming.plant(20,40);
-                        App.game.farming.plant(21,40);
-                        App.game.farming.plant(22,40);
-                        App.game.farming.plant(23,40);
-                        App.game.farming.plant(24,40);
-                    }, 50400000);
-                }
-                if (App.game.farming.plotList[5].age >= 50400){
-                    if (App.game.farming.plotList[0].age >= 71940){
-                        App.game.farming.harvestAll();
-                    }
-                }
-                break;
             case 'S+C+P':
-                //Starf 65 + Chople 40 + Petaya 62
+                if (App.game.farming.plotList[7].berry == -1 || App.game.farming.plotList[7].age >= App.game.farming.plotList[7].berryData.growthTime[4] - 5) {
+                    App.game.farming.harvest(7);
+                    App.game.farming.plant(7,BerryType.Petaya);
+                }
+            case 'S+C':
                 if (App.game.farming.plotList[5].berry == -1) {
-                    App.game.farming.plant(5,65);
-                    App.game.farming.plant(6,65);
-                    App.game.farming.plant(7,62);
-                    App.game.farming.plant(8,65);
-                    App.game.farming.plant(9,65);
-                    App.game.farming.plant(15,65);
-                    App.game.farming.plant(16,65);
-                    App.game.farming.plant(17,65);
-                    App.game.farming.plant(18,65);
-                    App.game.farming.plant(19,65);
-                    setTimeout(() => {
-                        App.game.farming.plant(0,40);
-                        App.game.farming.plant(1,40);
-                        App.game.farming.plant(2,40);
-                        App.game.farming.plant(3,40);
-                        App.game.farming.plant(4,40);
-                        App.game.farming.plant(10,40);
-                        App.game.farming.plant(11,40);
-                        App.game.farming.plant(12,40);
-                        App.game.farming.plant(13,40);
-                        App.game.farming.plant(14,40);
-                        App.game.farming.plant(20,40);
-                        App.game.farming.plant(21,40);
-                        App.game.farming.plant(22,40);
-                        App.game.farming.plant(23,40);
-                        App.game.farming.plant(24,40);
-                    }, 50400000);
+                    [5,6,7,8,9,15,16,17,18,19].forEach(s => App.game.farming.plant(s,BerryType.Starf))
                 }
-                if (App.game.farming.plotList[5].age >= 50400){
-                    if (App.game.farming.plotList[7].age >= 345600){
-                        App.game.farming.harvest(7);
-                        App.game.farming.plant(7,62);
-                    }
-                }
-                break;
-            case 'S+L':
-                //Starf 65 + Lum 19
-                if (App.game.farming.plotList[5].berry == -1) {
-                    [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(item => App.game.farming.plant(item,65));
-                    setTimeout(() => {
-                        [6,8,16,18].forEach(item => App.game.farming.plant(item,19));
-                    }, 82800000);
-                }
-                if (App.game.farming.plotList[6].age >= 41400){
-                    if (App.game.farming.plotList[0].age >= 343800){
-                        App.game.farming.harvestAll();
-                    }
+                if (App.game.farming.plotList[0].berry == -1 &&
+                    App.game.farming.plotList[5]?.berryData.growthTime[3] - App.game.farming.plotList[5]?.age > App.game.farming.berryData[BerryType.Chople].growthTime[3]) {
+                        [0,1,2,3,4,10,11,12,13,14,20,21,22,23].forEach(s => App.game.farming.plant(s,BerryType.Chople));
                 }
                 break;
             case 'S+L+P':
-                //Starf 65 + Lum 19 + Petaya 62
-                if(App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age < 90000 && App.game.farming.plotList[17].age >= 86400 && App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age >= 340000){
+                if(App.game.farming.plotList[17].berry == 62 
+                    && App.game.farming.plotList[17].age < 90000 
+                    && App.game.farming.plotList[17].age >= 86400 
+                    && App.game.farming.plotList[7].berry == 62 
+                    && App.game.farming.plotList[7].age >= 340000){
                     App.game.farming.harvest(7);
                     App.game.farming.plant(7,65);
                 }
-                else if(App.game.farming.plotList[7].berry == 62 && App.game.farming.plotList[7].age < 90000 && App.game.farming.plotList[7].age >= 86400 && App.game.farming.plotList[17].berry == 62 && App.game.farming.plotList[17].age >= 340000){
+                else if(App.game.farming.plotList[7].berry == 62 
+                    && App.game.farming.plotList[7].age < 90000 
+                    && App.game.farming.plotList[7].age >= 86400 
+                    && App.game.farming.plotList[17].berry == 62 
+                    && App.game.farming.plotList[17].age >= 340000){
                     App.game.farming.harvest(17);
                     App.game.farming.plant(17,65);
                 }
@@ -1646,13 +1579,25 @@ async function plantBot() {
                     App.game.farming.harvest(17);
                     App.game.farming.plant(17,62);
                 }
-                break;
-            case 'S+L+C':
-                //Starf 65 + Lum 19 + Chople 40
+            case 'S+L':
+                if (App.game.farming.plotList[5].berry == -1) {
+                    [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24].forEach(s => App.game.farming.plant(s,BerryType.Starf))
+                }
+                if (App.game.farming.plotList[6].berry == -1 &&
+                    App.game.farming.plotList[5]?.berryData.growthTime[3] - App.game.farming.plotList[5]?.age > App.game.farming.berryData[BerryType.Lum].growthTime[3]) {
+                        [6,8,16,18].forEach(s => App.game.farming.plant(s,BerryType.Lum));
+                }
                 break;
             case 'S+L+C+P':
                 //Starf 65 + Lum 19 + Chople 40 + Petaya 62
+            case 'S+L+C':
+                //Starf 65 + Lum 19 + Chople 40
+                break;
         }
+    }
+        
+    if (App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
+        App.game.farming.harvestAll();
     }
 }
 
