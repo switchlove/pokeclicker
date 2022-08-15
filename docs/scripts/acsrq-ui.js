@@ -141,6 +141,12 @@ Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A'
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 //#endregion
 
+Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
+    if (value) {
+        Settings.setSettingByName('disableSave', true);
+    }
+});
+
 //#region Info / Bot menu
 acsrqInfo = function () {
     document.getElementById('pokeballSelector').insertAdjacentHTML('afterend', `
