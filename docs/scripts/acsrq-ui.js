@@ -234,7 +234,7 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
         acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked() || App.game.breeding.canAccess()'),
         `<tr>${acsrqInfo.Row(
             'Pokeball',
             `<knockout data-bind="
