@@ -70,12 +70,12 @@ Settings.add(new Setting('gymOpts', 'Gym bot stop options', [
     new SettingOption('None', 'gymOptN'),
 ], 'gymOptN'));
 Settings.add(new Setting('gymE4Opts', 'E4 Boss to fight', [
-    new SettingOption('First', 1),
-    new SettingOption('Second', 2),
-    new SettingOption('Third', 3),
-    new SettingOption('Fourth', 4),
-    new SettingOption('Fifth', 5),
-], 1));
+    new SettingOption('First', '1'),
+    new SettingOption('Second', '2'),
+    new SettingOption('Third', '3'),
+    new SettingOption('Fourth', '4'),
+    new SettingOption('Fifth', '5'),
+], '1'));
 Settings.add(new Setting('bfOpts', 'Battle Frontier stop options', [
     new SettingOption('None', 'bfOptN'),
     new SettingOption('Time', 'bfOptT'),
