@@ -286,7 +286,7 @@ async function a6settings() {
         //Mutator Bots
         const mutateSelect = document.getElementById('select-botstate.mutate');
         if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
-            plantBot();
+            mutateBot();
         }
     }
 }
@@ -1536,7 +1536,7 @@ async function plantBot() {
         } else if (App.game.farming.plotList[12].age > App.game.farming.berryData[App.game.farming.plotList[12].berry].growthTime[3]) {
             App.game.farming.harvestAll();
         }
-    } else if ( selectedBerry > 65 ) {
+    } else {
         switch(selectedBerry) {
             case 'S+C':
                 //Starf 65 + Chople 40
