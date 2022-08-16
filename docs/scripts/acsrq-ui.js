@@ -70,12 +70,12 @@ Settings.add(new Setting('gymOpts', 'Gym bot stop options', [
     new SettingOption('None', 'gymOptN'),
 ], 'gymOptN'));
 Settings.add(new Setting('gymE4Opts', 'E4 Boss to fight', [
-    new SettingOption('First', 1),
-    new SettingOption('Second', 2),
-    new SettingOption('Third', 3),
-    new SettingOption('Fourth', 4),
-    new SettingOption('Fifth', 5),
-], 1));
+    new SettingOption('First', '1'),
+    new SettingOption('Second', '2'),
+    new SettingOption('Third', '3'),
+    new SettingOption('Fourth', '4'),
+    new SettingOption('Fifth', '5'),
+], '1'));
 Settings.add(new Setting('bfOpts', 'Battle Frontier stop options', [
     new SettingOption('None', 'bfOptN'),
     new SettingOption('Time', 'bfOptT'),
@@ -140,6 +140,12 @@ Settings.add(new BooleanSetting('botstate.sr', 'SR Bot', false));
 Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 //#endregion
+
+Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
+    if (value) {
+        Settings.setSettingByName('disableSave', true);
+    }
+});
 
 //#region Info / Bot menu
 acsrqInfo = function () {
@@ -234,7 +240,7 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
         acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked() || App.game.breeding.canAccess()'),
         `<tr>${acsrqInfo.Row(
             'Pokeball',
             `<knockout data-bind="
