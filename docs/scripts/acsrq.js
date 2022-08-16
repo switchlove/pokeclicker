@@ -37,16 +37,14 @@ window.addEventListener('load', () => {
         }, 500);
     }, 1000);
 
-    setInterval(function(){
-        if (Settings.getSetting('disableSave').observableValue() == true) {
-            Save.counter = 0;
-            window.onbeforeunload = [];
-        } else {
-            window.onbeforeunload = function () {
-                Save.store(player);
-            };
+    //#region PreventAutoSave
+    const gameSave = Game.prototype.save;
+    Game.prototype.save = function() {
+        if (!Settings.getSetting('disableSave').value) {
+            gameSave();
         }
-    }, 1000);
+    };
+    //#endregion
 
     setInterval(function(){
         if (Settings.getSetting('noWander').observableValue() == true) {
