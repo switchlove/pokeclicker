@@ -25,7 +25,6 @@ function srBot() {
     srBot[Settings.getSetting('srOpts').value]?.();
 
     localSettings({...localSettings()});
-    Settings.getSetting('botstate.sr').value = !!localSettings().state;
 }
 
 /** srBot option Pokemon shop */
