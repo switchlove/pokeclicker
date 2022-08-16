@@ -142,6 +142,7 @@ Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/
 //#endregion
 
 Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
+    localStorage.setItem(`settings${Save.key}`, JSON.stringify(Settings.toJSON()));
     if (value) {
         Settings.setSettingByName('disableSave', true);
     }
