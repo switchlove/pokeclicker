@@ -146,14 +146,14 @@ Settings.getSetting('botOptions').observableValue.subscribe((value) => {
 //srBot
 Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
     clickEngagedSR = +value;
-    localStorage.setItem(`settings${Save.key}`, JSON.stringify(Settings.toJSON()));
 
     if (!value) {
-        localLocal[6][1] = '';
-        localLocal[6][2] = '';
-        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-        localSettings({...localSettings(), state: 0});
+        localSettings({key:'', state: 0});
+    } else {
+        Settings.setSettingByName('disableSave', true);
     }
+
+    localStorage.setItem(`settings${Save.key}`, JSON.stringify(Settings.toJSON()));
 });
 //#endregion
 
