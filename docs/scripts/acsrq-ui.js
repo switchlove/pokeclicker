@@ -164,9 +164,9 @@ acsrqInfo = function () {
         <!-- ko if: Settings.getSetting(\'botOptions\').observableValue -->
         <div class="card-header p-0" data-toggle="collapse" href="#acsrqScriptingBody" style="position: relative">
             <span>ACSRQ - Scripts</span>
-            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;" 
+            <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;"
                 data-bind="click: (_,e) => {
-                    $('#settingsModal').modal('show'); 
+                    $('#settingsModal').modal('show');
                     $('a[href=\\'#settings-acsrq-script\\']').tab('show');
                     e.stopPropagation();
                 }">⏣</button>
@@ -182,7 +182,7 @@ acsrqInfo = function () {
             <span>ACSRQ - Info</span>
             <button class="btn btn-sm btn-primary" style="position: absolute; right: 0px; top: 0px; width: auto; height: 40px;"
                 data-bind="click: (_,e) => {
-                    $('#settingsModal').modal('show'); 
+                    $('#settingsModal').modal('show');
                     $('a[href=\\'#settings-acsrq\\']').tab('show');
                     e.stopPropagation();
                 }">⏣</button>
@@ -217,10 +217,10 @@ acsrqInfo = function () {
         new SettingOption('S+C', 'S+C'),
         new SettingOption('S+C+P','S+C+P'),
         new SettingOption('S+L', 'S+L'),
-        new SettingOption('Perp. P', 'Perp. P')
-        // new SettingOption('S+L+P', 'S+L+P'),
-        // new SettingOption('S+L+C', 'S+L+C'),
-        // new SettingOption('S+L+C+P', 'S+L+C+P')
+        new SettingOption('S+L+P', 'S+L+P'),
+        new SettingOption('S+L+C', 'S+L+C'),
+        new SettingOption('S+L+C+P', 'S+L+C+P')
+        // new SettingOption('Perp. P', 'Perp. P')
     );
     //#endregion
     //#region Pokeball Modal
@@ -256,7 +256,7 @@ acsrqInfo = function () {
             `<knockout data-bind="
             template: {
                 name: 'autoBuyPokeballDisplayTemplate',
-                data: { 
+                data: {
                     'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
                     'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
                     'title': 'Auto Buy Pokéball'
