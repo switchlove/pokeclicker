@@ -38,10 +38,10 @@ window.addEventListener('load', () => {
     }, 1000);
 
     //#region PreventAutoSave
-    const gameSave = Game.prototype.save;
     Game.prototype.save = function() {
+        player._lastSeen = Date.now();
         if (!Settings.getSetting('disableSave').value) {
-            gameSave();
+            Save.store(player);
         }
     };
     //#endregion
