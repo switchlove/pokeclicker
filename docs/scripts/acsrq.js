@@ -1662,12 +1662,13 @@ async function mutateBot() {
         'Petaya': { 48:[24], 50:[16], 39:[14], 42:[15], 46:[10], 40:[21], 44:[12], 38:[22], 49:[4], 36:[13], 52:[17], 35:[0], 43:[11], 51:[23], 45:[18], 37:[19], 41:[2], 47:[20] },
         'Apicot': { 51:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Lansat': { 52:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
+        'Starf': { 52:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24], 19:[6,8,16,18]},
     }
 
     const selectedBerry = Settings.getSetting('botstate.mutate').value;
     plantLayout(mutationLayouts[selectedBerry]);
 
-    if (App.game.farming.plotList.some(p => p.berry != -1 && 
+    if (App.game.farming.plotList.some(p => p.berry != -1 &&
         (p.age >  p.berryData.growthTime[4] - 5 || p.berry == BerryType[selectedBerry] &&  p.age > p.berryData.growthTime[3])
     )) {
         App.game.farming.harvestAll();
