@@ -16,6 +16,8 @@ var maxPhaseCount = 0;
 var moveBoss = 0;
 var mystSCount = 0;
 var started = 0;
+var lVer = '0.0.0';
+var rVer = '0.0.0';
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -27,6 +29,14 @@ Element.prototype.appendAfter = function (element) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var getJSON = async url => {
+    const response = await fetch(url);
+    if(!response.ok)
+        throw new Error(response.statusText);
+    const data = response.json();
+    return data;
 }
 
 window.addEventListener('load', () => {
@@ -288,6 +298,28 @@ async function a6settings() {
         if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
             mutateBot();
         }
+    }
+
+    getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
+        rVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    getJSON("./acsrq.json").then(data => {
+        lVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    if (rVer != lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#A93226';
+    } else if (rVer == lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#229954';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#229954';
     }
 }
 
@@ -1662,7 +1694,6 @@ async function mutateBot() {
         'Petaya': { 48:[24], 50:[16], 39:[14], 42:[15], 46:[10], 40:[21], 44:[12], 38:[22], 49:[4], 36:[13], 52:[17], 35:[0], 43:[11], 51:[23], 45:[18], 37:[19], 41:[2], 47:[20] },
         'Apicot': { 51:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Lansat': { 52:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Starf': { 52:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24], 19:[6,8,16,18]},
     }
 
     const selectedBerry = Settings.getSetting('botstate.mutate').value;

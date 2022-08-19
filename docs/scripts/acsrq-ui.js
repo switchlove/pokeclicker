@@ -363,6 +363,11 @@ acsrqSettings = function () {
                 acsrqSettings.Template('BooleanSettingTemplate', 'trackPhases'),
                 acsrqSettings.Number('phaseCount'),
             ]),
+        acsrqSettings.Section(
+            'Debug', [
+                acsrqSettings.Template2('Remote Script Version', `${rVer}`),
+                acsrqSettings.Template2('Local Script Version', `${lVer}`),
+            ], false),
     ];
     $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item"><a class="nav-link" href="#settings-acsrq" data-toggle="tab">ACSRQ</a></li>');
     $('#settingsModal .tab-content')[0].insertAdjacentHTML('beforeend', `<div class="tab-pane" id="settings-acsrq">${acsrq.join('')}</div>`);
@@ -415,6 +420,7 @@ acsrqSettings = function () {
 };
 
 acsrqSettings.Template = (template, setting, visible = true) => `<tr data-bind="template: { name: '${template}', data: Settings.getSetting('${setting}')}, visible: ${visible}"></tr>`;
+acsrqSettings.Template2 = (template, setting, visible = true) => `<tr><td>${template}</td><td>${setting}</td></tr>`;
 
 acsrqSettings.Number = (setting, visible = true) => `
     <tr data-bind="template: { data: Settings.getSetting('${setting}') }, visible: ${visible}">
