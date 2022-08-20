@@ -1,333 +1,267 @@
-//Test
-var hasRan = 0;
-// Save real Battle.generateNewEnemy function
-let oldBattle = Battle.generateNewEnemy;
-let oldEvent = SpecialEvents.prototype.initialize;
+var rolledMons = [];
+const gameInitialize = Game.prototype.initialize;
+Game.prototype.initialize = function() {
+    //Shiny Code
+    this.redeemableCodes.codeList[1].rewardFunction = function() {
+        const pokemon = pokemonMap.randomRegion(GameConstants.Region.final);
+        App.game.party.gainPokemonById(pokemon.id, true, true);
+    };
 
-window.addEventListener("load", function() {
-	// disable event to be sure there are not randomized
-	SpecialEvents.prototype.initialize = function() {}
-	// prevent from encountering pokemon until the randomizing is finished
-	Battle.generateNewEnemy = function () {
-		this.enemyPokemon(PokemonFactory.generateWildPokemon(-1, -1));
-	}
+    //Pokedex List
+    const pokedexList = PokedexHelper.getList;
+    PokedexHelper.getList = eval(pokedexList.toString().replace('getList()', '() =>').replace('nativeRegion > GameConstants.MAX_AVAILABLE_REGION || ', ''));
 
-    setTimeout(function(){
-        rando();
-
-        setInterval(function(){
-            rando();
-        }, 500);
-    }, 1000);
-});
-
-function rando(){
-    var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
-    if (CharCard == null && App.game != undefined) {
-        if (hasRan == 0) {
-            hasRan = 1;
-            makeRandom();
-        }
-    }
-}
-
-function makeRandom(){
-    console.log("Randomizing...");
-    declareRandomizer();
-    RandomizeEncounters();
-	setFunctions();
-
-	// re-enable Event
-	SpecialEvents.prototype.initialize = oldEvent;
-	App.game.specialEvents.initialize();
-	// re-enable Battle.generateNewEnemy
-	Battle.generateNewEnemy = oldBattle;
-	Battle.generateNewEnemy();
-}
-function RandomizeEncounters(){
-	currentRoute = player.route();
-	currentTown = player.town();
-	MapHelper.moveToTown(GameConstants.StartingTowns[player.region]);
-
-	for(var region = 0; region < 10; region++){
-		//Overwrite Dungeon Pokemon
-		Object.keys(TownList).forEach(town => {
-			var hasTrainers = false;
-			if(TownList[town] instanceof DungeonTown && TownList[town].region == region){
-				//Dungeon Encounters & Trainers
-				var dungeon = TownList[town].dungeon;
-				if(dungeon !== undefined){
-					if(dungeon.name !== undefined){
-						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
-							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
-								hasTrainers = true;
-							}
-						}
-						for(var enemy = 0; enemy < dungeon.enemyList.length; enemy++){
-							if(dungeon.enemyList[enemy] instanceof DungeonTrainer){
-								for(var poke = 0; poke < dungeon.enemyList[enemy].team.length; poke++){
-									dungeon.enemyList[enemy].team[poke].name = getIndexValue(1);
-								}
-							}
-							else{
-								if(hasTrainers == true){
-									dungeon.enemyList[enemy].pokemon = getIndexValue(0);
-								}
-								else{
-									dungeon.enemyList[enemy] = getIndexValue(0);
-								}
-
-							}
-						}
-					}
-					if(dungeon.name !== undefined){
-						for(var enemy = 0; enemy < dungeon.bossList.length; enemy++){
-							if(dungeon.bossList[enemy] instanceof DungeonTrainer){
-								for(var poke = 0; poke < dungeon.bossList[enemy].team.length; poke++){
-									dungeon.bossList[enemy].team[poke].name = getIndexValue(1);
-								}
-							}
-							else{
-								dungeon.bossList[enemy].name = getIndexValue(0);
-							}
-						}
-					}
-				}
-			}
-		});
-		//Overwrite Routes
-		var routes = Routes.getRoutesByRegion(region);
-		for(var y = 0; y < routes.length; y++){
-			//Land encounters
-			for(var poke = 0; poke < routes[y].pokemon.land.length; poke++){
-				routes[y].pokemon.land[poke] = getIndexValue(0);
-			}
-			//Headbutt encounters
-			for(var poke = 0; poke < routes[y].pokemon.headbutt.length; poke++){
-				routes[y].pokemon.headbutt[poke] = getIndexValue(0);
-			}
-			//Water encounters
-			for(var poke = 0; poke < routes[y].pokemon.water.length; poke++){
-				routes[y].pokemon.water[poke] = getIndexValue(0);
-			}
-			//Special encounters
-			for(var poke = 0; poke < routes[y].pokemon.special.length; poke++){
-				routes[y].pokemon.special[poke] = getIndexValue(0);
-			}
-		}
-	}
-	//Overwrite Eggs
-	var eggArray = [];
-	Object.keys(App.game.breeding.hatchList).every(eggs => eggArray.push(App.game.breeding.hatchList[eggs]));
-	for(var x = 0; x < eggArray.length; x++){
-		for(var y = 0; y < eggArray[x].length; y++){
-			for(var z = 0; z < eggArray[x][y].length; z++){
-				App.game.breeding.hatchList[x][y][z] = getIndexValue(0);
-			}
-		}
-	}
-	UpdateEggs();
-	//Move player to starting town and back
-	UpdateAreas();
-}
-function UpdateEggs(){
-	//Update Eggs
-	for(var x = 1; x < 8; x++){
-		var queryString = "#breeding-eggs > ul > li:nth-child(" + x + ") > knockout > knockout";
-		var queryStringEgg = "#breeding-eggs > ul > li:nth-child(" + x + ") > span";
-		var hatcheryEgg = document.querySelector(queryString);
-		if(hatcheryEgg !== null){
-			var typeEggU = document.querySelector(queryStringEgg).innerText.split(" ")[0];
-			typeEggU = typeEggU.charAt(0).toUpperCase() + typeEggU.slice(1) + '_egg';
-			switch(ItemList[typeEggU].getCaughtStatus()){
-				case 0:
-					document.querySelector(queryString).innerHTML = "<img title=\"You have captured this Pokémon shiny!\" class=\"pokeball-smallest\" src=\"assets/images/pokeball/None.svg\">";
-					break;
-				case 1:
-					document.querySelector(queryString).innerHTML = "<img title=\"You have captured this Pokémon!\" class=\"pokeball-smallest\" src=\"assets/images/pokeball/Pokeball.svg\">";
-					break;
-				case 2:
-					document.querySelector(queryString).innerHTML = "<img title=\"You have captured this Pokémon shiny!\" class=\"pokeball-smallest\" src=\"assets/images/pokeball/Pokeball-shiny.svg\">";
-					break;
-			}
-		}
-	}
-}
-function UpdateAreas(){
-	//Move across the routes
-	for(var x = 0; x < Routes.getRoutesByRegion(0).length; x++){
-		MapHelper.moveToRoute(Routes.getRoutesByRegion(0)[x].number, player.region);
-	}
-	//Move across the dungeons
-	Object.keys(TownList).forEach(town => {
-		if(TownList[town].region == player.region){
-			MapHelper.moveToTown(TownList[town].name);
-			}
-		});
-	//Move back to where you were
-	if(currentRoute == 0){
-		MapHelper.moveToTown(currentTown.name);
-	}
-	else{
-		MapHelper.moveToRoute(currentRoute, player.region);
-	}
-}
-function declareRandomizer(){
-	//
-	if(localStorage[`randomPokemonWild${Save.key}`] == null && localStorage[`randomPokemonTrainer${Save.key}`] == null){
-		for(var x = 0; x < 2000; x++){
-			getRandomPokemon();
-		}
-		localStorage[`randomPokemonWild${Save.key}`] = JSON.stringify(selectedPokemonWild);
-		for(var x = 0; x < 2000; x++){
-			getRandomTrainerPokemon();
-		}
-		localStorage[`randomPokemonTrainer${Save.key}`] = JSON.stringify(selectedPokemonTrainer);
-		localStorage.setItem(`randomPokemonTrainer${Save.key}`, JSON.stringify(selectedPokemonTrainer));
-		localStorage.setItem(`randomPokemonWild${Save.key}`, JSON.stringify(selectedPokemonWild));
-
-	}
-	else{
-		selectedPokemonWild = JSON.parse(localStorage[`randomPokemonWild${Save.key}`] || '[]');
-		selectedPokemonTrainer = JSON.parse(localStorage[`randomPokemonTrainer${Save.key}`] || '[]');
-	}
-}
-var currentRoute = "";
-var currentTown = "";
-var alreadyRolledPokemon = [];
-var selectedPokemonWild = [];
-var selectedPokemonTrainer = [];
-var selectedPokemonWildIndex = -1;
-var selectedPokemonTrainerIndex = -1;
-function getRandomTrainerPokemon(){
-	var availablePokemon = pokemonList;
-	var encounter = Rand.fromArray(availablePokemon);
-	selectedPokemonTrainer.push(encounter.name);
-	return encounter.name;
-}
-function getRandomPokemon(){
-	var availablePokemon = pokemonList.filter((poke) => {
-		if(alreadyRolledPokemon.includes(poke.name)){
-			return false;
-		}
-		return true;
-	});
-	if(availablePokemon.length > 0){
-		var encounter = Rand.fromArray(availablePokemon);
-		alreadyRolledPokemon.push(encounter.name);
-		selectedPokemonWild.push(encounter.name);
-	}
-	if(alreadyRolledPokemon.length == pokemonList.length){
-		alreadyRolledPokemon = [];
-	}
-	return encounter.name;
-}
-function getIndexValue(arrayType){
-	if(arrayType == 0){
-		//Wild Pokemon
-		selectedPokemonWildIndex++;
-		if(selectedPokemonWildIndex == selectedPokemonWild.length){
-			selectedPokemonWildIndex = 0;
-		}
-		return selectedPokemonWild[selectedPokemonWildIndex];
-	}
-	else{
-		//Trainer Pokemon
-		selectedPokemonTrainerIndex++;
-		if(selectedPokemonTrainerIndex == selectedPokemonTrainer.length){
-			selectedPokemonTrainerIndex = 0;
-		}
-		return selectedPokemonTrainer[selectedPokemonTrainerIndex];
-	}
-}
-
-function setFunctions(){
-	//Pokedex List
-	PokedexHelper.getList = function() {
-        const filter = PokedexHelper.getFilters();
-        const highestEncountered = App.game.statistics.pokemonEncountered.highestID;
-        const highestDefeated = App.game.statistics.pokemonDefeated.highestID;
-        const highestCaught = App.game.statistics.pokemonCaptured.highestID;
-        const highestDex = Math.max(highestEncountered, highestDefeated, highestCaught);
-        return pokemonList.filter((pokemon) => {
-            // Checks based on caught/shiny status
-            const alreadyCaught = App.game.party.alreadyCaughtPokemon(pokemon.id);
-            const alreadyCaughtShiny = App.game.party.alreadyCaughtPokemon(pokemon.id, true);
-            // If the Pokemon shouldn't be unlocked yet
-            const nativeRegion = PokemonHelper.calcNativeRegion(pokemon.name);
-            if (nativeRegion > 9) {
-                return false;
-            }
-            // If not showing this region
-            const region = filter['region'] ? parseInt(filter['region'], 10) : null;
-            if (region != null && region != nativeRegion) {
-                return false;
-            }
-            // If we haven't seen a pokemon this high yet
-            if (pokemon.id > highestDex) {
-                return false;
-            }
-            // Check if the name contains the string
-            if (filter['name'] && !pokemon.name.toLowerCase().includes(filter['name'].toLowerCase().trim())) {
-                return false;
-            }
-            // Check if either of the types match
-            const type1 = filter['type1'] ? parseInt(filter['type1'], 10) : null;
-            const type2 = filter['type2'] ? parseInt(filter['type2'], 10) : null;
-            if ([type1, type2].includes(PokemonType.None)) {
-                const type = (type1 == PokemonType.None) ? type2 : type1;
-                if (!PokedexHelper.isPureType(pokemon, type)) {
-                    return false;
-                }
-            }
-            else if ((type1 != null && !pokemon.type.includes(type1)) || (type2 != null && !pokemon.type.includes(type2))) {
-                return false;
-            }
-            // Only uncaught
-            if (filter['caught-shiny'] == 'uncaught' && alreadyCaught) {
-                return false;
-            }
-            // All caught
-            if (filter['caught-shiny'] == 'caught' && !alreadyCaught) {
-                return false;
-            }
-            // Only caught not shiny
-            if (filter['caught-shiny'] == 'caught-not-shiny' && (!alreadyCaught || alreadyCaughtShiny)) {
-                return false;
-            }
-            // Only caught shiny
-            if (filter['caught-shiny'] == 'caught-shiny' && !alreadyCaughtShiny) {
-                return false;
-            }
-            // Only pokemon with a hold item
-            if (filter['held-item'] && !BagHandler.displayName(pokemon.heldItem)) {
-                return false;
-            }
-            return true;
-        });
-    }
-	//Move to Region
-	MapHelper.ableToTravel = function() {
-        var _a, _b;
+    //Move to Region
+    MapHelper.ableToTravel = function() {
+        var a, b;
         // If player already reached highest region, they can't move on
         if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
             return false;
         }
         // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
         if (!App.game.challenges.list.requireCompletePokedex.active()) {
-            return (_b = (_a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || _a === void 0 ? void 0 : _a.isUnlocked()) !== null && _b !== void 0 ? _b : false;
+            return (b = (a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || a === void 0 ? void 0 : a.isUnlocked()) !== null && b !== void 0 ? b : false;
         }
         // Check if Champion of Region
-		if(App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13){
-			return true;
-		}
-		else{
-			return false;
-		}
+        return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
+    };
+
+    this.randomizer = new Randomizer();
+    gameInitialize.call(this);
+};
+
+class Randomizer {
+    saveKey = 'randomizer';
+
+    dungeons = {};
+    routes = {};
+    eggs = App.game.breeding.hatchList;
+
+    constructor() {
+        for (let dungeon in dungeonList) {
+            this.dungeons[dungeon] = new Randomizer.Dungeon(dungeonList[dungeon]);
+            if (!this.dungeons[dungeon]) {
+                this.dungeons[dungeon] = new Randomizer.Dungeon(dungeonList[dungeon]);
+            }
+        }
+        for (let region = 0; region <= GameConstants.MAX_AVAILABLE_REGION; region++) {
+            for (let route of Routes.getRoutesByRegion(region)) {
+                this.routes[route.routeName] = new Randomizer.Route(route);
+            }
+        }
     }
-	//Shiny Code
-	App.game.redeemableCodes.codeList[1].rewardFunction = function(){
-		const pokemon = pokemonMap.randomRegion(9);
-		App.game.party.gainPokemonById(pokemon.id, true, true);
-	}
+
+    fromJSON(json) {
+        for (let dungeon in this.dungeons) {
+            this.dungeons[dungeon].fromJSON((json.dungeons && json.dungeons[dungeon]) || this.dungeons[dungeon].toJSON());
+        }
+        for (let route in this.routes) {
+            this.routes[route].fromJSON((json.routes && json.routes[route]) || this.routes[route].toJSON());
+        }
+
+        if (JSON.stringify(json.eggs || this.eggs) === JSON.stringify(this.eggs)) {
+            for (let region in this.eggs) {
+                this.eggs[region].forEach((eggs, t) => {
+                    for (let i = 0; i < eggs.length; i++) {
+                        eggs[i] = Randomizer.Rand();
+                    }
+                });
+            }
+        } else {
+            for (let region in this.eggs) {
+                this.eggs[region].forEach((eggs, t) => {
+                    for (let i = 0; i < eggs.length; i++) {
+                        eggs[i] = t < json.eggs[region]?.length && i < json.eggs[region][t].length
+                            ? json.eggs[region][t][i]
+                            : Randomizer.Rand();
+                    }
+                });
+            }
+        }
+    }
+
+    toJSON() {
+        return {
+            dungeons: JSON.parse(JSON.stringify(this.dungeons)),
+            routes: JSON.parse(JSON.stringify(this.routes)),
+            eggs: this.eggs,
+        };
+    }
+
+    //TODO: make a randomisation system...
+    static Rand() {
+		var availableMons = pokemonList.filter(poke => !rolledMons.includes(poke.name));
+		var rolledMon = Rand.fromArray(availableMons).name;
+		rolledMons.push(rolledMon);
+		if(rolledMons.length == pokemonList.length){
+			rolledMons = [];
+		}
+        return rolledMon;
+    }
+
+    static Dungeon = class {
+        constructor(dungeon) {
+            this.enemyList = dungeon.enemyList;
+            this.bossList = dungeon.bossList;
+        }
+
+        toJSON() {
+            return {
+                enemyList: this.enemyList.map(
+                    p => p instanceof Object
+                        ? p instanceof DungeonTrainer
+                            ? p.team.map(({name}) => name)
+                            : p.pokemon
+                        : p
+                ),
+                bossList: this.bossList.map(
+                    b => b instanceof DungeonTrainer
+                        ? b.team.map(({name}) => name)
+                        : b.name
+                ),
+            };
+        }
+
+        fromJSON(json) {
+            if (JSON.stringify(json.enemyList) === JSON.stringify(this.toJSON().enemyList)) {
+                for (let i = 0; i < this.enemyList.length; i++) {
+                    this.randEnemy(i);
+                }
+            } else {
+                const jsonPokemon = json.enemyList.filter(p => !Array.isArray(p));
+                const thisPokemon = this.enemyList.map((p, i) => p instanceof DungeonTrainer ? -1 : i ).filter(_ => _ >= 0);
+                for (let i = 0; i < thisPokemon.length; i++) {
+                    if (i < jsonPokemon.length) {
+                        if (this.enemyList[thisPokemon[i]] instanceof Object) {
+                            this.enemyList[thisPokemon[i]].pokemon = jsonPokemon[i];
+                        } else {
+                            this.enemyList[thisPokemon[i]] = jsonPokemon[i];
+                        }
+                    } else {
+                        this.randEnemy(thisPokemon[i]);
+                    }
+                }
+
+                const jsonTrainer = json.enemyList.filter(p => Array.isArray(p));
+                const thisTrainer = this.enemyList.map((p, i) => p instanceof DungeonTrainer ? i : -1 ).filter(_ => _ >= 0);
+                for (let i = 0; i < thisTrainer.length; i++) {
+                    if (i < jsonTrainer.length) {
+                        this.enemyList[thisTrainer[i]].team.forEach((p, j) => {
+                            p.name = j < jsonTrainer[i].length
+                                ? jsonTrainer[i][j]
+                                : Randomizer.Rand();
+                        });
+                    } else {
+                        this.randEnemy(thisTrainer[i]);
+                    }
+                }
+            }
+
+            if (JSON.stringify(json.bossList) === JSON.stringify(this.toJSON().bossList)) {
+                for (let i = 0; i < this.bossList.length; i++) {
+                    this.randBoss(i);
+                }
+            } else {
+                const jsonBoss = json.bossList.filter(b => !Array.isArray(b));
+                const thisBoss = this.bossList.map((b, i) => b instanceof DungeonBossPokemon ? i : -1 ).filter(_ => _ >= 0);
+                for (let i = 0; i < thisBoss.length; i++) {
+                    if (i < jsonBoss.length) {
+                        this.bossList[thisBoss[i]].name = jsonBoss[i];
+                    } else {
+                        this.randBoss(thisBoss[i]);
+                    }
+                }
+
+                const jsonTrainer = json.bossList.filter(b => Array.isArray(b));
+                const thisTrainer = this.bossList.map((b, i) => b instanceof DungeonTrainer ? i : -1 ).filter(_ => _ >= 0);
+                for (let i = 0; i < thisTrainer.length; i++) {
+                    if (i < jsonTrainer.length) {
+                        this.bossList[thisTrainer[i]].team.forEach((p, j) => {
+                            p.name = j < jsonTrainer[i].length
+                                ? jsonTrainer[i][j]
+                                : Randomizer.Rand();
+                        });
+                    } else {
+                        this.randBoss(thisTrainer[i]);
+                    }
+                }
+            }
+        }
+
+        randEnemy(index) {
+            if (this.enemyList[index] instanceof DungeonTrainer) {
+                this.enemyList[index].team = this.enemyList[index].team.map(pokemon => {
+                    pokemon.name = Randomizer.Rand();
+                    return pokemon;
+                });
+            } else if (this.enemyList[index] instanceof Object) {
+                this.enemyList[index].pokemon = Randomizer.Rand();
+            } else {
+                this.enemyList[index] = Randomizer.Rand();
+            }
+        }
+
+        randBoss(index) {
+            if (this.bossList[index] instanceof DungeonTrainer) {
+                this.bossList[index].team = this.bossList[index].team.map(pokemon => {
+                    pokemon.name = Randomizer.Rand();
+                    return pokemon;
+                });
+            } else if (this.bossList[index] instanceof DungeonBossPokemon) {
+                this.bossList[index].name = Randomizer.Rand();
+            }
+        }
+    };
+
+    static Route = class {
+        constructor(route) {
+            this.land = route.pokemon.land;
+            this.water = route.pokemon.water;
+            this.headbutt = route.pokemon.headbutt;
+            this.special = route.pokemon.special;
+        }
+
+        toJSON() {
+            return {
+                land: this.land,
+                water: this.water,
+                headbutt: this.headbutt,
+                special: this.special.map(({pokemon}) => pokemon),
+            };
+        }
+
+        fromJSON(json) {
+            for (let section of ['land', 'water', 'headbutt'].filter(s => this[s].length)) {
+                if (JSON.stringify(json[section]) === JSON.stringify(this[section])) {
+                    for (let i = 0; i < this[section].length; i++) {
+                        this[section][i] = Randomizer.Rand();
+                    }
+                } else {
+                    for (let i = 0; i < this[section].length; i++) {
+                        this[section][i] = i < json[section].length
+                            ? json[section][i]
+                            : Randomizer.Rand();
+                    }
+                }
+            }
+
+            if (this.special.length > 0) {
+                if (JSON.stringify(json.special) === JSON.stringify(this.toJSON().special)) {
+                    this.special.forEach(({pokemon}) => {
+                        for (let i = 0; i < pokemon.length; i++) {
+                            pokemon[i] = Randomizer.Rand();
+                        }
+                    });
+                } else {
+                    this.special.forEach(({pokemon}, i) => {
+                        for (let j = 0; j < pokemon.length; j++) {
+                            pokemon[j] = j < json.special.length
+                                ? json.special[i][j]
+                                : Randomizer.Rand();
+                        }
+                    });
+                }
+            }
+        }
+    }
 }
