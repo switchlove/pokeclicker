@@ -506,7 +506,7 @@ ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Wh
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new DungeonShinyRequirement('Tin Tower'));
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 27), new DungeonShinyRequirement('Dark Cave'));
+ChallengeRequirements.set(TownList['Tohjo Falls'], new DungeonShinyRequirement('Dark Cave'));
 //#endregion
 //#region Hoenn
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));

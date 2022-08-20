@@ -1053,54 +1053,20 @@ async function dungeonBot() {
 }
 
 async function gymBot() {
-    if (App.game.gameState == 6) {
-        var gymsFound = 0;
-        var gymAtX = 0;
-        var townContent = player.town().content;
-        for (let x = 0; x < townContent.length; x++) {
-            if (townContent[x].leaderName != null ) {
-                gymsFound++;
-                gymAtX = x;
-            }
-        }
-
-        if (gymsFound == 1) {
-            if (townContent[gymAtX].isUnlocked() == true) {
-                switch(Settings.getSetting('gymOpts').observableValue()) {
-                    case "gymOptC":
-                        if ((townContent[gymAtX].clears() || 0) < Number(Settings.getSetting('maxClears').observableValue())) {
-                            GymRunner.startGym(townContent[gymAtX]);
-                        }
-                        break;
-                    case "gymOptN":
-                        GymRunner.startGym(townContent[gymAtX]);
-                }
-            }
-        } else if (gymsFound > 1) {
-            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
-            if (townContent[pickE4 - 1].isUnlocked() == true) {
-                switch (pickE4) {
-                    case "1":
-                        GymRunner.startGym(townContent[0]);
-                        break;
-                    case "2":
-                        GymRunner.startGym(townContent[1]);
-                        break;
-                    case "3":
-                        GymRunner.startGym(townContent[2]);
-                        break;
-                    case "4":
-                        GymRunner.startGym(townContent[3]);
-                        break;
-                    case "5":
-                        GymRunner.startGym(townContent[4]);
-                        break;
-                    default:
-                        GymRunner.startGym(townContent[0]);
-                }
-            }
-        }
+    if (App.game.gameState != GameConstants.GameState.town) {
+        return;
     }
+
+    const opts = Settings.getSetting('gymOpts').value;
+    const gyms = player.town().content.filter(c => c instanceof Gym && c.isUnlocked());
+    const idx = Settings.getSetting('gymE4Opts').value -1;
+    const gym = gyms[idx] || gyms[0];
+
+    if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
+        return;
+    }
+    
+    GymRunner.startGym(gym);
 }
 
 async function safariBot() {
