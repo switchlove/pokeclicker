@@ -30,6 +30,13 @@ Game.prototype.initialize = function() {
         return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
     };
 
+    //Move to Region
+    const pokeballToUse = Pokeballs.prototype.calculatePokeballToUse;
+    Pokeballs.prototype.calculatePokeballToUse = eval(pokeballToUse.toString()
+        .replace('calculatePokeballToUse', 'function')
+        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)')
+    );
+
     this.randomizer = new Randomizer();
     gameInitialize.call(this);
 
