@@ -9,7 +9,11 @@ Game.prototype.initialize = function() {
 
     //Pokedex List
     const pokedexList = PokedexHelper.getList;
-    PokedexHelper.getList = eval(pokedexList.toString().replace('getList()', '() =>').replace('nativeRegion > GameConstants.MAX_AVAILABLE_REGION || ', ''));
+    PokedexHelper.getList = eval(pokedexList.toString()
+        .replace('getList()', '() =>')
+        .replace('if (nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none) {return false;}', '')
+        .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
+    );
 
     //Move to Region
     MapHelper.ableToTravel = function() {
