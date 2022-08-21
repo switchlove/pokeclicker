@@ -1,5 +1,5 @@
 {
-    "version": "0.0.8b",
+    "version": "0.0.8c",
     "files": [
         "scripts/randomizer.js",
         "scripts/modules.min.js",
