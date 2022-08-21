@@ -9,7 +9,11 @@ Game.prototype.initialize = function() {
 
     //Pokedex List
     const pokedexList = PokedexHelper.getList;
-    PokedexHelper.getList = eval(pokedexList.toString().replace('getList()', '() =>').replace('nativeRegion > GameConstants.MAX_AVAILABLE_REGION || ', ''));
+    PokedexHelper.getList = eval(pokedexList.toString()
+        .replace('getList()', '() =>')
+        .replace('if (nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none) {return false;}', '')
+        .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
+    );
 
     //Move to Region
     MapHelper.ableToTravel = function() {
@@ -26,8 +30,21 @@ Game.prototype.initialize = function() {
         return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
     };
 
+    //Move to Region
+    const pokeballToUse = Pokeballs.prototype.calculatePokeballToUse;
+    Pokeballs.prototype.calculatePokeballToUse = eval(pokeballToUse.toString()
+        .replace('calculatePokeballToUse', 'function')
+        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)')
+    );
+
     this.randomizer = new Randomizer();
     gameInitialize.call(this);
+
+    //Tutoral Quest
+    const catch5Pidgey = App.game.quests.getQuestLine('Tutorial Quests').quests()[6];
+    const R1Pokemon = App.game.randomizer.routes[Routes.getName(1,GameConstants.Region.kanto)].land[0];
+    catch5Pidgey.customDescription = catch5Pidgey.customDescription.replace('Pidgey', R1Pokemon);
+    catch5Pidgey.focus = () => App.game.statistics.pokemonCaptured[PokemonHelper.getPokemonByName(R1Pokemon).id]();
 };
 
 class Randomizer {
