@@ -32,10 +32,10 @@ Game.prototype.initialize = function() {
 
     //Move to Region
     const pokeballToUse = Pokeballs.prototype.calculatePokeballToUse;
-    Pokeballs.prototype.calculatePokeballToUse = eval(pokeballToUse.toString()
+    const customToUse = pokeballToUse.toString()
         .replace('calculatePokeballToUse', 'function')
-        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)')
-    );
+        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)');
+    Pokeballs.prototype.calculatePokeballToUse = eval(`(${customToUse})`);
 
     this.randomizer = new Randomizer();
     gameInitialize.call(this);
@@ -107,12 +107,12 @@ class Randomizer {
 
     //TODO: make a randomisation system...
     static Rand() {
-		var availableMons = pokemonList.filter(poke => !rolledMons.includes(poke.name));
-		var rolledMon = Rand.fromArray(availableMons).name;
-		rolledMons.push(rolledMon);
-		if(rolledMons.length == pokemonList.length){
-			rolledMons = [];
-		}
+        var availableMons = pokemonList.filter(poke => !rolledMons.includes(poke.name));
+        var rolledMon = Rand.fromArray(availableMons).name;
+        rolledMons.push(rolledMon);
+        if (rolledMons.length == pokemonList.length) {
+            rolledMons = [];
+        }
         return rolledMon;
     }
 
