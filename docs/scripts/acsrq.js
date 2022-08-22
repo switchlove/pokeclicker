@@ -67,7 +67,7 @@ window.addEventListener('load', () => {
 
     setInterval(function(){
         if (clickEngagedD){
-            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true){
+            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true && DungeonRunner.fightingLootEnemy() != true){
                 dungeonBot();
             }
         }
