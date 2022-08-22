@@ -77,7 +77,7 @@ window.addEventListener('load', () => {
 
     setInterval(function(){
         if (clickEngagedD){
-            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true){
+            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true && DungeonRunner.fightingLootEnemy() != true){
                 dungeonBot();
             }
         }
@@ -1065,7 +1065,7 @@ async function gymBot() {
     if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
         return;
     }
-    
+
     GymRunner.startGym(gym);
 }
 
