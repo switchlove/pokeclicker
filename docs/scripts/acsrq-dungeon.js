@@ -1,4 +1,13 @@
-window.addEventListener('load', () => setTimeout(() => dungeonBot.interval = setInterval(dungeonBot, 100), 100));
+window.addEventListener('load', () => {
+    setTimeout(() => dungeonBot.interval = setInterval(dungeonBot, 100), 100);
+
+    // Reset boss position
+    const initializeDungeon = DungeonRunner.initializeDungeon;
+    DungeonRunner.initializeDungeon = function (dungeon) {
+        initializeDungeon.call(this, dungeon);
+        dungeonBot.boss == undefined;
+    };
+});
 
 function dungeonBot() {
     if (!clickEngagedD || !dungeonBot.isRunning()) {
@@ -68,6 +77,7 @@ dungeonBot.isRunning = ko.pureComputed(() => {
             return true;
     }
 });
+
 
 // async function dungeonBot() {
 //     } else if ( DungeonRunner.timeLeft() != -10 && DungeonRunner.dungeonFinished() != true) {
