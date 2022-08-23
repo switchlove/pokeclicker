@@ -1,9 +1,11 @@
 {
-    "version": "0.0.14c",
+    "version": "0.0.14d",
     "files": [
         "scripts/acsrq.js",
-        "scripts/acsrq-movement.js",
         "scripts/acsrq-ui.js",
+        "scripts/acsrq-chalenges/index.js",
+        "scripts/acsrq-chalenges/acsrq-breeding.js",
+        "scripts/acsrq-chalenges/acsrq-movement.js",
         "scripts/modules.min.js",
         "scripts/script.min.js",
         "index.html"
