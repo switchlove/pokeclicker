@@ -57,10 +57,18 @@ function dungeonBot() {
     }
 
     //Go to boss tile once everything is finished (or boss rush was enabled after the boss tile was found)
-    if (dungeonBot.boss && Settings.getSetting('botRush').value
-        || DungeonRunner.map.board().every(row => row.every(tile => tile.isVisited))) {
-        DungeonRunner.map.moveToTile(dungeonBot.boss);
-        return DungeonRunner.handleClick();
+    if (dungeonBot.boss && (Settings.getSetting('botRush').value || DungeonRunner.map.board().every(row => row.every(tile => tile.isVisited)))) {
+        if (DungeonRunner.map.hasAccessToTile(dungeonBot.boss)) {
+            DungeonRunner.map.moveToTile(dungeonBot.boss);
+            return DungeonRunner.handleClick();
+        }
+
+        for (let y = dungeonBot.boss.y; y <= max; y++) {
+            let pos = {x:dungeonBot.boss.x, y:y};
+            if (DungeonRunner.map.hasAccessToTile(pos)) {
+                return DungeonRunner.map.moveToTile(pos);
+            }
+        }
     }
 
     //Movement algorythme
@@ -95,3 +103,16 @@ dungeonBot.isRunning = ko.pureComputed(() => {
             return true;
     }
 });
+
+const showAllTiles = DungeonMap.prototype.showAllTiles;
+DungeonMap.prototype.showAllTiles = function () {
+    showAllTiles.call(this);
+
+    for (let y = 0; y < DungeonRunner.map.size; y++) {
+        for (let x = 0; x < DungeonRunner.map.size; x++) {
+            if (this.board()[y][x].type() == GameConstants.DungeonTile.boss) {
+                dungeonBot.boss = {x, y};
+            }
+        }
+    }
+};
