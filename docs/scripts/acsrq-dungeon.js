@@ -10,7 +10,7 @@ window.addEventListener('load', () => {
 });
 
 function dungeonBot() {
-    if (!clickEngagedD || !dungeonBot.isRunning()) {
+    if (!DungeonRunner.map || !clickEngagedD || !dungeonBot.isRunning()) {
         return;
     }
 
