@@ -64,3 +64,19 @@ BreedingController.visible = eval(`(${
         .replace('visible', 'function')
         .replace('partyPokemon.level < 100', 'partyPokemon.level < (App.game?.challenges.list.noBreeding?.active() ? 40 : 100)')
 })`);
+
+const party = Party.prototype.constructor;
+Party = class extends party {
+    constructor(multiplier) {
+        super(multiplier);
+
+        this.hasMaxLevelPokemon = ko.pureComputed(() => {
+            for (let i = 0; i < this.caughtPokemon.length; i++) {
+                if (this.caughtPokemon[i].level >= (App.game?.challenges.list.noBreeding?.active() ? 40 : 100)) {
+                    return true;
+                }
+            }
+            return false;
+        }).extend({rateLimit: 1000});
+    }
+};
