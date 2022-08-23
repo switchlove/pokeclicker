@@ -300,19 +300,19 @@ async function a6settings() {
         }
     }
 
-    getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
-        rVer = data.version;
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
-    }).catch(error => {
-        console.error(error);
-    });
+    // getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
+    //     rVer = data.version;
+    //     document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
+    // }).catch(error => {
+    //     console.error(error);
+    // });
 
-    getJSON("./acsrq.json").then(data => {
-        lVer = data.version;
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
-    }).catch(error => {
-        console.error(error);
-    });
+    // getJSON("./acsrq.json").then(data => {
+    //     lVer = data.version;
+    //     document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
+    // }).catch(error => {
+    //     console.error(error);
+    // });
 
     if (rVer != lVer) {
         document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
