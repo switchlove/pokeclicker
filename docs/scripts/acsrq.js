@@ -1677,40 +1677,9 @@ async function autoBreed() {
         if(Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'attack'){
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
-            let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                if (partyPokemon.breeding || partyPokemon.level < 100) {
+            let filteredEggList = sortededHatcheryList.filter(partyPokemon => {
+                if (!BreedingController.visible(partyPokemon)()) {
                     return false;
-                }
-                if (!BreedingFilters.search.value().test(partyPokemon.name)) {
-                    return false;
-                }
-                if (BreedingFilters.category.value() >= 0) {
-                    if (partyPokemon.category !== BreedingFilters.category.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.shinyStatus.value() >= 0) {
-                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.region.value() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
-                        return false;
-                    }
-                }
-                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
-                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
-                if (type1 !== null || type2 !== null) {
-                    const { type: types } = pokemonMap[partyPokemon.name];
-                    if ([type1, type2].includes(PokemonType.None)) {
-                        const type = type1 == PokemonType.None ? type2 : type1;
-                        if (!BreedingController.isPureType(partyPokemon, type)) {
-                            return false;
-                        }
-                    } else if ((type1 !== null && !types.includes(type1)) || (type2 !== null && !types.includes(type2))) {
-                        return false;
-                    }
                 }
                 if(Settings.getSetting('breedingOpts').observableValue() == 'attack') {
                     var breedAtk = Settings.getSetting('minBreedAttack').observableValue();

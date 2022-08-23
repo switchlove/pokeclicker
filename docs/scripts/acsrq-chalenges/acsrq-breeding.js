@@ -57,3 +57,10 @@ PartyPokemon.prototype.calculateEVAttackBonus = function() {
         return (this.evs() < 50) ? (1 + 0.01 * this.evs()) : (1 + Math.min(1, Math.pow((this.evs() - 30),0.075) - 0.75));
     }
 };
+
+//Allow breeding from level 40
+BreedingController.visible = eval(`(${
+    BreedingController.visible.toString()
+        .replace('visible', 'function')
+        .replace('partyPokemon.level < 100', 'partyPokemon.level < (App.game?.challenges.list.noBreeding?.active() ? 40 : 100)')
+})`);
