@@ -936,7 +936,7 @@ async function gymBot() {
     if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
         return;
     }
-    
+
     GymRunner.startGym(gym);
 }
 
