@@ -532,6 +532,7 @@ ChallengeRequirements.add(GymList['Fortree City'], new ItemsRequirement(ItemList
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 120), new GymBadgeRequirement(BadgeEnums.Feather));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 123), new DungeonShinyRequirement('Mt. Pyre'));
 ChallengeRequirements.set(TownList['Magma Hideout'], new RouteShinyRequirement(GameConstants.Region.hoenn, 123));
+ChallengeRequirements.set(TownList['Lilycove City'], new DungeonShinyRequirement('Magma Hideout'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 125), new RouteShinyRequirement(GameConstants.Region.hoenn, 126));
 ChallengeRequirements.set(TownList['Mossdeep City'], new DungeonShinyRequirement('Shoal Cave'));
 ChallengeRequirements.add(GymList['Mossdeep City'], new ItemsRequirement(ItemList.Beldum, ItemList.Prism_scale, ItemList.Upgrade));
