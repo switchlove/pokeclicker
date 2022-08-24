@@ -11,7 +11,7 @@ Game.prototype.initialize = function() {
     const pokedexList = PokedexHelper.getList;
     PokedexHelper.getList = eval(pokedexList.toString()
         .replace('getList()', '() =>')
-        .replace('if (nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none) {return false;}', '')
+        .replace('(nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none)', '(false)')
         .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
     );
 
