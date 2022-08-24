@@ -7,36 +7,6 @@ Game.prototype.initialize = function() {
         App.game.party.gainPokemonById(pokemon.id, true, true);
     };
 
-    //Pokedex List
-    const pokedexList = PokedexHelper.getList;
-    PokedexHelper.getList = eval(pokedexList.toString()
-        .replace('getList()', '() =>')
-        .replace('(nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none)', '(false)')
-        .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
-    );
-
-    //Move to Region
-    MapHelper.ableToTravel = function() {
-        var a, b;
-        // If player already reached highest region, they can't move on
-        if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
-            return false;
-        }
-        // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
-        if (!App.game.challenges.list.requireCompletePokedex.active()) {
-            return (b = (a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || a === void 0 ? void 0 : a.isUnlocked()) !== null && b !== void 0 ? b : false;
-        }
-        // Check if Champion of Region
-        return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
-    };
-
-    //Move to Region
-    const pokeballToUse = Pokeballs.prototype.calculatePokeballToUse;
-    const customToUse = pokeballToUse.toString()
-        .replace('calculatePokeballToUse', 'function')
-        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)');
-    Pokeballs.prototype.calculatePokeballToUse = eval(`(${customToUse})`);
-
     this.randomizer = new Randomizer();
     gameInitialize.call(this);
 
@@ -282,3 +252,40 @@ class Randomizer {
         }
     }
 }
+
+//Pokedex List
+PokedexHelper.getList =  eval(`(${
+    PokedexHelper.getList.toString()
+        .replace('getList()', '() =>')
+        .replace('(nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none)', '(false)')
+        .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
+})`);
+
+//Move to Region
+MapHelper.ableToTravel = function() {
+    var a, b;
+    // If player already reached highest region, they can't move on
+    if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
+        return false;
+    }
+    // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
+    if (!App.game.challenges.list.requireCompletePokedex.active()) {
+        return (b = (a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || a === void 0 ? void 0 : a.isUnlocked()) !== null && b !== void 0 ? b : false;
+    }
+    // Check if Champion of Region
+    return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
+};
+
+//Move to Region
+Pokeballs.prototype.calculatePokeballToUse = eval(`(${
+    Pokeballs.prototype.calculatePokeballToUse.toString()
+        .replace('calculatePokeballToUse', 'function')
+        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)')
+})`);
+
+//Change default save name
+Save.download = eval(`(${
+    Save.download.toString()
+        .replace('download', 'function')
+        .replace('PokeClickerSave', 'PokeRandomSave')
+})`);
