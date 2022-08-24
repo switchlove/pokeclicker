@@ -4,6 +4,7 @@
         "scripts/acsrq.js",
         "scripts/acsrq-movement.js",
         "scripts/acsrq-ui.js",
+        "scripts/acsrq-dungeon.js",
         "scripts/modules.min.js",
         "scripts/script.min.js",
         "index.html"
