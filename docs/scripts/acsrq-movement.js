@@ -478,7 +478,7 @@ ChallengeRequirements.set(TownList['Pokémon Mansion'], new RouteShinyRequiremen
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 21), new QuestLineCompletedRequirement('Bill\'s Errand'));
 ChallengeRequirements.set(GymList['Viridian City'], new RouteShinyRequirement(GameConstants.Region.kanto, 21));
 // Sevii 123
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 26), new QuestLineStepCompletedRequirement('Bill\'s Errand', GameConstants.Region.kanto));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 26), new QuestLineStepCompletedRequirement('Bill\'s Errand', 0));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 27), new RouteShinyRequirement(GameConstants.Region.kanto, 26));
 ChallengeRequirements.set(TownList['Two Island'], new DungeonShinyRequirement('Mt. Ember Summit'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 28), new QuestLineStepCompletedRequirement('Bill\'s Errand', 1));
@@ -507,6 +507,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new D
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
 ChallengeRequirements.set(TownList['Tohjo Falls'], new DungeonShinyRequirement('Dark Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 28), new QuestLineCompletedRequirement('Unfinished Business'));
 //#endregion
 //#region Hoenn
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));
