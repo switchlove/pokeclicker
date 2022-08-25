@@ -9,15 +9,7 @@ window.addEventListener('load', () => {
     // execute once save is fully loaded
     const gameStart = Game.prototype.start;
     Game.prototype.start = function() {
-        //#region Subscriptions
-        //reset bot state when bot are disabled
-        Settings.getSetting('botOptions').observableValue.subscribe((value) => {
-            if (!value) {
-                Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
-            }
-        });
-
-        //Disable/Enable event
+        //Disable/Enable event - need game to be fully loaded before triggering
         Settings.getSetting('disEvent').observableValue.subscribe((disable) => {
             for (let event of SpecialEvents.events) {
                 if (disable && event.hasStarted()) {
@@ -39,7 +31,6 @@ window.addEventListener('load', () => {
                 this.status = 2;
             }
         };
-        //#endregion
 
         gameStart.call(this);
     };
@@ -94,9 +85,11 @@ Settings.add(new Setting('srOpts', 'Soft Reset Type', [
     new SettingOption('Shop Mon', 'poke'),
     new SettingOption('Regular Eggs', 'egg'),
 ], 'none'));
-Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item',
-    Object.values(ItemList).filter(i => i instanceof EvolutionStone).map(e => new SettingOption(e.displayName, e.name)),
-    'Water_stone'));
+Settings.add(new RangeSetting('maxEggs', 'Max Eggs', 1, 4, 1, 1));
+Settings.add(new Setting('evoOpts', 'Soft Reset Evo Item', [
+    new SettingOption('All', ''),
+    ...Object.values(ItemList).filter(i => i instanceof EvolutionStone).map(e => new SettingOption(e.displayName, e.name)),
+], ''));
 Settings.add(new Setting('breedingOpts', 'Breeding options',[
     new SettingOption('None', 'none'),
     new SettingOption('Upto Attack', 'attack'),
@@ -113,9 +106,10 @@ Settings.add(new Setting('typedEggOpts', 'Typed egg to use', [
     new SettingOption('Fighting', 'fighting'),
     new SettingOption('Dragon', 'dragon'),
 ], 'fire'));
-Settings.add(new Setting('fossilOpts', 'Fossil to use',
-    UndergroundItems.list.filter(i => i.valueType == UndergroundItemValueType.Fossil).map(f => new SettingOption(f.displayName, f.name)),
-    'Dome Fossil'));
+Settings.add(new Setting('fossilOpts', 'Fossil to use',[
+    new SettingOption('All', ''),
+    ...UndergroundItems.list.filter(i => i.valueType == UndergroundItemValueType.Fossil).map(f => new SettingOption(f.displayName, f.name)),
+], ''));
 Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
     new SettingOption('None', GameConstants.Pokeball.None),
@@ -139,6 +133,28 @@ Settings.add(new BooleanSetting('botstate.bf', 'BF Bot', false));
 Settings.add(new BooleanSetting('botstate.sr', 'SR Bot', false));
 Settings.add(new Setting('botstate.plant', 'Plant Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
 Settings.add(new Setting('botstate.mutate', 'Mutate Bot', [new SettingOption('N/A', 'N/A')], 'N/A'));
+//#endregion
+
+//#region Settings Subscriptions
+//reset bot state when bot are disabled
+Settings.getSetting('botOptions').observableValue.subscribe((value) => {
+    if (!value) {
+        Settings.list.filter(s => s.name.startsWith('botstate.')).forEach(s => s.set(s.defaultValue));
+    }
+});
+
+//srBot
+Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
+    clickEngagedSR = +value;
+
+    if (!value) {
+        localSettings({key:'', state: 0});
+    } else {
+        Settings.setSettingByName('disableSave', true);
+    }
+
+    localStorage.setItem(`settings${Save.key}`, JSON.stringify(Settings.toJSON()));
+});
 //#endregion
 
 //#region Info / Bot menu
@@ -234,7 +250,7 @@ acsrqInfo = function () {
         acsrqInfo.Checkbox('botstate.dungeon', 'App.game.keyItems.hasKeyItem(KeyItemType.Dungeon_ticket)', '!player.route() && player.town()?.dungeon'),
         acsrqInfo.Checkbox('botstate.gym', true, '!player.route() && player.town()?.content?.find(c => c instanceof Gym)'),
         acsrqInfo.Checkbox('botstate.safari', 'App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)', 'Safari.inProgress()'),
-        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked()'),
+        acsrqInfo.Checkbox('botstate.sr','TownList[\'Route 3 Pokémon Center\'].isUnlocked() || App.game.breeding.canAccess()'),
         `<tr>${acsrqInfo.Row(
             'Pokeball',
             `<knockout data-bind="
@@ -413,6 +429,7 @@ acsrqSettings = function () {
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'fos\''),
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'evoOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
                 acsrqSettings.Number('evoItemCount', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
+                acsrqSettings.Range('maxEggs', '[\'fos\', \'egg\'].includes(Settings.getSetting(\'srOpts\').observableValue())'),
             ], false),
     ];
     $('#settingsModal .nav-tabs')[0].insertAdjacentHTML('beforeend', '<li class="nav-item" data-bind="visible: Settings.getSetting(\'botOptions\').observableValue"><a class="nav-link" href="#settings-acsrq-script" data-toggle="tab">ACSRQ Scripting</a></li>');
@@ -430,6 +447,12 @@ acsrqSettings.Number = (setting, visible = true) => `
                 data-bind="value: $data.observableValue(), attr: {name}"
                 onchange="Settings.setSettingByName(this.name, this.value)"/>
         </td>
+    </tr>
+`;
+
+acsrqSettings.Range = (setting, visible = true) => `
+    <tr data-bind="visible: ${visible}">
+        <td colspan="2" data-bind="template: { name: 'RangeSettingTemplate', data: Settings.getSetting('${setting}')}">
     </tr>
 `;
 
@@ -635,4 +658,19 @@ DungeonRunner.initializeDungeon = function(dungeon) {
         });
     }, 1);
 };
+//#endregion
+
+//#region BreedingSearchFilter
+Settings.add(new Setting('breedingSearchFilter', 'breedingSearchFilter', [], ''));
+
+Settings.getSetting('breedingSearchFilter').observableValue.subscribe((newValue) => {
+    const field = document.querySelector('#breeding-filter > div.form-group.col-md-6.col-6 > input');
+    if (`/(${field.value})/i` != newValue) {
+        field.value = newValue.slice(1,-1);
+        BreedingFilters.search.value(new RegExp(newValue, 'i'));
+    }
+});
+BreedingFilters.search.value.subscribe((newValue) => {
+    Settings.getSetting('breedingSearchFilter').set(newValue.source);
+});
 //#endregion
