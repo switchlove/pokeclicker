@@ -16,6 +16,8 @@ var maxPhaseCount = 0;
 var moveBoss = 0;
 var mystSCount = 0;
 var started = 0;
+var lVer = '0.0.0';
+var rVer = '0.0.0';
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -27,6 +29,14 @@ Element.prototype.appendAfter = function (element) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+var getJSON = async url => {
+    const response = await fetch(url);
+    if(!response.ok)
+        throw new Error(response.statusText);
+    const data = response.json();
+    return data;
 }
 
 window.addEventListener('load', () => {
@@ -64,11 +74,6 @@ window.addEventListener('load', () => {
     }, 5000);
 
     setInterval(function(){
-        if (clickEngagedD){
-            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true){
-                dungeonBot();
-            }
-        }
         if (clickEngagedG){
             gymBot();
         }
@@ -174,28 +179,7 @@ async function a6settings() {
 
         //Dungeon Bot
         const dungeonCheck = document.getElementById('checkbox-botstate.dungeon');
-        const dungeon = player.town().dungeon;
-        const curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
-        if (!dungeonCheck.disabled && dungeonCheck.checked && curDT >= dungeon.tokenCost) {
-            switch (Settings.getSetting('dungeOpts').observableValue()) {
-                case 'dungOptN':
-                    dungeonClick(1);
-                    break;
-                case 'dungOptSC':
-                    dungeonClick(!DungeonRunner.dungeonCompleted(dungeon, true));
-                    break;
-                case 'dungOptC':
-                    dungeonClick(App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon.name)]() < Settings.getSetting('maxClears').observableValue());
-                    break;
-                case 'dungOptDT':
-                    dungeonClick(curDT >= Settings.getSetting('minDT').observableValue());
-                    break;
-                default:
-                    dungeonClick(0);
-            }
-        } else {
-            dungeonClick(0);
-        }
+        dungeonClick(!dungeonCheck.disabled && dungeonCheck.checked);
 
         //Gym Bot
         const gymCheck = document.getElementById('checkbox-botstate.gym');
@@ -245,6 +229,28 @@ async function a6settings() {
         if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
             mutateBot();
         }
+    }
+
+    getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
+        rVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    getJSON("./acsrq.json").then(data => {
+        lVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    if (rVer != lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#A93226';
+    } else if (rVer == lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#229954';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#229954';
     }
 }
 
@@ -873,159 +879,22 @@ function a6phases() {
     }
 }
 
-async function dungeonBot() {
-    if (App.game.gameState == 6) {
-        stage = 0;
-        started = 0;
-        chestOpened = 0;
-        if (App.game.wallet.currencies[GameConstants.Currency.dungeonToken]() >= DungeonRunner.dungeon.tokenCost) {
-            DungeonRunner.initializeDungeon(player.town().dungeon);
-        }
-    } else if ( DungeonRunner.timeLeft() != -10 && DungeonRunner.dungeonFinished() != true) {
-        for (let aa = 0; aa < DungeonRunner.map.board().length; aa++) {
-            for (let bb = 0; bb < DungeonRunner.map.board()[aa].length; bb++) {
-                var cellType = DungeonRunner.map.board()[aa][bb].type();
-                if (cellType == 4) {
-                    bossA = aa;
-                    bossB = bb;
-                }
-            }
-        }
-        var pX = DungeonRunner.map.playerPosition().x;
-        var pY = DungeonRunner.map.playerPosition().y;
-        if ( Settings.getSetting('botRush').observableValue() == true) {
-            if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(DungeonRunner.dungeon.name)]() >= 200) {
-                if (Math.abs(DungeonRunner.map.playerPosition().y - bossA) <= 1) {
-                    if (pX == bossB) {
-                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (Math.abs(DungeonRunner.map.playerPosition().x - bossB) <= 1) {
-                    if (pY == bossA) {
-                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                        await DungeonRunner.handleClick();
-                    }
-                }
-            }
-            if (pX == bossB && pY == bossA) {
-                await DungeonRunner.handleClick();
-            }
-        }
-        if ( Settings.getSetting('chestCollect').observableValue() == true) {
-            if (DungeonRunner.map.currentTile().type() == 3) {
-                if (chestOpened < Settings.getSetting('maxChests').observableValue()) {
-                    DungeonRunner.handleClick();
-                    chestOpened++
-                }
-            }
-        }
-        var dClears = App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]();
-        var dSize = player.region;
-
-        if (started == 0){
-            moveBoss = 0;
-            if (dClears < 10) {
-                dSize = player.region;
-                dMax = 4 + player.region;
-            } else if (dClears < 100) {
-                dSize = player.region - 1;
-                dMax = 4 + player.region - 1;
-            } else if (dClears < 1000) {
-                dSize = player.region - 2;
-                dMax = 4 + player.region - 2;
-            } else if (dClears < 10000) {
-                dSize = player.region - 3;
-                dMax = 4 + player.region - 3;
-            } else if (dClears < 100000) {
-                dSize = player.region - 4;
-                dMax = 4 + player.region - 4;
-            } else {
-                dSize = player.region - 5;
-                dMax = 4 + player.region - 5;
-            }
-            if (dSize < 0) {
-                dSize = 0;
-            }
-            if (dMax < 4) {
-                dMax = 4;
-            }
-            dMaxY = dMax;
-            if (pY == dMax) {
-                DungeonRunner.map.moveLeft();
-                if (pX == 0 && pY == dMax) {
-                    started = 1;
-                }
-            }
-        } else {
-            if (moveBoss == 1) {
-                if (pX == bossB && pY == bossA) {
-                    await DungeonRunner.handleClick();
-                }
-            } else {
-                DungeonRunner.map.moveRight();
-                if (pX == dMax && pY == dMaxY) {
-                    await DungeonRunner.map.moveToCoordinates(0,dMaxY);
-                    await DungeonRunner.map.moveUp();
-                    dMaxY = dMaxY - 1;
-                } else if (pX == dMax && pY == 0) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    moveBoss = 1;
-                }
-            }
-        }
-    }
-}
 
 async function gymBot() {
-    if (App.game.gameState == 6) {
-        var gymsFound = 0;
-        var gymAtX = 0;
-        var townContent = player.town().content;
-        for (let x = 0; x < townContent.length; x++) {
-            if (townContent[x].leaderName != null ) {
-                gymsFound++;
-                gymAtX = x;
-            }
-        }
-
-        if (gymsFound == 1) {
-            if (townContent[gymAtX].isUnlocked() == true) {
-                switch(Settings.getSetting('gymOpts').observableValue()) {
-                    case "gymOptC":
-                        if ((townContent[gymAtX].clears() || 0) < Number(Settings.getSetting('maxClears').observableValue())) {
-                            GymRunner.startGym(townContent[gymAtX]);
-                        }
-                        break;
-                    case "gymOptN":
-                        GymRunner.startGym(townContent[gymAtX]);
-                }
-            }
-        } else if (gymsFound > 1) {
-            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
-            if (townContent[pickE4 - 1].isUnlocked() == true) {
-                switch (pickE4) {
-                    case "1":
-                        GymRunner.startGym(townContent[0]);
-                        break;
-                    case "2":
-                        GymRunner.startGym(townContent[1]);
-                        break;
-                    case "3":
-                        GymRunner.startGym(townContent[2]);
-                        break;
-                    case "4":
-                        GymRunner.startGym(townContent[3]);
-                        break;
-                    case "5":
-                        GymRunner.startGym(townContent[4]);
-                        break;
-                    default:
-                        GymRunner.startGym(townContent[0]);
-                }
-            }
-        }
+    if (App.game.gameState != GameConstants.GameState.town) {
+        return;
     }
+
+    const opts = Settings.getSetting('gymOpts').value;
+    const gyms = player.town().content.filter(c => c instanceof Gym && c.isUnlocked());
+    const idx = Settings.getSetting('gymE4Opts').value -1;
+    const gym = gyms[idx] || gyms[0];
+
+    if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
+        return;
+    }
+
+    GymRunner.startGym(gym);
 }
 
 async function safariBot() {
@@ -1309,7 +1178,7 @@ async function mutateBot() {
     const selectedBerry = Settings.getSetting('botstate.mutate').value;
     plantLayout(mutationLayouts[selectedBerry]);
 
-    if (App.game.farming.plotList.some(p => p.berry != -1 && 
+    if (App.game.farming.plotList.some(p => p.berry != -1 &&
         (p.age >  p.berryData.growthTime[4] - 5 || p.berry == BerryType[selectedBerry] &&  p.age > p.berryData.growthTime[3])
     )) {
         App.game.farming.harvestAll();
