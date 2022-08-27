@@ -111,7 +111,7 @@ srBot.fos = function() {
         const option = new RegExp(Settings.getSetting('fossilOpts').value);
         const fosItems = Object.keys(GameConstants.FossilToPokemon)
             .map(f => player.mineInventory().find(i => i.name == f))
-            .filter((v) => v && option.test(v.name) && v.amount());
+            .filter((v) => v && option.test(v.name) && v.amount() && PartyController.getCaughtStatusByName(GameConstants.FossilToPokemon[v.name]) < CaughtStatus.CaughtShiny);
 
         if (!fosItems.length) {
             return;
