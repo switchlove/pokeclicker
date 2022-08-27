@@ -22,6 +22,7 @@ function srBot() {
     }
 
     srCount = localLocal[6][2] ?? 0;
+    sessionStorage.removeItem('reload');
     srBot[Settings.getSetting('srOpts').value]?.();
 
     localSettings({...localSettings()});
@@ -95,6 +96,8 @@ srBot.mys = function () {
         ItemList.Mystery_egg.use();
         if (App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true)) {
             console.log(`Already have - ${App.game.breeding.eggList[0]().pokemon} - Shiny: ${true}`);
+            localSettings({ ...localSettings(), key: Save.key });
+            sessionStorage.setItem('reload', true);
             return location.reload();
         }
     }
