@@ -118,8 +118,12 @@ srBot.fos = function() {
         }
 
         const max = Settings.getSetting('maxEggs').value - 1;
-        while (fosItems.length && App.game.breeding.eggList[max]().type < 0) {
-            Underground.sellMineItem(fosItems.shift().id);
+        while (fosItems.length && fosItems[0].amount() && App.game.breeding.eggList[max]().type < 0) {
+            Underground.sellMineItem(
+                !!Settings.getSetting('fossilOpts').value
+                    ? fosItems[0].id
+                    : fosItems.shift().id
+            );
         }
     }
     return srBot.hatch();
@@ -166,11 +170,12 @@ srBot.hatch = function () {
 
     localSettings().state = 1;
     console.log(`Hatching - ${egg.pokemon} - Shiny: ${shiny}`);
-    localLocal[6][1] = egg.pokemon;
-    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-    App.game.breeding.hatchPokemonEgg(0);
+    while (App.game.breeding.eggList[0]().pokemon == egg.pokemon) {
+        App.game.breeding.hatchPokemonEgg(0);
+    }
 
-    return srBot.log(localLocal[6][1]);
+    localLocal[6][1] = egg.pokemon;
+    return srBot.log(egg.pokemon);
 };
 
 srBot.log = function (pokeName, ...msgs) {
