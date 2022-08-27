@@ -104,7 +104,7 @@ function main() {
             a6settings();
         }, 1500);
     } else {
-        if (localSettings().state) {
+        if (localSettings().state || !!sessionStorage.getItem('reload')) {
             $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
