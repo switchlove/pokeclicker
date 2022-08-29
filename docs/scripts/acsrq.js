@@ -1,4 +1,4 @@
-var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, evoName, evoUsed, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phases, phaseVal, save, saveKey, saveLoaded, smnName, smnUsed;
+var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phases, phaseVal, save, saveKey, saveLoaded;
 
 var bossA = 0;
 var bossB = 0;
@@ -16,6 +16,8 @@ var maxPhaseCount = 0;
 var moveBoss = 0;
 var mystSCount = 0;
 var started = 0;
+var lVer = '0.0.0';
+var rVer = '0.0.0';
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
@@ -29,6 +31,14 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+var getJSON = async url => {
+    const response = await fetch(url);
+    if(!response.ok)
+        throw new Error(response.statusText);
+    const data = response.json();
+    return data;
+}
+
 window.addEventListener('load', () => {
     setTimeout(() => {
         main();
@@ -37,16 +47,14 @@ window.addEventListener('load', () => {
         }, 500);
     }, 1000);
 
-    setInterval(function(){
-        if (Settings.getSetting('disableSave').observableValue() == true) {
-            Save.counter = 0;
-            window.onbeforeunload = [];
-        } else {
-            window.onbeforeunload = function () {
-                Save.store(player);
-            };
+    //#region PreventAutoSave
+    Game.prototype.save = function() {
+        player._lastSeen = Date.now();
+        if (!Settings.getSetting('disableSave').value) {
+            Save.store(player);
         }
-    }, 1000);
+    };
+    //#endregion
 
     setInterval(function(){
         if (Settings.getSetting('noWander').observableValue() == true) {
@@ -66,11 +74,6 @@ window.addEventListener('load', () => {
     }, 5000);
 
     setInterval(function(){
-        if (clickEngagedD){
-            if (DungeonRunner.map != undefined && Battle.catching() != true && DungeonRunner.fighting() != true && DungeonRunner.fightingLootEnemy != true){
-                dungeonBot();
-            }
-        }
         if (clickEngagedG){
             gymBot();
         }
@@ -84,14 +87,6 @@ window.addEventListener('load', () => {
             safariBot();
         }
     }, 250);
-
-    setTimeout(function(){
-        setInterval(function(){
-            if (clickEngagedSR){
-                srBot();
-            }
-        }, 3000);
-    }, 3000);
 });
 
 function main() {
@@ -101,33 +96,17 @@ function main() {
         a6menu();
         a6phases();
 
-        if (Settings.getSetting('botstate.sr').observableValue()) {
-            clickEngagedSR = 1;
-            localSettings[2] = 1;
-            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-        } else {
-            clickEngagedSR = 0;
-            srCount = 0;
-            localSettings[2] = 0;
-            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-            localLocal[6][1] = '';
-            localLocal[6][2] = '';
-            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-        }
-
         if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
             ballBot();
         }
 
-        setTimeout(function(){
+        setTimeout(() => {
             a6settings();
         }, 1500);
     } else {
-        if (localStorage.getItem('a6csrq-settings') != null) {
-            if (JSON.parse(localStorage.getItem('a6csrq-settings'))[2] == 1) {
-                Save.key = JSON.parse(localStorage.getItem('a6csrq-settings'))[1];
-                $(`[data-key="${Save.key}"]`)[1]?.click();
-            }
+        if (localSettings().state || !!sessionStorage.getItem('reload')) {
+            Game.prototype.computeOfflineEarnings = () => {};
+            $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
 }
@@ -174,20 +153,6 @@ function a6save() {
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
 
-    localSettings = ['','','',''];
-    settingKey = "a6csrq-settings";
-
-    if ( localStorage.getItem(settingKey) == null ) {
-        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-    } else {
-        localSettings = JSON.parse(localStorage.getItem(settingKey));
-    }
-
-    if (localSettings.length == 14) {
-        localSettings = localSettings.splice(9,1)[0];
-        localStorage.setItem(settingKey, JSON.stringify(localSettings));
-    }
-
     phases = [];
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -206,8 +171,6 @@ function a6menu() {
 }
 
 async function a6settings() {
-    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-
     if (Settings.getSetting('botOptions')?.observableValue()) {
         //Breeding Bot
         const breedingCheck = document.getElementById('checkbox-botstate.breeding');
@@ -217,28 +180,7 @@ async function a6settings() {
 
         //Dungeon Bot
         const dungeonCheck = document.getElementById('checkbox-botstate.dungeon');
-        const dungeon = player.town().dungeon;
-        const curDT = App.game.wallet.currencies[GameConstants.Currency.dungeonToken]();
-        if (!dungeonCheck.disabled && dungeonCheck.checked && curDT >= dungeon.tokenCost) {
-            switch (Settings.getSetting('dungeOpts').observableValue()) {
-                case 'dungOptN':
-                    dungeonClick(1);
-                    break;
-                case 'dungOptSC':
-                    dungeonClick(!DungeonRunner.dungeonCompleted(dungeon, true));
-                    break;
-                case 'dungOptC':
-                    dungeonClick(App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(dungeon.name)]() < Settings.getSetting('maxClears').observableValue());
-                    break;
-                case 'dungOptDT':
-                    dungeonClick(curDT >= Settings.getSetting('minDT').observableValue());
-                    break;
-                default:
-                    dungeonClick(0);
-            }
-        } else {
-            dungeonClick(0);
-        }
+        dungeonClick(!dungeonCheck.disabled && dungeonCheck.checked);
 
         //Gym Bot
         const gymCheck = document.getElementById('checkbox-botstate.gym');
@@ -288,6 +230,28 @@ async function a6settings() {
         if (!mutateSelect.disabled && mutateSelect.value != 'N/A') {
             mutateBot();
         }
+    }
+
+    getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
+        rVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    getJSON("./acsrq.json").then(data => {
+        lVer = data.version;
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
+    }).catch(error => {
+        console.error(error);
+    });
+
+    if (rVer != lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#A93226';
+    } else if (rVer == lVer) {
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#229954';
+        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#229954';
     }
 }
 
@@ -916,159 +880,22 @@ function a6phases() {
     }
 }
 
-async function dungeonBot() {
-    if (App.game.gameState == 6) {
-        stage = 0;
-        started = 0;
-        chestOpened = 0;
-        if (App.game.wallet.currencies[GameConstants.Currency.dungeonToken]() >= DungeonRunner.dungeon.tokenCost) {
-            DungeonRunner.initializeDungeon(player.town().dungeon);
-        }
-    } else if ( DungeonRunner.timeLeft() != -10 && DungeonRunner.dungeonFinished() != true) {
-        for (let aa = 0; aa < DungeonRunner.map.board().length; aa++) {
-            for (let bb = 0; bb < DungeonRunner.map.board()[aa].length; bb++) {
-                var cellType = DungeonRunner.map.board()[aa][bb].type();
-                if (cellType == 4) {
-                    bossA = aa;
-                    bossB = bb;
-                }
-            }
-        }
-        var pX = DungeonRunner.map.playerPosition().x;
-        var pY = DungeonRunner.map.playerPosition().y;
-        if ( Settings.getSetting('botRush').observableValue() == true) {
-            if (App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(DungeonRunner.dungeon.name)]() >= 200) {
-                if (Math.abs(DungeonRunner.map.playerPosition().y - bossA) <= 1) {
-                    if (pX == bossB) {
-                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                        await DungeonRunner.handleClick();
-                    }
-                }
-                if (Math.abs(DungeonRunner.map.playerPosition().x - bossB) <= 1) {
-                    if (pY == bossA) {
-                        await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                        await DungeonRunner.handleClick();
-                    }
-                }
-            }
-            if (pX == bossB && pY == bossA) {
-                await DungeonRunner.handleClick();
-            }
-        }
-        if ( Settings.getSetting('chestCollect').observableValue() == true) {
-            if (DungeonRunner.map.currentTile().type() == 3) {
-                if (chestOpened < Settings.getSetting('maxChests').observableValue()) {
-                    DungeonRunner.handleClick();
-                    chestOpened++
-                }
-            }
-        }
-        var dClears = App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]();
-        var dSize = player.region;
-
-        if (started == 0){
-            moveBoss = 0;
-            if (dClears < 10) {
-                dSize = player.region;
-                dMax = 4 + player.region;
-            } else if (dClears < 100) {
-                dSize = player.region - 1;
-                dMax = 4 + player.region - 1;
-            } else if (dClears < 1000) {
-                dSize = player.region - 2;
-                dMax = 4 + player.region - 2;
-            } else if (dClears < 10000) {
-                dSize = player.region - 3;
-                dMax = 4 + player.region - 3;
-            } else if (dClears < 100000) {
-                dSize = player.region - 4;
-                dMax = 4 + player.region - 4;
-            } else {
-                dSize = player.region - 5;
-                dMax = 4 + player.region - 5;
-            }
-            if (dSize < 0) {
-                dSize = 0;
-            }
-            if (dMax < 4) {
-                dMax = 4;
-            }
-            dMaxY = dMax;
-            if (pY == dMax) {
-                DungeonRunner.map.moveLeft();
-                if (pX == 0 && pY == dMax) {
-                    started = 1;
-                }
-            }
-        } else {
-            if (moveBoss == 1) {
-                if (pX == bossB && pY == bossA) {
-                    await DungeonRunner.handleClick();
-                }
-            } else {
-                DungeonRunner.map.moveRight();
-                if (pX == dMax && pY == dMaxY) {
-                    await DungeonRunner.map.moveToCoordinates(0,dMaxY);
-                    await DungeonRunner.map.moveUp();
-                    dMaxY = dMaxY - 1;
-                } else if (pX == dMax && pY == 0) {
-                    await DungeonRunner.map.moveToCoordinates(bossB,bossA);
-                    moveBoss = 1;
-                }
-            }
-        }
-    }
-}
 
 async function gymBot() {
-    if (App.game.gameState == 6) {
-        var gymsFound = 0;
-        var gymAtX = 0;
-        var townContent = player.town().content;
-        for (let x = 0; x < townContent.length; x++) {
-            if (townContent[x].leaderName != null ) {
-                gymsFound++;
-                gymAtX = x;
-            }
-        }
-
-        if (gymsFound == 1) {
-            if (townContent[gymAtX].isUnlocked() == true) {
-                switch(Settings.getSetting('gymOpts').observableValue()) {
-                    case "gymOptC":
-                        if ((townContent[gymAtX].clears() || 0) < Number(Settings.getSetting('maxClears').observableValue())) {
-                            GymRunner.startGym(townContent[gymAtX]);
-                        }
-                        break;
-                    case "gymOptN":
-                        GymRunner.startGym(townContent[gymAtX]);
-                }
-            }
-        } else if (gymsFound > 1) {
-            var pickE4 = Settings.getSetting('gymE4Opts').observableValue();
-            if (townContent[pickE4 - 1].isUnlocked() == true) {
-                switch (pickE4) {
-                    case "1":
-                        GymRunner.startGym(townContent[0]);
-                        break;
-                    case "2":
-                        GymRunner.startGym(townContent[1]);
-                        break;
-                    case "3":
-                        GymRunner.startGym(townContent[2]);
-                        break;
-                    case "4":
-                        GymRunner.startGym(townContent[3]);
-                        break;
-                    case "5":
-                        GymRunner.startGym(townContent[4]);
-                        break;
-                    default:
-                        GymRunner.startGym(townContent[0]);
-                }
-            }
-        }
+    if (App.game.gameState != GameConstants.GameState.town) {
+        return;
     }
+
+    const opts = Settings.getSetting('gymOpts').value;
+    const gyms = player.town().content.filter(c => c instanceof Gym && c.isUnlocked());
+    const idx = Settings.getSetting('gymE4Opts').value -1;
+    const gym = gyms[idx] || gyms[0];
+
+    if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
+        return;
+    }
+
+    GymRunner.startGym(gym);
 }
 
 async function safariBot() {
@@ -1201,321 +1028,6 @@ async function bfBot() {
                     BattleFrontierRunner.start();
                 }
         }
-    }
-}
-
-async function srBot() {
-    var srCount;
-    if (localLocal[6][2] != 0) {
-        srCount = localLocal[6][2];
-    } else {
-        srCount = 0;
-    }
-    localSettings[1] = Save.key;
-    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-    switch(Settings.getSetting('srOpts').observableValue()) {
-        case "mys":
-            if (ItemList.Mystery_egg.getCaughtStatus() != 2 ) {
-                if (localLocal[6][1] == '') {
-                    if (App.game.breeding.eggList[0]().type == -1 && player.itemList["Mystery_egg"]() > 0) {
-                        ItemList['Mystery_egg'].use();
-                        if(App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true) == true) {
-                            console.log( 'Already have - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                            location.reload();
-                        } else if (App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true) != true) {
-                            localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
-                            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        }
-                    }
-                } else if (localLocal[6][1] != '') {
-                    if (App.game.breeding.eggList[0]().type != -1) {
-                        if (App.game.breeding.eggList[0]().steps() < App.game.breeding.eggList[0]().totalSteps) {
-                            console.log( 'Waiting for steps - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                        }
-                        if (App.game.breeding.eggList[0]().steps() >= App.game.breeding.eggList[0]().totalSteps) {
-                            console.log( 'Hatching - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                            Save.store(player);
-                            setTimeout(function(){
-                                localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
-                                localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                                [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-                                if(App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) != true) {
-                                    srCount++;
-                                    localLocal[6][2] = srCount;
-                                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                                    console.log( 'SR Count: ' + srCount );
-                                    location.reload();
-                                } else {
-                                    console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
-                                    localLocal[6][1] = '';
-                                    localLocal[6][2] = 0;
-                                    localSettings[2] = 0;
-                                    srCount = 0;
-                                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                                    Save.store(player);
-                                }
-                            }, 1500);
-                        }
-                    }
-                }
-            }
-            break;
-        case "evo":
-            var evoUse = Settings.getSetting('evoOpts').observableValue();
-            var evoUseCount = Number(Settings.getSetting('evoItemCount').observableValue());
-            var evoList = PokemonHelper.getPokemonsWithEvolution(GameConstants.StoneType[evoUse]);
-            var evoDone = 0;
-            for (let x = 0; x < evoList.length; x++) {
-                if (evoList[x].evolutions.length > 1) {
-                    for (let y = 0; y < evoList[x].evolutions.length; y++) {
-                        if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-                            if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
-                                evoDone++;
-                            }
-                        }
-                    }
-                } else {
-                    if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[0].evolvedPokemon, true) != true && evoList[x].evolutions[0].isSatisfied()) {
-                        evoDone++;
-                    }
-                }
-            }
-            if (evoDone >= 1 ) {
-                if (player._itemList[evoUse]() >= 1) {
-                    evoLoop:
-                    for (let x = 0; x < evoList.length; x++) {
-                        for (let y = 0; y < evoList[x].evolutions.length; y++) {
-                            if (evoList[x].evolutions[y].stone == GameConstants.StoneType[evoUse]) {
-                                if ( App.game.party.alreadyCaughtPokemonByName(evoList[x].evolutions[y].evolvedPokemon, true) != true && evoList[x].evolutions[y].isSatisfied()) {
-                                    localLocal[6][1] = evoList[x].evolutions[y].evolvedPokemon;
-                                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                                    evoName = evoList[x].evolutions[y].evolvedPokemon;
-                                    player.itemList[evoUse](player.itemList[evoUse]() - 1);
-                                    ItemHandler.stoneSelected(evoUse);
-                                    ItemHandler.pokemonSelected(evoList[x].name);
-                                    ItemHandler.amountSelected(evoUseCount);
-                                    ItemHandler.useStones();
-                                    evoUsed = 1;
-                                    break evoLoop;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (evoUsed == 1) {
-                if (App.game.party.alreadyCaughtPokemonByName(evoName, true) != true) {
-                    srCount++;
-                    localLocal[6][2] = srCount;
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    console.log( '[FAILED] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
-                    location.reload();
-                } else {
-                    console.log( '[CAUGHT] :: ' + evoName + ' :: SR Count: ' + srCount + ' :: Stone: ' + evoUse + ' - Needed: ' + evoDone );
-                    localLocal[6][1] = '';
-                    localLocal[6][2] = 0;
-                    localSettings[2] = 0;
-                    srCount = 0;
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                    evoUsed = 0;
-                    evoName = '';
-                    Save.store(player);
-                }
-            }
-            break;
-        case "fos":
-            var fossilSR = Settings.getSetting('fossilOpts').observableValue();
-            var fossilDeets = player.mineInventory().find(i => i.name == fossilSR);
-            var fossilMon = GameConstants.FossilToPokemon[fossilSR];
-            if ( fossilDeets.amount() >= 1 ) {
-                if ( App.game.party.alreadyCaughtPokemonByName(fossilMon, true) != true ) {
-                    if (App.game.breeding.eggList[0]().type == -1) {
-                        Underground.sellMineItem(fossilDeets.id);
-                        localLocal[6][1] = fossilMon;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    }
-                }
-            }
-            if (App.game.breeding.eggList[0]().type != -1) {
-                if (App.game.breeding.eggList[0]().steps() < App.game.breeding.eggList[0]().totalSteps) {
-                    console.log( 'Waiting for steps - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                }
-                if (App.game.breeding.eggList[0]().steps() >= App.game.breeding.eggList[0]().totalSteps) {
-                    console.log( 'Hatching - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                    Save.store(player);
-                    setTimeout(function(){
-                        localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-                        if(App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) != true) {
-                            srCount++;
-                            localLocal[6][2] = srCount;
-                            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                            console.log( 'SR Count: ' + srCount );
-                            location.reload();
-                        } else {
-                            console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
-                            localLocal[6][1] = '';
-                            localLocal[6][2] = 0;
-                            localSettings[2] = 0;
-                            srCount = 0;
-                            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                            Save.store(player);
-                        }
-                    }, 1500);
-                }
-            }
-            break;
-        case "poke":
-            var shopA = player.town().content;
-            for (let x = 0; x < shopA.length; x++) {
-                if (shopA[x].constructor.name == 'Shop') {
-                    for (let y = 0; y < shopA[x].items.length; y++) {
-                        if (shopA[x].items[y].constructor.name == 'PokemonItem') {
-                            var sSName = shopA[x];
-                        }
-                    }
-                }
-            }
-            ShopHandler.showShop(sSName);
-            var smnList = ShopHandler.shopObservable().items;
-            var smnNeed = 0;
-            for (let x = 0; x < smnList.length; x++) {
-                if (smnList[x].imageDirectory == 'pokemonItem' && App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                    smnNeed++;
-                }
-            }
-            if (smnNeed >= 1 ) {
-                for (let x = 0; x < smnList.length; x++) {
-                    if (smnList[x].imageDirectory == 'pokemonItem' &&  App.game.party.alreadyCaughtPokemonByName(smnList[x].name, true) != true) {
-                        if (App.game.wallet.currencies[ShopHandler.shopObservable().items[x].currency]() >= ShopHandler.shopObservable().items[x].price()) {
-                            smnName = smnList[x].name;
-                            ShopHandler.shopObservable().items[x].buy(1);
-                            smnUsed = 1;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (smnUsed == 1) {
-                if (App.game.party.alreadyCaughtPokemonByName(smnName, true) != true) {
-                    srCount++;
-                    localLocal[6][2] = srCount;
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    console.log( '[FAILED] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                    location.reload();
-                } else {
-                    smnNeed = smnNeed - 1;
-                    console.log( '[CAUGHT] :: ' + smnName + ' :: SR Count: ' + srCount + ' :: Needed: ' + smnNeed );
-                    localLocal[6][1] = '';
-                    localLocal[6][2] = 0;
-                    localSettings[2] = 0;
-                    srCount = 0;
-                    localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                    smnUsed = 0;
-                    smnName = '';
-                    Save.store(player);
-                }
-            }
-            break;
-        case "egg":
-            if (document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value == ""){
-                document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value = localSettings[3];
-                BreedingFilters.search.value(new RegExp((document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value), 'i'));
-            }
-            if(document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value !== ""){
-                localSettings[3] = document.querySelector("#breeding-filter > div.form-group.col-md-6.col-6 > input").value;
-                localStorage.setItem(settingKey, JSON.stringify(localSettings));
-            }
-            PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
-            var sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
-            var filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                if (partyPokemon.breeding || partyPokemon.level < 100) {
-                    return false;
-                }
-                if (BreedingFilters.category.value() >= 0) {
-                    if (partyPokemon.category !== BreedingFilters.category.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.shinyStatus.value() == 0) {
-                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.region.value() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
-                        return false;
-                    }
-                }
-                if(localSettings[3] == ""){
-                    if (!BreedingFilters.search.value().test(partyPokemon.name)) {
-                        return false;
-                    }
-                }
-                else{
-                    if (BreedingFilters.search.value().test(partyPokemon.name)) {
-                        return false;
-                    }
-                }
-                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
-                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
-                if (type1 !== null || type2 !== null) {
-                    const { type: types } = pokemonMap[partyPokemon.name];
-                    if ([type1, type2].includes(PokemonType.None)) {
-                        const type = type1 == PokemonType.None ? type2 : type1;
-                        if (!BreedingController.isPureType(partyPokemon, type)) {
-                            return false;
-                        }
-                    } else if ((type1 !== null && !types.includes(type1)) || (type2 !== null && !types.includes(type2))) {
-                        return false;
-                    }
-                }
-                return true;
-            });
-            if(filteredEggList.length > 0){
-                if(App.game.breeding.eggList[0]().type == -1){
-                    App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
-                }
-                localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
-                localStorage.setItem(saveKey, JSON.stringify(localLocal));
-            }
-
-            if (localLocal[6][1] != '' && localLocal[6][1] != "MissingNo." && App.game.breeding.eggList[0]().type != -1) {
-                if (App.game.breeding.eggList[0]().steps() < App.game.breeding.eggList[0]().totalSteps) {
-                    console.log( 'Waiting for steps - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                }
-                if (App.game.breeding.eggList[0]().steps() >= App.game.breeding.eggList[0]().totalSteps) {
-                    console.log( 'Hatching - ' + App.game.breeding.eggList[0]().pokemon + ' - Shiny: ' + App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) );
-                    Save.store(player);
-                    setTimeout(function(){
-                        localLocal[6][1] = App.game.breeding.eggList[0]().pokemon;
-                        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                        [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-                        if(App.game.party.alreadyCaughtPokemonByName(localLocal[6][1], true) != true) {
-                            srCount++;
-                            localLocal[6][2] = srCount;
-                            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                            console.log( 'SR Count: ' + srCount );
-                            location.reload();
-                        } else {
-                            console.log( 'Got SR shiny - ' + localLocal[6][1] + ' - SR Count: ' + srCount );
-                            localLocal[6][1] = '';
-                            localLocal[6][2] = 0;
-                            localSettings[2] = 0;
-                            srCount = 0;
-                            localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                            localStorage.setItem(settingKey, JSON.stringify(localSettings));
-                            Save.store(player);
-                        }
-                    }, 1500);
-                }
-            }
-            break;
     }
 }
 

@@ -1,10 +1,13 @@
 {
-    "version":"0.0.14c",
-    "files":[
+    "version": "0.0.15",
+    "files": [
         "scripts/acsrq.js",
+        "scripts/acsrq-dungeon.js",
         "scripts/acsrq-movement.js",
+        "scripts/acsrq-srBot.js",
         "scripts/acsrq-ui.js",
         "scripts/modules.min.js",
         "scripts/script.min.js",
-        "index.html"]
-    }
+        "index.html"
+    ]
+}
