@@ -105,6 +105,7 @@ function main() {
         }, 1500);
     } else {
         if (localSettings().state || !!sessionStorage.getItem('reload')) {
+            Game.prototype.computeOfflineEarnings = () => {};
             $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
