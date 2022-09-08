@@ -375,10 +375,15 @@ MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyM
 MapHelper.isRegionCleared = (region) => {
     let check = true;
     for (let i = 0; check && i <= region; i++) {
-        check = check && Routes.getRoutesByRegion(i).every(r => RouteHelper.routeCompleted(r.number, i, false));
-        check = check && GameConstants.RegionDungeons[i].every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false));
-        check = check && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
-        check = check && Object.values(TemporaryBattleList).filter(b => b.parent?.region == i)?.every(b => b.completeRequirements.every(r => r.isCompleted()));
+        const subRegionsId = SubRegions.getSubRegions(i).map(sub => sub.id);
+        check = check
+            && Routes.getRoutesByRegion(i)
+                .filter(r => subRegionsId.includes(r.subRegion))
+                ?.every(r => RouteHelper.routeCompleted(r.number, i, false))
+            && GameConstants.RegionDungeons[i]
+                .filter(d => (dungeonList[d].optionalParameters.dungeonRegionalDifficulty ?? 0) <= region)
+                ?.every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false))
+            && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
     }
     return check;
 };
