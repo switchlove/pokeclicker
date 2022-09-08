@@ -368,6 +368,13 @@ Gym.prototype.isUnlocked = function () {
     }
     return contentUnlock.call(this) || this.wasUnlock;
 };
+
+Gym.prototype.protectedOnclick = eval(`(${
+    Gym.prototype.protectedOnclick.toString()
+        .replace('protectedOnclick', 'function')
+        .replace('reqsList.length', '!App.game.badgeCase.hasBadge(this.badgeReward) && reqsList.length')
+})`);
+
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
