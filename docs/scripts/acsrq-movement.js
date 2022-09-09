@@ -559,8 +559,8 @@ ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[1].options, new 
 ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[2].options, new DungeonShinyRequirement('Pinkan Mountain'));
 ChallengeRequirements.add(TownList['Battle Frontier'], new DungeonShinyRequirement('Pinkan Mountain'));
 // Sevii 4567
-ChallengeRequirements.add(TownList['Six Island'], new GymBadgeRequirement(BadgeEnums.Jade_Star));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 34), new GymBadgeRequirement(BadgeEnums.Jade_Star));
+ChallengeRequirements.set(TownList['Six Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 40));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 34), new RouteShinyRequirement(GameConstants.Region.kanto, 40));
 ChallengeRequirements.set(TownList['Pattern Bush'], new RouteShinyRequirement(GameConstants.Region.kanto, 37));
 ChallengeRequirements.set(TownList['Five Island'], new DungeonShinyRequirement('Altering Cave'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 30),  new DungeonShinyRequirement('Altering Cave'));
@@ -568,9 +568,8 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 32),  new 
 ChallengeRequirements.add(TownList['Seven Island'], new GymBadgeRequirement(BadgeEnums.Sea_Ruby));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 38), new GymBadgeRequirement(BadgeEnums.Sea_Ruby));
 ChallengeRequirements.add(TownList['Mikan Island'], new ItemsRequirement(...TanobyRuinsShop.items));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 40), new GymBadgeRequirement(BadgeEnums['Coral-Eye']));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 41), new RouteShinyRequirement(GameConstants.Region.kanto, 40));
-ChallengeRequirements.add(TownList['Trovita Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 42));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 41), new GymBadgeRequirement(BadgeEnums['Coral-Eye']));
+ChallengeRequirements.set(TownList['Trovita Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 42));
 //#endregion
 //#region Sinnoh
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 203), new ItemsRequirement(ItemList.Mystery_egg));
