@@ -515,36 +515,39 @@ acsrqFooter.missingShinies = ko.pureComputed(() => {
         missing.push(
             ...poke.filter(p => !App.game.party.alreadyCaughtPokemonByName(p, true)).sort()
         );
-    } else if (shops.length) { //Shop poke
-        missing.push(
-            ...shops.map(({items}) => items
-                .filter(i => i instanceof PokemonItem && !App.game.party.alreadyCaughtPokemonByName(i.name, true))
-                .map(({name}) => name)
-            ).flat()
-        );
-    } else if (town.dungeon) { //Dungeon poke
-        const poke = town.dungeon.allAvailablePokemon();
-        missing.push(
-            ...poke.filter(p => !App.game.party.alreadyCaughtPokemonByName(p, true))
-        );
+    } else {
+        if (shops.length) { //Shop poke
+            missing.push(
+                ...shops.map(({items}) => items
+                    .filter(i => i instanceof PokemonItem && !App.game.party.alreadyCaughtPokemonByName(i.name, true))
+                    .map(({name}) => name)
+                ).flat()
+            );
+        }
+        if (town.dungeon) { //Dungeon poke
+            const poke = town.dungeon.allAvailablePokemon();
+            missing.push(
+                ...poke.filter(p => !App.game.party.alreadyCaughtPokemonByName(p, true))
+            );
 
-        for (let key in town.dungeon.lootTable) {
-            for (let {loot} of town.dungeon.lootTable[key]) {
-                if (PokemonHelper.getPokemonByName(loot).id && !App.game.party.alreadyCaughtPokemonByName(loot, true)) {
-                    missing.push(`<span style="line-height: normal; color:#D4AC0D;">${loot}</span>`);
+            for (let key in town.dungeon.lootTable) {
+                for (let {loot} of town.dungeon.lootTable[key]) {
+                    if (PokemonHelper.getPokemonByName(loot).id && !App.game.party.alreadyCaughtPokemonByName(loot, true)) {
+                        missing.push(`<span style="line-height: normal; color:#D4AC0D;">${loot}</span>`);
+                    }
                 }
             }
-        }
 
-        missing.sort((a, b) => {
-            if (a.startsWith('<')) {
-                a = a.replace(/<[^\>]*>/g, '');
-            }
-            if (b.startsWith('<')) {
-                b = b.replace(/<[^\>]*>/g, '');
-            }
-            return a.localeCompare(b);
-        });
+            missing.sort((a, b) => {
+                if (a.startsWith('<')) {
+                    a = a.replace(/<[^\>]*>/g, '');
+                }
+                if (b.startsWith('<')) {
+                    b = b.replace(/<[^\>]*>/g, '');
+                }
+                return a.localeCompare(b);
+            });
+        }
     }
 
     return missing.length
