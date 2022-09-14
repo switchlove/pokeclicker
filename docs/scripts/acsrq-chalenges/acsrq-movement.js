@@ -334,6 +334,13 @@ Gym.prototype.isUnlocked = function () {
     }
     return contentUnlock.call(this) || this.wasUnlock;
 };
+
+Gym.prototype.protectedOnclick = eval(`(${
+    Gym.prototype.protectedOnclick.toString()
+        .replace('protectedOnclick', 'function')
+        .replace('reqsList.length', '!App.game.badgeCase.hasBadge(this.badgeReward) && reqsList.length')
+})`);
+
 //#endregion
 //#region End region conditions
 const mapTravel = MapHelper.ableToTravel;
@@ -341,10 +348,15 @@ MapHelper.ableToTravel = () => mapTravel() && (!App.game?.challenges.list.shinyM
 MapHelper.isRegionCleared = (region) => {
     let check = true;
     for (let i = 0; check && i <= region; i++) {
-        check = check && Routes.getRoutesByRegion(i).every(r => RouteHelper.routeCompleted(r.number, i, false));
-        check = check && GameConstants.RegionDungeons[i].every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false));
-        check = check && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
-        check = check && Object.values(TemporaryBattleList).filter(b => b.parent?.region == i)?.every(b => b.completeRequirements.every(r => r.isCompleted()));
+        const subRegionsId = SubRegions.getSubRegions(i).map(sub => sub.id);
+        check = check
+            && Routes.getRoutesByRegion(i)
+                .filter(r => subRegionsId.includes(r.subRegion))
+                ?.every(r => RouteHelper.routeCompleted(r.number, i, false))
+            && GameConstants.RegionDungeons[i]
+                .filter(d => (dungeonList[d].optionalParameters.dungeonRegionalDifficulty ?? 0) <= region)
+                ?.every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false))
+            && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
     }
     return check;
 };
@@ -444,7 +456,7 @@ ChallengeRequirements.set(TownList['Pokémon Mansion'], new RouteShinyRequiremen
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 21), new QuestLineCompletedRequirement('Bill\'s Errand'));
 ChallengeRequirements.set(GymList['Viridian City'], new RouteShinyRequirement(GameConstants.Region.kanto, 21));
 // Sevii 123
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 26), new QuestLineStepCompletedRequirement('Bill\'s Errand', GameConstants.Region.kanto));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 26), new QuestLineStepCompletedRequirement('Bill\'s Errand', 0));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 27), new RouteShinyRequirement(GameConstants.Region.kanto, 26));
 ChallengeRequirements.set(TownList['Two Island'], new DungeonShinyRequirement('Mt. Ember Summit'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 28), new QuestLineStepCompletedRequirement('Bill\'s Errand', 1));
@@ -473,6 +485,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new D
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
 ChallengeRequirements.set(TownList['Tohjo Falls'], new DungeonShinyRequirement('Dark Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 28), new QuestLineCompletedRequirement('Unfinished Business'));
 //#endregion
 //#region Hoenn
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));
@@ -497,6 +510,7 @@ ChallengeRequirements.add(GymList['Fortree City'], new ItemsRequirement(ItemList
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 120), new GymBadgeRequirement(BadgeEnums.Feather));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 123), new DungeonShinyRequirement('Mt. Pyre'));
 ChallengeRequirements.set(TownList['Magma Hideout'], new RouteShinyRequirement(GameConstants.Region.hoenn, 123));
+ChallengeRequirements.set(TownList['Lilycove City'], new DungeonShinyRequirement('Magma Hideout'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 125), new RouteShinyRequirement(GameConstants.Region.hoenn, 126));
 ChallengeRequirements.set(TownList['Mossdeep City'], new DungeonShinyRequirement('Shoal Cave'));
 ChallengeRequirements.add(GymList['Mossdeep City'], new ItemsRequirement(ItemList.Beldum, ItemList.Prism_scale, ItemList.Upgrade));
@@ -507,6 +521,21 @@ ChallengeRequirements.set(TownList['Pacifidlog Town'], new GymBadgeRequirement(B
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 132), new GymBadgeRequirement(BadgeEnums.Rain), new ItemsRequirement(ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
 ChallengeRequirements.set(TownList['Ever Grande City'], new DungeonShinyRequirement('Sealed Chamber'));
 ChallengeRequirements.set(TownList['Victory Road Hoenn'], new DungeonShinyRequirement('Sealed Chamber'), new ItemsRequirement(ItemList.Dragon_scale));
+ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[1].options, new DungeonShinyRequirement('Pinkan Mountain'));
+ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[2].options, new DungeonShinyRequirement('Pinkan Mountain'));
+ChallengeRequirements.add(TownList['Battle Frontier'], new DungeonShinyRequirement('Pinkan Mountain'));
+// Sevii 4567
+ChallengeRequirements.set(TownList['Six Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 40));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 34), new RouteShinyRequirement(GameConstants.Region.kanto, 40));
+ChallengeRequirements.set(TownList['Pattern Bush'], new RouteShinyRequirement(GameConstants.Region.kanto, 37));
+ChallengeRequirements.set(TownList['Five Island'], new DungeonShinyRequirement('Altering Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 30),  new DungeonShinyRequirement('Altering Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 32),  new DungeonShinyRequirement('Sunburst Island'));
+ChallengeRequirements.add(TownList['Seven Island'], new GymBadgeRequirement(BadgeEnums.Sea_Ruby));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 38), new GymBadgeRequirement(BadgeEnums.Sea_Ruby));
+ChallengeRequirements.add(TownList['Mikan Island'], new ItemsRequirement(...TanobyRuinsShop.items));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 41), new GymBadgeRequirement(BadgeEnums['Coral-Eye']));
+ChallengeRequirements.set(TownList['Trovita Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 42));
 //#endregion
 //#region Sinnoh
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 203), new ItemsRequirement(ItemList.Mystery_egg));

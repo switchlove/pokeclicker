@@ -44,7 +44,7 @@ function dungeonBot() {
     }
 
     //handle flash for boss rush
-    if (DungeonRunner.map.flash) {
+    if (DungeonRunner.map.flash && Settings.getSetting('botRush').value) {
         if (playerPos.y > 0 && DungeonRunner.map.board()[playerPos.y - 1][playerPos.x].type() == GameConstants.DungeonTile.boss) {
             return DungeonRunner.map.moveUp();
         }
