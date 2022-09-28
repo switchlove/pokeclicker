@@ -480,6 +480,7 @@ ChallengeRequirements.add(GymList['Cianwood City'], new ItemsRequirement(ItemLis
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 42), new RouteShinyRequirement(GameConstants.Region.johto, 48));
 ChallengeRequirements.set(TownList['Mt. Mortar'], new RouteShinyRequirement(GameConstants.Region.johto, 42));
 ChallengeRequirements.set(TownList['Mahogany Town'], new DungeonShinyRequirement('Mt. Mortar'));
+ChallengeRequirements.add(TemporaryBattleList['Suicune 2'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 43), new ItemsRequirement(ItemList.Upgrade));
 ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'), new ObtainedPokemonRequirement(pokemonNameIndex.entei), new ObtainedPokemonRequirement(pokemonNameIndex.suicune), new ObtainedPokemonRequirement(pokemonNameIndex.raikou));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new DungeonShinyRequirement('Tin Tower'));
