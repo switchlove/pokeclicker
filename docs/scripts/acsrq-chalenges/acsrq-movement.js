@@ -440,10 +440,11 @@ ChallengeRequirements.set(TownList['Saffron City'], new DungeonShinyRequirement(
 ChallengeRequirements.set(TemporaryBattleList['Fighting Dojo'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Moon_stone));
 ChallengeRequirements.set(TownList['Pokémon Tower'], ...TemporaryBattleList['Fighting Dojo'].completeRequirements);
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 12), new GymBadgeRequirement(BadgeEnums.Marsh));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 13), new RouteShinyRequirement(GameConstants.Region.kanto, 12));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 13), new TemporaryBattleRequirement('Snorlax route 12'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 14), new RouteShinyRequirement(GameConstants.Region.kanto, 13));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 15), new RouteShinyRequirement(GameConstants.Region.kanto, 14));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 16), new RouteShinyRequirement(GameConstants.Region.kanto, 15));
+ChallengeRequirements.set(TemporaryBattleList['Snorlax route 16'], new RouteShinyRequirement(GameConstants.Region.kanto, 15));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 16), new TemporaryBattleRequirement('Snorlax route 16'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 17), new RouteShinyRequirement(GameConstants.Region.kanto, 16));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 18), new RouteShinyRequirement(GameConstants.Region.kanto, 17));
 ChallengeRequirements.set(TownList['Fuchsia City'], new RouteShinyRequirement(GameConstants.Region.kanto, 18));
