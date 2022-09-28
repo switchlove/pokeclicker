@@ -356,7 +356,7 @@ MapHelper.isRegionCleared = (region) => {
             && GameConstants.RegionDungeons[i]
                 .filter(d => (dungeonList[d].optionalParameters.dungeonRegionalDifficulty ?? 0) <= region)
                 ?.every(d => DungeonRunner.dungeonCompleted(dungeonList[d], false))
-            && RoamingPokemonList.list[i].flat().every(p => App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
+            && RoamingPokemonList.list[i].flat().every(p => !p.isRoaming() || App.game.party.alreadyCaughtPokemon(p.pokemon.id, true));
     }
     return check;
 };
