@@ -623,6 +623,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 22), new G
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 4), new RouteShinyRequirement(GameConstants.Region.kalos, 22));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 5), new ItemsRequirement(...FriseurFurfrouShop.items));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new ItemsRequirement(ItemList.Thunder_stone));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 7), new ItemsRequirement(ItemList['Furfrou (Star)'], ItemList['Furfrou (La Reine)']));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 9), new ItemsRequirement(ItemList.Water_stone));
 ChallengeRequirements.add(GymList['Cyllage City'], new ItemsRequirement(ItemList.Upgrade, ItemList.Prism_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 10), new GymBadgeRequirement(BadgeEnums.Cliff));
@@ -642,10 +643,6 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 19), new D
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new GymBadgeRequirement(BadgeEnums.Iceberg));
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
-ChallengeRequirement.add(dungeonList['Reflection Cave'].bossList[2].options, { hint: () => '', isCompleted: () => TownList['Kiloude City'].npcs[0].talkedTo() });
-ChallengeRequirement.add(dungeonList['Kalos Power Plant'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Reflection Cave'].bossList[2]));
-ChallengeRequirement.add(dungeonList['Terminus Cave'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Kalos Power Plant'].bossList[1]));
-ChallengeRequirements.add(TemporaryBattleList.AZ, new ObtainedPokemonShinyRequirement(dungeonList['Terminus Cave'].bossList[1]));
 //#endregion
 //#region Alola
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
