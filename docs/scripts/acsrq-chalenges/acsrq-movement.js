@@ -756,7 +756,7 @@ for (let stone of Object.values(ItemList).filter(i => i instanceof EvolutionSton
             // Ensure the we actually found an evolution
             .filter(evolution => evolution)
             // Filter out evolution which can't be done in this region
-            .filter(evolution => evolution.type.includes(EvolutionType.Region) && evolution.atLocation())
+            .filter(evolution => !evolution.type.includes(EvolutionType.Region) || evolution.atLocation())
             // Filter out any Pokémon which can't be obtained yet (future region)
             .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon()) <= player.highestRegion())
             // Finally get the evolution
