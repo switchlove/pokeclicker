@@ -739,3 +739,37 @@ for (let region = 0; region < GameConstants.Region.final; region++) {
     }
 }
 //#endregion
+
+// hopefully it will be fixed in vanilla soon
+//#region Fix EvolItems
+for (let stone of Object.values(ItemList).filter(i => i instanceof EvolutionStone)) {
+    stone.getCaughtStatus.dispose();
+    stone.getCaughtStatus =  ko.pureComputed(() => {
+        // Only include Pokémon which have evolutions
+        const unlockedEvolutions = pokemonList.filter((p) => p.evolutions)
+            // only include base Pokémon we have caught
+            .filter(p => PartyController.getCaughtStatusByName(p.name))
+            // Map to the evolution which uses this stone type
+            .map((p) => p.evolutions.filter(e => e.type.includes(EvolutionType.Stone) && e.stone === stone.type))
+            // Flatten the array (in case of multiple evolutions)
+            .flat()
+            // Ensure the we actually found an evolution
+            .filter(evolution => evolution)
+            // Filter out evolution which can't be done in this region
+            .filter(evolution => evolution.type.includes(EvolutionType.Region) && evolution.atLocation())
+            // Filter out any Pokémon which can't be obtained yet (future region)
+            .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon()) <= player.highestRegion())
+            // Finally get the evolution
+            .map(evolution => evolution.getEvolvedPokemon());
+
+        if (unlockedEvolutions.length == 0) {
+            return undefined;
+        }
+
+        // Calculate the lowest caught status
+        return unlockedEvolutions.reduce((status, pokemonName) => {
+            return Math.min(status, PartyController.getCaughtStatusByName(pokemonName));
+        }, CaughtStatus.CaughtShiny);
+    });
+}
+//#endregion
