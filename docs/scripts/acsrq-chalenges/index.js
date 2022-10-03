@@ -58,9 +58,9 @@ Update.prototype.check = function () {
 
     if (saveData.challenges.list.shinyMovement == undefined) {
         setTimeout(async () => {
-            // Check if player wants to activate the new challenge modes
-            if (!await Notifier.confirm({ title: 'Shiny Movement', message: 'New challenge mode added: Shiny Movement.\n\nPrevent movement if you can obtain shinies.\n\nThis is an recommended challenge for ACSRQ.\n\nPlease choose if you would like this challenge mode to be disabled or enabled.\n\nCan be disabled later. Can NOT be enabled later!', confirm: 'Disable', cancel: 'Enable' })) {
-                App.game.challenges.list.shinyMovement.activate();
+            // Check if player wants to disable the new challenge modes
+            if (await Notifier.confirm({ title: 'Shiny Movement', message: 'New challenge mode added: Shiny Movement.\n\nPrevent movement if you can obtain shinies.\n\nThis is an recommended challenge for ACSRQ.\n\nPlease choose if you would like this challenge mode to be disabled or enabled.\n\nCan be disabled later. Can NOT be enabled later!', confirm: 'Disable', cancel: 'Enable' })) {
+                App.game.challenges.list.shinyMovement.active(false);
             }
         }, GameConstants.SECOND);
     }
