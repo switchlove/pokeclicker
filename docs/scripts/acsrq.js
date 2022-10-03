@@ -144,6 +144,12 @@ function a6save() {
         localLocal[0] = newArr;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
+    if (localLocal[0][0].length == 25) {
+        var newArr = localLocal[0][0];
+        newArr.push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+        localLocal[0][0] = newArr;
+        localStorage.setItem(saveKey, JSON.stringify(localLocal));
+    }
     if (localLocal[1].length == 10) {
         localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
@@ -152,7 +158,10 @@ function a6save() {
         localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
-
+    if (localLocal[1].length == 135) {
+        localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+        localStorage.setItem(saveKey, JSON.stringify(localLocal));
+    }
     phases = [];
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -1144,6 +1153,7 @@ async function mutateBot() {
         'Watmel': { 27:all },
         'Durin': { 28:all },
         'Belue': { 29:all },
+        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 17:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
         'Occa': { 30:[5,9,22], 25:[0,4,17], 14:[2,15,19], 9:[7,20,24] },
         'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 43:[7,20,24] },
         'Wacan': { 22:[5,9,22], 18:[0,4,17], 13:[2,15,19], 24:[7,20,24] },

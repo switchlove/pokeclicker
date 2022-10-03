@@ -708,11 +708,14 @@ ChallengeRequirement.add(dungeonList['Thrifty Megamart'].bossList[1].options, ne
 ChallengeRequirements.add(TownList['Lake of the Sunne and Moone'], new ObtainedPokemonShinyRequirement(dungeonList['Thrifty Megamart'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Mina\'s Houseboat'].bossList[1].options, new DungeonShinyRequirement('Lake of the Sunne and Moone'), new ObtainedPokemonRequirement(pokemonNameIndex.solgaleo), new ObtainedPokemonRequirement(pokemonNameIndex.lunala));
 ChallengeRequirement.add(dungeonList['Vast Poni Canyon'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Mina\'s Houseboat'].bossList[1]));
-ChallengeRequirements.add(TownList['Ruins of Hope'], new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 27), new DungeonShinyRequirement('Ruins of Hope'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 28), new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 27), new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]));
+ChallengeRequirements.add(TownList['Ruins of Hope'], new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 28), new DungeonShinyRequirement('Ruins of Hope'));
+ChallengeRequirements.add(TownList['Poni Meadow'], new RouteShinyRequirement(GameConstants.Region.alola, 28));
+ChallengeRequirements.add(TownList['Resolution Cave'], new DungeonShinyRequirement('Poni Meadow'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 29), new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 18));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Poni Meadow', 16));
-ChallengeRequirements.add(TownList['Resolution Cave'], new RouteShinyRequirement(GameConstants.Region.alola, 30));
+
 //#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
