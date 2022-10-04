@@ -197,7 +197,7 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
     }
 
     isCompleted() {
-        return super.isCompleted()  && (
+        return super.isCompleted() && (
             DungeonRunner.dungeonCompleted(this.town?.dungeon, true)
             || !App.game?.challenges.list.shinyMovement?.active());
     }
@@ -206,6 +206,7 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
 class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
     constructor(pokemon) {
         super(pokemonNameIndex[pokemon.name.toLowerCase()]);
+        this.isCompleted = () => super.isCompleted() && pokemon.options.requirement?.isCompleted();
     }
 
     getProgress() {
@@ -645,7 +646,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new G
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
 //#endregion
 //#region Alola
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
+// ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
 ChallengeRequirements.set(TownList['Melemele Woods'], new DungeonShinyRequirement('Hau\'oli Cemetery'));
 ChallengeRequirements.set(TownList['Iki Town'], new DungeonShinyRequirement('Seaward Cave'));
 ChallengeRequirement.set(SubRegions.getSubRegionById(GameConstants.Region.alola, 1), new DungeonShinyRequirement('Ten Carat Hill'));
@@ -665,54 +666,64 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 15), new R
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 24), new ItemsRequirement(ItemList.Deepsea_scale, ItemList.Deepsea_tooth, ItemList.Prism_scale, ItemList.Sachet, ItemList.Whipped_dream));
 ChallengeRequirements.add(TownList['Exeggutor Island Hill'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Dragon_scale, ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 26), new DungeonShinyRequirement('Exeggutor Island Hill'));
-ChallengeRequirements.set(TownList['Vast Poni Canyon'],  new RouteShinyRequirement(GameConstants.Region.alola, 26));
+ChallengeRequirements.set(TownList['Vast Poni Canyon'], new RouteShinyRequirement(GameConstants.Region.alola, 26));
 ChallengeRequirements.add(TemporaryBattleList['Ultra Megalopolis'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Poipole));
 // Post Game
-ChallengeRequirements.add(TownList['Ruins of Conflict'],
-    new ObtainedPokemonShinyRequirement(dungeonList['Verdant Cavern'].bossList[2]),
-    new ObtainedPokemonShinyRequirement(dungeonList['Verdant Cavern'].bossList[3])
-);
-ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[2].options, new DungeonShinyRequirement('Ruins of Conflict'));
-ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[3].options, new DungeonShinyRequirement('Ruins of Conflict'));
+ChallengeRequirement.add(dungeonList['Pikachu Valley'].bossList[5].options, new DungeonShinyRequirement('Ruins of Conflict'));
+
+ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Pikachu Valley'].bossList[5]));
+ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Pikachu Valley'].bossList[5]));
+
 ChallengeRequirement.add(dungeonList['Lush Jungle'].bossList[1].options,
     new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[2]),
     new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[3])
 );
+
+ChallengeRequirement.add(dungeonList['Wela Volcano Park'].enemyList[6].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
-ChallengeRequirement.add(dungeonList['Wela Volcano Park'].enemyList[6].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Diglett\'s Tunnel'].enemyList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
-ChallengeRequirement.add(dungeonList['Verdant Cavern'].enemyList[5].options,
-    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[2]),
-    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[3])
-);
-ChallengeRequirement.add(dungeonList['Melemele Meadow'].enemyList[6].options,
-    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[2]),
-    new ObtainedPokemonShinyRequirement(dungeonList['Wela Volcano Park'].bossList[3])
-);
-ChallengeRequirements.set(TownList['Ruins of Life'],  new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 10));
+
+ChallengeRequirements.add(TownList['Ruins of Life'], new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 10));
 
 ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[14].options, new DungeonShinyRequirement('Ruins of Life'));
 ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[15].options, new DungeonShinyRequirement('Ruins of Life'));
-
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 17).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 23).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
 
 ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[2].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
 ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[3].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
+
 ChallengeRequirements.add(TownList['Ruins of Abundance'],
     new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[2]),
     new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[3])
 );
+
 ChallengeRequirement.add(dungeonList['Thrifty Megamart'].bossList[1].options, new DungeonShinyRequirement('Ruins of Abundance'));
-ChallengeRequirements.add(TownList['Lake of the Sunne and Moone'], new ObtainedPokemonShinyRequirement(dungeonList['Thrifty Megamart'].bossList[1]));
-ChallengeRequirement.add(dungeonList['Mina\'s Houseboat'].bossList[1].options, new DungeonShinyRequirement('Lake of the Sunne and Moone'), new ObtainedPokemonRequirement(pokemonNameIndex.solgaleo), new ObtainedPokemonRequirement(pokemonNameIndex.lunala));
+ChallengeRequirements.add(TownList['Lake of the Sunne and Moone'], new DungeonShinyRequirement('Ruins of Abundance'));
+
+ChallengeRequirement.add(dungeonList['Mina\'s Houseboat'].bossList[1].options, new DungeonShinyRequirement('Lake of the Sunne and Moone'));
+
 ChallengeRequirement.add(dungeonList['Vast Poni Canyon'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Mina\'s Houseboat'].bossList[1]));
-ChallengeRequirements.add(TownList['Ruins of Hope'], new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 27), new DungeonShinyRequirement('Ruins of Hope'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 28), new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Poni Meadow', 16));
-ChallengeRequirements.add(TownList['Resolution Cave'], new RouteShinyRequirement(GameConstants.Region.alola, 30));
+
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 27),
+    new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]),
+    new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 15)
+);
+
+ChallengeRequirements.add(TownList['Ruins of Hope'],
+    new RouteShinyRequirement(GameConstants.Region.alola, 27),
+    new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16)
+);
+
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 28), new DungeonShinyRequirement('Ruins of Hope'));
+
+ChallengeRequirements.add(TownList['Resolution Cave'], new DungeonShinyRequirement('Poni Meadow'));
+
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Resolution Cave'));
+
+ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[1].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
+ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[2].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 //#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
