@@ -144,6 +144,12 @@ function a6save() {
         localLocal[0] = newArr;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
+    if (localLocal[0][0].length == 25) {
+        var newArr = localLocal[0][0];
+        newArr.push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+        localLocal[0][0] = newArr;
+        localStorage.setItem(saveKey, JSON.stringify(localLocal));
+    }
     if (localLocal[1].length == 10) {
         localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
@@ -152,7 +158,10 @@ function a6save() {
         localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
-
+    if (localLocal[1].length == 135) {
+        localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+        localStorage.setItem(saveKey, JSON.stringify(localLocal));
+    }
     phases = [];
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -232,19 +241,19 @@ async function a6settings() {
         }
     }
 
-    getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
-        rVer = data.version;
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
-    }).catch(error => {
-        console.error(error);
-    });
+    // getJSON("https://raw.githubusercontent.com/switchlove/pokeclicker/acsrq-beta/docs/acsrq.json").then(data => {
+    //     rVer = data.version;
+    //     document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").innerText = String(rVer);
+    // }).catch(error => {
+    //     console.error(error);
+    // });
 
-    getJSON("./acsrq.json").then(data => {
-        lVer = data.version;
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
-    }).catch(error => {
-        console.error(error);
-    });
+    // getJSON("./acsrq.json").then(data => {
+    //     lVer = data.version;
+    //     document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").innerText = String(lVer);
+    // }).catch(error => {
+    //     console.error(error);
+    // });
 
     if (rVer != lVer) {
         document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
@@ -1144,6 +1153,7 @@ async function mutateBot() {
         'Watmel': { 27:all },
         'Durin': { 28:all },
         'Belue': { 29:all },
+        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 17:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
         'Occa': { 30:[5,9,22], 25:[0,4,17], 14:[2,15,19], 9:[7,20,24] },
         'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 43:[7,20,24] },
         'Wacan': { 22:[5,9,22], 18:[0,4,17], 13:[2,15,19], 24:[7,20,24] },
@@ -1191,40 +1201,9 @@ async function autoBreed() {
         if(Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'attack'){
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
-            let filteredEggList = sortededHatcheryList.filter( (partyPokemon) => {
-                if (partyPokemon.breeding || partyPokemon.level < 100) {
+            let filteredEggList = sortededHatcheryList.filter(partyPokemon => {
+                if (!BreedingController.visible(partyPokemon)()) {
                     return false;
-                }
-                if (!BreedingFilters.search.value().test(partyPokemon.name)) {
-                    return false;
-                }
-                if (BreedingFilters.category.value() >= 0) {
-                    if (partyPokemon.category !== BreedingFilters.category.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.shinyStatus.value() >= 0) {
-                    if (+partyPokemon.shiny !== BreedingFilters.shinyStatus.value()) {
-                        return false;
-                    }
-                }
-                if (BreedingFilters.region.value() > -2) {
-                    if (PokemonHelper.calcNativeRegion(partyPokemon.name) !== BreedingFilters.region.value()) {
-                        return false;
-                    }
-                }
-                const type1 = BreedingFilters.type1.value() > -2 ? BreedingFilters.type1.value() : null;
-                const type2 = BreedingFilters.type2.value() > -2 ? BreedingFilters.type2.value() : null;
-                if (type1 !== null || type2 !== null) {
-                    const { type: types } = pokemonMap[partyPokemon.name];
-                    if ([type1, type2].includes(PokemonType.None)) {
-                        const type = type1 == PokemonType.None ? type2 : type1;
-                        if (!BreedingController.isPureType(partyPokemon, type)) {
-                            return false;
-                        }
-                    } else if ((type1 !== null && !types.includes(type1)) || (type2 !== null && !types.includes(type2))) {
-                        return false;
-                    }
                 }
                 if(Settings.getSetting('breedingOpts').observableValue() == 'attack') {
                     var breedAtk = Settings.getSetting('minBreedAttack').observableValue();

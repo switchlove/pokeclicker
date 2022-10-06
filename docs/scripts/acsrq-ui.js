@@ -270,8 +270,7 @@ acsrqInfo = function () {
 };
 
 acsrqInfo.boostedRoute = ko.pureComputed(() => {
-    return RoamingPokemonList.increasedChanceRoute[player.region]?.[player.subregion]?.().routeName
-        || RoamingPokemonList.increasedChanceRoute[player.region][0]().routeName;
+    return RoamingPokemonList.getIncreasedChanceRouteBySubRegionGroup(player.region, RoamingPokemonList.findGroup(player.region, player.subregion))().routeName;
 });
 
 acsrqInfo.regionShiny = ko.pureComputed(() => {
