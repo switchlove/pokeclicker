@@ -7,28 +7,14 @@ Game.prototype.initialize = function() {
         App.game.party.gainPokemonById(pokemon.id, true, true);
     };
 
-    //Pokedex List
-    const pokedexList = PokedexHelper.getList;
-    PokedexHelper.getList = eval(pokedexList.toString().replace('getList()', '() =>').replace('if (nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none) {return false;}', ''));
-    PokedexHelper.getList = eval(pokedexList.toString().replace('getList()', '() =>').replace('!alreadyCaught && pokemon.id != Math.floor(pokemon.id)', '!alreadyCaught && pokemon.id != pokemon.id'));
-	
-    //Move to Region
-    MapHelper.ableToTravel = function() {
-        var a, b;
-        // If player already reached highest region, they can't move on
-        if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
-            return false;
-        }
-        // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
-        if (!App.game.challenges.list.requireCompletePokedex.active()) {
-            return (b = (a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || a === void 0 ? void 0 : a.isUnlocked()) !== null && b !== void 0 ? b : false;
-        }
-        // Check if Champion of Region
-        return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
-    };
-
     this.randomizer = new Randomizer();
     gameInitialize.call(this);
+
+    //Tutoral Quest
+    const catch5Pidgey = App.game.quests.getQuestLine('Tutorial Quests').quests()[6];
+    const R1Pokemon = App.game.randomizer.routes[Routes.getName(1,GameConstants.Region.kanto)].land[0];
+    catch5Pidgey.customDescription = catch5Pidgey.customDescription.replace('Pidgey', R1Pokemon);
+    catch5Pidgey.focus = () => App.game.statistics.pokemonCaptured[PokemonHelper.getPokemonByName(R1Pokemon).id]();
 };
 
 class Randomizer {
@@ -91,12 +77,12 @@ class Randomizer {
 
     //TODO: make a randomisation system...
     static Rand() {
-		var availableMons = pokemonList.filter(poke => !rolledMons.includes(poke.name));
-		var rolledMon = Rand.fromArray(availableMons).name;
-		rolledMons.push(rolledMon);
-		if(rolledMons.length == pokemonList.length){
-			rolledMons = [];
-		}
+        var availableMons = pokemonList.filter(poke => !rolledMons.includes(poke.name));
+        var rolledMon = Rand.fromArray(availableMons).name;
+        rolledMons.push(rolledMon);
+        if (rolledMons.length == pokemonList.length) {
+            rolledMons = [];
+        }
         return rolledMon;
     }
 
@@ -266,3 +252,40 @@ class Randomizer {
         }
     }
 }
+
+//Pokedex List
+PokedexHelper.getList =  eval(`(${
+    PokedexHelper.getList.toString()
+        .replace('getList()', '() =>')
+        .replace('(nativeRegion > GameConstants.MAX_AVAILABLE_REGION || nativeRegion == GameConstants.Region.none)', '(false)')
+        .replace(' && pokemon.id != Math.floor(pokemon.id)', '')
+})`);
+
+//Move to Region
+MapHelper.ableToTravel = function() {
+    var a, b;
+    // If player already reached highest region, they can't move on
+    if (player.highestRegion() >= GameConstants.MAX_AVAILABLE_REGION) {
+        return false;
+    }
+    // Check if player doesn't require complete dex to move on to the next region and has access to next regions starter town
+    if (!App.game.challenges.list.requireCompletePokedex.active()) {
+        return (b = (a = TownList[GameConstants.StartingTowns[player.highestRegion() + 1]]) === null || a === void 0 ? void 0 : a.isUnlocked()) !== null && b !== void 0 ? b : false;
+    }
+    // Check if Champion of Region
+    return App.game.badgeCase.badgeCount() == (player.highestRegion() + 1) * 13;
+};
+
+//Move to Region
+Pokeballs.prototype.calculatePokeballToUse = eval(`(${
+    Pokeballs.prototype.calculatePokeballToUse.toString()
+        .replace('calculatePokeballToUse', 'function')
+        .replace('else if (GameConstants.UltraBeastType[pokemon.name] != undefined)', 'else if (false)')
+})`);
+
+//Change default save name
+Save.download = eval(`(${
+    Save.download.toString()
+        .replace('download', 'function')
+        .replace('PokeClickerSave', 'PokeRandomSave')
+})`);
