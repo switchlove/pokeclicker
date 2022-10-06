@@ -8,6 +8,7 @@
         "scripts/acsrq-ui.js",
         "scripts/modules.min.js",
         "scripts/script.min.js",
+        "scripts/randomizer.js",
         "index.html"
     ]
 }
