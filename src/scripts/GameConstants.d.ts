@@ -331,11 +331,20 @@ namespace GameConstants {
         //'Grass_Flute' = '',
     }
     declare enum PokemonItemType {
+        'Pinkan Arbok',
+        'Pinkan Oddish',
+        'Pinkan Poliwhirl',
+        'Pinkan Geodude',
+        'Pinkan Dodrio',
+        'Lickitung',
+        'Pinkan Weezing',
+        'Mr. Mime',
+        'Pinkan Scyther',
+        'Jynx',
+        'Pinkan Electabuzz',
+        'Magikarp',
         'Eevee',
         'Porygon',
-        'Jynx',
-        'Mr. Mime',
-        'Lickitung',
         'Togepi',
         'Beldum',
         'Skorupi',
@@ -351,6 +360,7 @@ namespace GameConstants {
         'Arctozolt',
         'Dracovish',
         'Arctovish',
+        'Zarude (Dada)',
     }
 
     declare enum UltraBeastType {
@@ -398,6 +408,9 @@ namespace GameConstants {
         None = -2,
         All = -1,
         Kanto,
+        Johto,
+        Hoenn,
+        Sevii4567,
         Kalos,
         Alola,
         Galar,
@@ -442,6 +455,7 @@ namespace GameConstants {
     declare const UnovaGyms: string[];
     declare const KalosGyms: string[];
     declare const GalarGyms: string[];
+    declare const OrangeGyms: string[];
     declare const RegionGyms: string[][];
     declare function getGymIndex(gym: string): number;
     declare function getGymRegion(gym: string): Region;
@@ -475,6 +489,12 @@ namespace GameConstants {
         'Infected',
         'Contagious',
         'Resistant',
+    }
+    declare enum BerryTraderLocations {
+        'Goldenrod City',
+        'Mauville City',
+        'Pinkan Pokémon Reserve',
+        'Hearthome City',
     }
     declare enum ShardTraderLocations {
         'Cerulean City',
@@ -565,6 +585,7 @@ namespace GameConstants {
     declare enum KantoSubRegions {
         Kanto,
         Sevii123,
+        Sevii4567,
     }
     declare enum JohtoSubRegions {
         Johto,
@@ -584,9 +605,8 @@ namespace GameConstants {
     declare enum AlolaSubRegions {
         MelemeleIsland,
         AkalaIsland,
-        UlaulaAndPoniIslands,
-        // UlaulaIsland,
-        // PoniIsland,
+        UlaulaIsland,
+        PoniIsland,
     }
     declare enum GalarSubRegions {
         SouthGalar,
