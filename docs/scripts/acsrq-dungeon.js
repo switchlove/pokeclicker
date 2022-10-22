@@ -25,8 +25,8 @@ function dungeonBot() {
         return;
     }
 
-    const max = DungeonRunner.map.size - 1;
     const playerPos = DungeonRunner.map.playerPosition();
+    const max = DungeonRunner.map.floorSizes[playerPos.floor] - 1;
 
     //Tiles interaction
     switch (DungeonRunner.currentTileType()()) {
@@ -36,6 +36,7 @@ function dungeonBot() {
             }
             break;
         case GameConstants.DungeonTile.boss:
+        case GameConstants.DungeonTile.ladder:
             dungeonBot.boss = playerPos;
             if (Settings.getSetting('botRush').value) {
                 return DungeonRunner.handleClick();
@@ -45,26 +46,32 @@ function dungeonBot() {
 
     //handle flash for boss rush
     if (DungeonRunner.map.flash && Settings.getSetting('botRush').value) {
-        if (playerPos.y > 0 && DungeonRunner.map.board()[playerPos.y - 1][playerPos.x].type() == GameConstants.DungeonTile.boss) {
+        if (playerPos.y > 0 &&
+            (DungeonRunner.map.board()[playerPos.floor][playerPos.y - 1][playerPos.x].type() == GameConstants.DungeonTile.boss
+            || DungeonRunner.map.board()[playerPos.floor][playerPos.y - 1][playerPos.x].type() == GameConstants.DungeonTile.ladder)) {
             return DungeonRunner.map.moveUp();
         }
-        if (playerPos.x > 0 && DungeonRunner.map.board()[playerPos.y][playerPos.x - 1].type() == GameConstants.DungeonTile.boss) {
+        if (playerPos.x > 0 &&
+            (DungeonRunner.map.board()[playerPos.floor][playerPos.y ][playerPos.x - 1].type() == GameConstants.DungeonTile.boss
+            || DungeonRunner.map.board()[playerPos.floor][playerPos.y ][playerPos.x - 1].type() == GameConstants.DungeonTile.ladder)) {
             return DungeonRunner.map.moveLeft();
         }
-        if (playerPos.x < max && DungeonRunner.map.board()[playerPos.y][playerPos.x + 1].type() == GameConstants.DungeonTile.boss) {
+        if (playerPos.x < max &&
+            (DungeonRunner.map.board()[playerPos.floor][playerPos.y][playerPos.x + 1].type() == GameConstants.DungeonTile.boss
+            || DungeonRunner.map.board()[playerPos.floor][playerPos.y][playerPos.x + 1].type() == GameConstants.DungeonTile.ladder)) {
             return DungeonRunner.map.moveRight();
         }
     }
 
     //Go to boss tile once everything is finished (or boss rush was enabled after the boss tile was found)
-    if (dungeonBot.boss && (Settings.getSetting('botRush').value || DungeonRunner.map.board().every(row => row.every(tile => tile.isVisited)))) {
+    if (dungeonBot.boss?.floor == playerPos.floor && (Settings.getSetting('botRush').value || DungeonRunner.map.isFloorComplete())) {
         if (DungeonRunner.map.hasAccessToTile(dungeonBot.boss)) {
             DungeonRunner.map.moveToTile(dungeonBot.boss);
             return DungeonRunner.handleClick();
         }
 
         for (let y = dungeonBot.boss.y; y <= max; y++) {
-            let pos = {x:dungeonBot.boss.x, y:y};
+            let pos = {x:dungeonBot.boss.x, y, floor: playerPos.floor};
             if (DungeonRunner.map.hasAccessToTile(pos)) {
                 return DungeonRunner.map.moveToTile(pos);
             }
@@ -72,8 +79,8 @@ function dungeonBot() {
     }
 
     //Movement algorythme
-    if (!DungeonRunner.map.board().every(row => row.every(tile => tile.isVisited))) {
-        if (playerPos.y == max && !DungeonRunner.map.board()[max][0].isVisited) {
+    if (!DungeonRunner.map.isFloorComplete()) {
+        if (playerPos.y == max && !DungeonRunner.map.board()[playerPos.floor][max][0].isVisited) {
             return DungeonRunner.map.moveLeft();
         }
         if (playerPos.x == max) {
@@ -82,6 +89,10 @@ function dungeonBot() {
         return DungeonRunner.map.moveRight();
     }
 }
+
+DungeonMap.prototype.isFloorComplete = function() {
+    return this.board()[this.playerPosition().floor].every(row => row.every(tile => tile.isVisited));
+};
 
 //Check for dungeon options
 dungeonBot.isRunning = ko.pureComputed(() => {
@@ -107,11 +118,13 @@ dungeonBot.isRunning = ko.pureComputed(() => {
 const showAllTiles = DungeonMap.prototype.showAllTiles;
 DungeonMap.prototype.showAllTiles = function () {
     showAllTiles.call(this);
+    const floor = this.playerPosition().floor;
 
-    for (let y = 0; y < DungeonRunner.map.size; y++) {
-        for (let x = 0; x < DungeonRunner.map.size; x++) {
-            if (this.board()[y][x].type() == GameConstants.DungeonTile.boss) {
-                dungeonBot.boss = {x, y};
+    for (let y = 0; y < this.board()[floor].length; y++) {
+        for (let x = 0; x < this.board()[floor][y].length; x++) {
+            if (this.board()[floor][y][x].type() == GameConstants.DungeonTile.boss
+            || this.board()[floor][y][x].type() == GameConstants.DungeonTile.ladder) {
+                dungeonBot.boss = {x, y, floor};
             }
         }
     }

@@ -635,7 +635,7 @@ DungeonRunner.initializeDungeon = function(dungeon) {
                 chestToOpen = Settings.getSetting('chestCollect').observableValue()
                     ? Settings.getSetting('maxChests').observableValue()
                     : 0;
-                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.size}`;
+                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.totalChests()}`;
             }),
         });
 
