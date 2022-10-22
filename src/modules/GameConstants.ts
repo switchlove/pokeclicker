@@ -11,6 +11,7 @@ export const BATTLE_FRONTIER_TICK = 0.5 * SECOND;
 export const UNDERGROUND_TICK = 1 * SECOND;
 export const DUNGEON_TIME = 60 * SECOND;
 export const DUNGEON_TICK = 0.1 * SECOND;
+export const DUNGEON_LADDER_BONUS = 10 * SECOND;
 export const EFFECT_ENGINE_TICK = 1 * SECOND;
 export const SAVE_TICK = 10 * SECOND;
 export const GYM_TIME = 30 * SECOND;
@@ -24,6 +25,8 @@ export const WANDER_TICK = 1.5 * SECOND;
 export const TEMP_BATTLE_TIME = 60 * SECOND;
 export const TEMP_BATTLE_TICK = 0.1 * SECOND;
 
+// Update the requirement for "Final Region Town" in TownList, when adding new regions.
+// Else the professor NPC won't work.
 export enum Region {
     none = -1,
     kanto = 0,
@@ -38,7 +41,7 @@ export enum Region {
     final = 8,
 }
 
-export const MAX_AVAILABLE_REGION = Region.alola;
+export const MAX_AVAILABLE_REGION = Region.galar;
 
 export const MaxIDPerRegion = [
     151, // 151 - Kanto
@@ -64,6 +67,7 @@ export const SHINY_CHANCE_DUNGEON = 4096;
 export const SHINY_CHANCE_STONE = 2048;
 export const SHINY_CHANCE_SAFARI = 2048;
 export const SHINY_CHANCE_SHOP = 1024;
+export const SHINY_CHANCE_BATTLEFRONTIER = 1024;
 export const SHINY_CHANCE_BREEDING = 1024;
 export const SHINY_CHANCE_FARM = 1024;
 
@@ -106,6 +110,7 @@ export const BerryColor = [
 // Dungeons
 export const BASE_DUNGEON_SIZE = 5;
 export const MIN_DUNGEON_SIZE = 5;
+export const MAX_DUNGEON_SIZE = 10;
 export const DUNGEON_CHEST_SHOW = 2;
 export const DUNGEON_MAP_SHOW = 4;
 
@@ -118,27 +123,25 @@ export enum AchievementOption {
 
 export enum AchievementType {
     'None' = -1,
-    'Money' = 0,
-    'Token',
-    'Attack',
-    'Diamond',
-    'Underground Items Found',
-    'Underground Layers Mined',
-    'Max Level Oak Item',
-    'Captured',
-    'Defeated',
+    'Pokedollars' = 0,
+    'Dungeon Token',
     'Caught Pokemon',
     'Shiny Pokemon',
-    'Hatch',
-    'Pokeball',
-    'Click',
-    'Route Defeat',
+    'Total Captured',
+    'Total Defeated',
+    'Attack',
+    'Poke Balls',
+    'Route Defeats',
     'Clear Gym',
     'Clear Dungeon',
-    'Farming',
     'Quest',
+    'Max Level Oak Item',
+    'Hatchery',
+    'Farming',
+    'Underground',
     'Battle Frontier',
     'Protein',
+    'Pokerus',
 }
 
 export enum DungeonTile {
@@ -147,6 +150,7 @@ export enum DungeonTile {
     enemy,
     chest,
     boss,
+    ladder,
 }
 
 // Held item chance
@@ -156,6 +160,9 @@ export const DUNGEON_BOSS_HELD_ITEM_MODIFIER = DUNGEON_HELD_ITEM_MODIFIER * 1.5;
 export const HELD_ITEM_CHANCE = 512;
 export const HELD_UNDERGROUND_ITEM_CHANCE = 2048;
 export const DNA_ITEM_CHANCE = 60;
+export const LIGHT_ITEM_CHANCE = 100;
+export const RUST_ITEM_CHANCE = 90;
+export const MANE_ITEM_CHANCE = 10;
 
 // Gems
 export const GEM_UPGRADE_COST = 500;
@@ -657,28 +664,15 @@ export enum StoneType {
     'Sachet',
     'Whipped_dream',
     'Ice_stone',
+    'Solar_light',
+    'Lunar_light',
     'Sweet_apple',
     'Tart_apple',
     'Cracked_pot',
     'Galarica_cuff',
     'Galarica_wreath',
-}
-
-export enum ShardType {
-    'None' = -1,
-    'Red Shard',
-    'Yellow Shard',
-    'Green Shard',
-    'Blue Shard',
-    'Grey Shard',
-    'Purple Shard',
-    'Ochre Shard',
-    'Black Shard',
-    'Crimson Shard',
-    'Lime Shard',
-    'White Shard',
-    'Pink Shard',
-    'Cyan Shard',
+    'Black_mane_hair',
+    'White_mane_hair',
 }
 
 export enum FossilPieceType {
@@ -1254,6 +1248,7 @@ export const StartingTowns = [
     'Vaniville Town', // Kalos
     'Iki Town Outskirts', // Alola
     'Postwick', // Galar
+    'Final Region Town', // Final
 ];
 
 export const StartingRoutes = [
@@ -1297,6 +1292,7 @@ export const TemporaryBattles = [
     'Biker Goon 2',
     'Biker Goon 3',
     'Cue Ball Paxton',
+    'Sudowoodo',
     'Suicune 1',
     'Eusine',
     'Suicune 2',
@@ -1314,6 +1310,7 @@ export const TemporaryBattles = [
     'Scientist Gideon',
     'Pinkan Jessie & James',
     'Pinkan Officer Jenny',
+    'Kimono Girls',
     'Spiky-eared Pichu',
     'Rocket Boss Giovanni',
     'Galactic Boss Cyrus',
@@ -1407,6 +1404,7 @@ export const TemporaryBattles = [
     'Avery2',
     'Klara3',
     'Avery3',
+    'Kubfu',
     'Zarude Tribe 1',
     'Zarude Tribe 2',
     'Zarude Tribe 3',
@@ -1418,6 +1416,15 @@ export const TemporaryBattles = [
     'Glastrier',
     'Spectrier',
     'Dyna Tree Birds',
+    'Galarian Articuno 1',
+    'Galarian Articuno 2',
+    'Galarian Articuno 3',
+    'Galarian Zapdos 1',
+    'Galarian Zapdos 2',
+    'Galarian Zapdos 3',
+    'Galarian Moltres 1',
+    'Galarian Moltres 2',
+    'Galarian Moltres 3',
     'Regigigas',
 ];
 
@@ -1577,4 +1584,49 @@ export enum GalarSubRegions {
     NorthGalar,
     IsleofArmor,
     CrownTundra,
+}
+
+// Gender Types
+export enum Genders {
+    Genderless = 0,
+    MaleFemale, // Default
+}
+
+// Wild/Trainer/BF Pokémon Gender
+export enum BattlePokemonGender {
+    NoGender = 0,
+    Male,
+    Female,
+}
+
+// Pokemon Statistics
+export const STATISTIC_CAPTURED = 'Captured';
+export const STATISTIC_DEFEATED = 'Defeated';
+export const STATISTIC_ENCOUNTERED = 'Encountered';
+export const STATISTIC_HATCHED = 'Hatched';
+
+export enum AlcremieSweet {
+    'Strawberry Sweet',
+    'Love Sweet',
+    'Berry Sweet',
+    'Clover Sweet',
+    'Flower Sweet',
+    'Star Sweet',
+    'Ribbon Sweet',
+}
+export enum AlcremieSpins {
+    dayClockwiseBelow5,
+    dayCounterclockwiseBelow5,
+    nightClockwiseBelow5,
+    nightCounterclockwiseAbove5,
+    nightClockwiseAbove5,
+    nightCounterclockwiseBelow5,
+    dayClockwiseAbove5,
+    dayCounterclockwiseAbove5,
+    at7Above10,
+}
+
+export enum ExtraAchievementCategories {
+    global = Region.final,
+    sevii,
 }
