@@ -646,7 +646,7 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new G
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
 //#endregion
 //#region Alola
-// ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
 ChallengeRequirements.set(TownList['Melemele Woods'], new DungeonShinyRequirement('Hau\'oli Cemetery'));
 ChallengeRequirements.set(TownList['Iki Town'], new DungeonShinyRequirement('Seaward Cave'));
 ChallengeRequirement.set(SubRegions.getSubRegionById(GameConstants.Region.alola, 1), new DungeonShinyRequirement('Ten Carat Hill'));

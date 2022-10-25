@@ -464,7 +464,7 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
 //#endregion
 //#region Footer
 acsrqFooter = function () {
-    $('#battleContainer .card-footer')[0].insertAdjacentHTML('beforebegin', `
+    $('#battleContainer')[0].insertAdjacentHTML('beforeend', `
         <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot && acsrqFooter.showShiny">
             <table width="100%" class="table table-sm m-0">
                 <colgroup>
@@ -635,7 +635,7 @@ DungeonRunner.initializeDungeon = function(dungeon) {
                 chestToOpen = Settings.getSetting('chestCollect').observableValue()
                     ? Settings.getSetting('maxChests').observableValue()
                     : 0;
-                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.size}`;
+                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.totalChests()}`;
             }),
         });
 
