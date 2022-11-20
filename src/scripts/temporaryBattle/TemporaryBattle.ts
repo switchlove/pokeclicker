@@ -5,19 +5,23 @@ type TemporaryBattleOptionalArgument = {
     displayName?: string,
     returnTown?: string, // If in town, that town will be used. If not in town, this will be used, with the Dock town as default
     imageName?: string,
+    visibleRequirement?: Requirement,
+    hideTrainer?: boolean,
 };
 
 class TemporaryBattle extends TownContent {
     completeRequirements: (Requirement | OneFromManyRequirement)[];
 
     public cssClass(): string {
-        return 'btn btn-secondary';
+        return App.game.statistics.temporaryBattleDefeated[GameConstants.getTemporaryBattlesIndex(this.name)]() ?
+            'btn btn-success' :
+            'btn btn-secondary';
     }
     public text(): string {
         return `Fight ${this.getDisplayName()}`;
     }
     public isVisible(): boolean {
-        return this.isUnlocked() && !this.completeRequirements.every(r => r.isCompleted());
+        return (this.isUnlocked() || this.optionalArgs.visibleRequirement?.isCompleted()) && !this.completeRequirements.every(r => r.isCompleted());
     }
     public onclick(): void {
         TemporaryBattleRunner.startBattle(this);
@@ -49,7 +53,7 @@ class TemporaryBattle extends TownContent {
 
     constructor(
         public name: string,
-        public pokemons: GymPokemon[],
+        private pokemons: GymPokemon[],
         public defeatMessage: string,
         requirements: Requirement[] = [],
         completeRequirements: Requirement[] = undefined,
@@ -59,6 +63,13 @@ class TemporaryBattle extends TownContent {
         if (!completeRequirements) {
             completeRequirements = [new TemporaryBattleRequirement(name)];
         }
+        if (optionalArgs.isTrainerBattle == undefined) {
+            optionalArgs.isTrainerBattle = true;
+        }
         this.completeRequirements = completeRequirements;
+    }
+
+    public getPokemonList() {
+        return this.pokemons.filter((p) => p.requirements.every((r => r.isCompleted())));
     }
 }

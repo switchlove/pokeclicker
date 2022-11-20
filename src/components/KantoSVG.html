@@ -636,7 +636,7 @@
             , x: 27, y: 37
             , width: 6, height: 3
             , databind: "click:function(){MapHelper.moveToTown('Pallet Town')}, attr:{ class: MapHelper.calculateTownCssClass('Pallet Town') }"
-            , visible:  "MapHelper.ableToTravel() && player.starter() != GameConstants.Starter.Pikachu"
+            , visible:  "MapHelper.ableToTravel() && player.regionStarters[GameConstants.Region.kanto]() != GameConstants.Starter.Special"
             , image: "assets/images/map/blimp_empty.png"
             })
         %>
@@ -646,7 +646,7 @@
             , x: 27, y: 37
             , width: 6, height: 3
             , databind: "click:function(){MapHelper.moveToTown('Pallet Town')}, attr:{ class: MapHelper.calculateTownCssClass('Pallet Town') }"
-            , visible:  "MapHelper.ableToTravel() && player.starter() == GameConstants.Starter.Pikachu"
+            , visible:  "MapHelper.ableToTravel() && player.regionStarters[GameConstants.Region.kanto]() == GameConstants.Starter.Special"
             , image: "assets/images/map/blimp_pikachu.png"
             })
         %>
@@ -672,6 +672,46 @@
         %>
 
         <%- include('templates/mapOverlay',
+            { name: "Rival Blue"
+            , x: 17, y: 24
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Blue 1'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Blue 1'] && TemporaryBattleList['Blue 1'].isVisible()"
+            , image: "assets/images/map/blue.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Rival Blue"
+            , x: 65.5, y: 5
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Blue 2'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Blue 2'] && TemporaryBattleList['Blue 2'].isVisible()"
+            , image: "assets/images/map/blue.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Rival Blue"
+            , x: 62, y: 34
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Blue 3'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Blue 3'] && TemporaryBattleList['Blue 3'].isVisible()"
+            , image: "assets/images/map/blue.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Rival Blue"
+            , x: 17, y: 24
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Blue 6'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Blue 6'] && TemporaryBattleList['Blue 6'].isVisible()"
+            , image: "assets/images/map/blue.png"
+            })
+        %>
+
+      <%- include('templates/mapOverlay',
             { name: "Ash Ketchum"
             , x: 18, y: 33
             , width: 4, height: 4
@@ -680,6 +720,67 @@
             , image: "assets/images/map/ashketchumoverworld.png"
             })
         %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Suicune"
+            , x: 66, y: 34
+            , width: 3, height: 4
+            , databind: "click: () => TemporaryBattleList['Suicune 3'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Suicune 3'] && TemporaryBattleList['Suicune 3'].isVisible()"
+            , image: "assets/images/map/suicune.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Suicune"
+            , x: 75, y: 43
+            , width: 3, height: 4
+            , databind: "click: () => TemporaryBattleList['Suicune 4'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Suicune 4'] && TemporaryBattleList['Suicune 4'].isVisible()"
+            , image: "assets/images/map/suicune.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Suicune"
+            , x: 80, y: 1
+            , width: 3, height: 4
+            , databind: "click: () => TemporaryBattleList['Suicune 5'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Suicune 5'] && TemporaryBattleList['Suicune 5'].isVisible()"
+            , image: "assets/images/map/suicune.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Suicune"
+            , x: 80, y: 1
+            , width: 3, height: 4
+            , databind: "click: () => TemporaryBattleList['Suicune 6'].protectedOnclick()"
+            , visible:  "TemporaryBattleList['Suicune 6'] && TemporaryBattleList['Suicune 6'].isVisible()"
+            , image: "assets/images/map/suicune.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+            { name: "Snorlax"
+            , x: 36, y: 19
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Snorlax route 16'].protectedOnclick(), attr: { class: TemporaryBattleList['Snorlax route 16'].isUnlocked() ? '' : 'locked' }"
+            , visible:  "TemporaryBattleList['Snorlax route 16'] && TemporaryBattleList['Snorlax route 16'].isVisible()"
+            , image: "assets/images/map/snorlaxoverworld.png"
+            })
+        %>
+
+        <%- include('templates/mapOverlay',
+        { name: "Snorlax"
+            , x: 87, y: 32
+            , width: 4, height: 4
+            , databind: "click: () => TemporaryBattleList['Snorlax route 12'].protectedOnclick(), attr: { class: TemporaryBattleList['Snorlax route 12'].isUnlocked() ? '' : 'locked' }"
+            , visible:  "TemporaryBattleList['Snorlax route 12'] && TemporaryBattleList['Snorlax route 12'].isVisible()"
+            , image: "assets/images/map/snorlaxoverworld.png"
+            })
+        %>
+    %>
     </g>
 
     <g data-bind="visible: player.subregion == SubRegions.getSubRegion(GameConstants.Region.kanto, 'Sevii Islands 123').id">
@@ -779,6 +880,61 @@
             { name: "Professor Ivy\'s Lab"
             , x: 97.3, y: 36
             , width: 1.5, height: 0.4
+            , isExtension: true
+            })
+        %>
+
+
+        <!--Client Island-->
+        <%- include('templates/mapOverlay',
+            { x: 72, y: 6
+            , width: 16, height: 16
+            , databind: "style: {'pointer-events': 'none'}"
+            , visible:  "App.isUsingClient && App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Cinnabar Island')]() >= 1"
+            , image: "assets/images/map/client_island.png"
+            })
+        %>
+        <!--Client Island extension-->
+        <%- include('templates/mapOverlay',
+            { name: "Client Island"
+            , x: 76, y: 12
+            , width: 7, height: 4
+            , databind: "click:function(){MapHelper.moveToTown('Client Island')}, attr:{ class: MapHelper.calculateTownCssClass('Client Island') }"
+            , visible:  "App.isUsingClient && App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Cinnabar Island')]() >= 1"
+            , image: "assets/images/map/transparent.png"
+            , connectedToTown: "Client Island"
+            })
+        %>
+        <!--Client Island extension-->
+        <%- include('templates/mapOverlay',
+            { name: "Client Island"
+            , x: 77, y: 16
+            , width: 5, height: 1
+            , databind: "click:function(){MapHelper.moveToTown('Client Island')}, attr:{ class: MapHelper.calculateTownCssClass('Client Island') }"
+            , visible:  "App.isUsingClient && App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Cinnabar Island')]() >= 1"
+            , image: "assets/images/map/transparent.png"
+            , isExtension: true
+            })
+        %>
+        <!--Client Island extension-->
+        <%- include('templates/mapOverlay',
+            { name: "Client Island"
+            , x: 77, y: 11
+            , width: 6, height: 1
+            , databind: "click:function(){MapHelper.moveToTown('Client Island')}, attr:{ class: MapHelper.calculateTownCssClass('Client Island') }"
+            , visible:  "App.isUsingClient && App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Cinnabar Island')]() >= 1"
+            , image: "assets/images/map/transparent.png"
+            , isExtension: true
+            })
+        %>
+        <!--Client Island extension-->
+        <%- include('templates/mapOverlay',
+            { name: "Client Island"
+            , x: 78, y: 10
+            , width: 3, height: 1
+            , databind: "click:function(){MapHelper.moveToTown('Client Island')}, attr:{ class: MapHelper.calculateTownCssClass('Client Island') }"
+            , visible:  "App.isUsingClient && App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Cinnabar Island')]() >= 1"
+            , image: "assets/images/map/transparent.png"
             , isExtension: true
             })
         %>

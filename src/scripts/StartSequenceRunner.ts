@@ -15,12 +15,13 @@ class StartSequenceRunner {
         App.game.quests.getQuestLine('Tutorial Quests').beginQuest(0);
         this.starterPicked = s;
         $('#pickStarterTutorialModal').modal('hide');
-        const dataPokemon = PokemonHelper.getPokemonByName(GameConstants.Starter[this.starterPicked]);
+        const dataPokemon = PokemonHelper.getPokemonById(GameConstants.RegionalStarters[GameConstants.Region.kanto][this.starterPicked]);
         const shiny: boolean = PokemonFactory.generateShiny(GameConstants.SHINY_CHANCE_BATTLE);
+        const gender = PokemonFactory.generateGender(dataPokemon.gender.femaleRatio, dataPokemon.gender.type);
 
         App.game.gameState = GameConstants.GameState.fighting;
 
-        const battlePokemon = new BattlePokemon(dataPokemon.name, dataPokemon.id, dataPokemon.type1, dataPokemon.type2, 10, 1, 100, 0, new Amount(0, GameConstants.Currency.money), shiny);
+        const battlePokemon = new BattlePokemon(dataPokemon.name, dataPokemon.id, dataPokemon.type1, dataPokemon.type2, 10, 1, 100, 0, new Amount(0, GameConstants.Currency.money), shiny, 0, gender);
         Battle.enemyPokemon(battlePokemon);
 
         // Show the help information text
@@ -38,7 +39,7 @@ class StartSequenceRunner {
             if (battlePokemon.health() <= 0) {
                 setTimeout(() => {
                     Information.hide();
-                    player.starter(StartSequenceRunner.starterPicked);
+                    player.regionStarters[GameConstants.Region.kanto](StartSequenceRunner.starterPicked);
                     App.game.profile.pokemon(dataPokemon.id);
                     StartSequenceRunner.showCaughtMessage();
                 }, 1000);
@@ -79,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 $('#starterSelection').append(`<div class="col">
                         <input class="image-starter" type="image"
                            src="assets/images/pokemon/25.png"
-                           onclick="StartSequenceRunner.pickStarter(GameConstants.Starter.Pikachu)">
+                           onclick="StartSequenceRunner.pickStarter(GameConstants.Starter.Special)">
                     </div>`);
             }
         }
