@@ -18,20 +18,20 @@ class PartyController {
         return CaughtStatus.NotCaught;
     }
 
-    static getStoneEvolutionsCaughtStatus(id: number, evoType?: GameConstants.StoneType): CaughtStatus[] {
+    static getStoneEvolutionsCaughtData(id: number, evoType?: GameConstants.StoneType): { status: CaughtStatus, locked: boolean, lockHint: string }[] {
         const pokemon = App.game.party.caughtPokemon.find(p => p.id == id);
-        const statuses: CaughtStatus[] = [];
         if (pokemon) {
-            for (const evolution of pokemon.evolutions) {
-                // skip other Restrictions to show all eevee evolutions for the region
-                const regionStatisfied = PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon()) <= player.highestRegion();
-                if (evolution instanceof StoneEvolution && evolution.stone == evoType && regionStatisfied) {
-                    const pStatus = this.getCaughtStatusByName(evolution.getEvolvedPokemon());
-                    statuses.push(pStatus);
-                }
-            }
+            return pokemon.evolutions
+                .filter((evo) => evo.trigger === EvoTrigger.STONE &&
+                    (evo as StoneEvoData).stone === evoType &&
+                    PokemonHelper.calcNativeRegion(evo.evolvedPokemon) <= player.highestRegion())
+                .map((evo) => ({
+                    status: this.getCaughtStatusByName(evo.evolvedPokemon),
+                    locked: !EvolutionHandler.isSatisfied(evo),
+                    lockHint: evo.restrictions.filter(r => !r.isCompleted()).map(r => r.hint()).join('<br>'),
+                }));
         }
-        return statuses;
+        return [];
     }
 
     static hasMultipleStoneEvolutionsAvailable(pokemonName: PokemonNameType, evoType: GameConstants.StoneType) {
@@ -40,7 +40,7 @@ class PartyController {
         let found = false;
         if (pokemon) {
             for (const evolution of pokemon.evolutions) {
-                if (evolution instanceof StoneEvolution && evolution.stone == evoType && evolution.isSatisfied()) {
+                if (evolution.trigger === EvoTrigger.STONE && (evolution as StoneEvoData).stone == evoType && EvolutionHandler.isSatisfied(evolution)) {
                     // If we've already found 1 evolution, then there are multiple possible evolutions
                     if (found) {
                         return true;
@@ -85,6 +85,27 @@ class PartyController {
         }
         return PartyController.proteinSortedList;
     }).extend({ rateLimit: 500 });
+
+    private static heldItemSortedList = [];
+    static getHeldItemSortedList = ko.pureComputed(() => {
+        // If the held item modal is open, we should sort it.
+        if (modalUtils.observableState.heldItemModal === 'show') {
+            PartyController.heldItemSortedList = [...App.game.party.caughtPokemon];
+            return PartyController.heldItemSortedList.sort(PartyController.compareBy(Settings.getSetting('heldItemSort').observableValue(), Settings.getSetting('heldItemSortDirection').observableValue()));
+        }
+        return PartyController.heldItemSortedList;
+    }).extend({ rateLimit: 500 });
+
+    private static pokemonsWithHeldItemSortedList = [];
+    static getPokemonsWithHeldItemSortedList = ko.pureComputed(() => {
+        // If the held item modal is open, we should sort it.
+        if (modalUtils.observableState.heldItemModal === 'show') {
+            PartyController.pokemonsWithHeldItemSortedList = [...App.game.party.caughtPokemon.filter(p => p.heldItem())];
+            return PartyController.pokemonsWithHeldItemSortedList.sort(PartyController.compareBy(Settings.getSetting('heldItemSort').observableValue(), Settings.getSetting('heldItemSortDirection').observableValue()));
+        }
+        return PartyController.pokemonsWithHeldItemSortedList;
+    }).extend({ rateLimit: 500 });
+
 
     public static calculateRegionalMultiplier(pokemon: PartyPokemon, region: number): number {
         if (region > -1 && PokemonHelper.calcNativeRegion(pokemon.name) !== region) {

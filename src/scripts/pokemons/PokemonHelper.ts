@@ -1,4 +1,3 @@
-///<reference path="PokemonList.ts"/>
 ///<reference path="../GameConstants.d.ts"/>
 
 enum PokemonLocationType {
@@ -18,94 +17,22 @@ enum PokemonLocationType {
     Discord,
 }
 
-class PokemonHelper {
+class PokemonHelper extends TmpPokemonHelper {
 
+    // Can't move to modules yet because it wants to know what a PartyPokemon looks like
+    // TODO: Maybe this one should be on Party too...
     public static getPokemonsWithEvolution(evoType: GameConstants.StoneType): PartyPokemon[] {
         return App.game.party.caughtPokemon.filter((partyPokemon: PartyPokemon) => {
             if (!partyPokemon.evolutions) {
                 return false;
             }
             for (const evolution of partyPokemon.evolutions) {
-                if (evolution instanceof StoneEvolution && evolution.stone == evoType && evolution.isSatisfied() && PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon()) <= player.highestRegion()) {
+                if (evolution.trigger === EvoTrigger.STONE && (evolution as StoneEvoData).stone == evoType && EvolutionHandler.isSatisfied(evolution) && PokemonHelper.calcNativeRegion(evolution.evolvedPokemon) <= player.highestRegion()) {
                     return true;
                 }
             }
             return false;
         }).sort((a, b) => a.id - b.id);
-    }
-
-    public static getEvolution(id: number, evoType: GameConstants.StoneType): string {
-        const pokemon = App.game.party.getPokemon(id);
-        if (pokemon) {
-            for (const evolution of pokemon.evolutions) {
-                if (evolution instanceof StoneEvolution && evolution.stone == evoType) {
-                    return evolution.getEvolvedPokemon();
-                }
-            }
-        }
-        return '';
-    }
-
-    public static getPokemonById(id: number): DataPokemon {
-        return this.getPokemonByName(pokemonMap[id].name);
-    }
-
-    public static getPokemonByName(name: PokemonNameType): DataPokemon {
-        const basePokemon = pokemonMap[name];
-        if (!basePokemon) {
-            console.warn('Could not find pokemon', name);
-            return;
-        }
-
-        const type1 = basePokemon.type[0];
-        const type2: PokemonType = basePokemon.type[1] ?? PokemonType.None;
-
-        const eggCycles: number = basePokemon.eggCycles || 20;
-        return new DataPokemon(basePokemon.id, basePokemon.name, basePokemon.catchRate, basePokemon.evolutions, type1, type2, basePokemon.attack, basePokemon.base.hitpoints, basePokemon.levelType, basePokemon.exp, eggCycles, basePokemon.heldItem);
-    }
-
-    public static typeStringToId(id: string) {
-        return PokemonType[id];
-    }
-
-    public static typeIdToString(id: number) {
-        return PokemonType[id];
-    }
-
-    public static getImage(pokemon: PokemonInterface, shiny: boolean): string {
-        let src = 'assets/images/';
-        if (shiny) {
-            src += 'shiny';
-        }
-        src += `pokemon/${pokemon.id}.png`;
-        return src;
-    }
-
-    public static getPokeballImage(pokemonName: PokemonNameType): string {
-        let src = '';
-        if (App.game.party.alreadyCaughtPokemon(PokemonHelper.getPokemonByName(pokemonName).id)) {
-            src = 'assets/images/pokeball/Pokeball-';
-            if (App.game.party.alreadyCaughtPokemon(PokemonHelper.getPokemonByName(pokemonName).id, true)) {
-                src += 'shiny-';
-            }
-            src += 'small.png';
-        }
-        return src;
-    }
-
-
-    public static calcNativeRegion(pokemonName: PokemonNameType) {
-        const pokemon = pokemonMap[pokemonName];
-        if (pokemon.nativeRegion != undefined) {
-            return pokemon.nativeRegion;
-        }
-        const id = pokemon.id;
-        const region = GameConstants.MaxIDPerRegion.findIndex(maxRegionID => maxRegionID >= Math.floor(id));
-        return region >= 0 ? region : GameConstants.Region.none;
-    }
-
-    public static calcUniquePokemonsByRegion(region: GameConstants.Region) {
-        return new Set(pokemonList.filter(p => p.id > 0 && PokemonHelper.calcNativeRegion(p.name) === region).map(p => Math.floor(p.id))).size;
     }
 
     /*
@@ -289,11 +216,11 @@ class PokemonHelper {
         return safariPokemon ? +((SafariPokemon.calcPokemonWeight(safariPokemon) / safariWeight) * 100).toFixed(2) : 0;
     }
 
-    public static getPokemonPrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): Array<Evolution> {
+    public static getPokemonPrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): Array<EvoData> {
         const evolutions = [];
-        const prevolutionPokemon = pokemonList.filter((p: PokemonListData) => p.evolutions?.find(e => e.getEvolvedPokemon() == pokemonName));
+        const prevolutionPokemon = pokemonList.filter((p: PokemonListData) => p.evolutions?.find(e => e.evolvedPokemon == pokemonName));
         prevolutionPokemon.forEach((p: PokemonListData) => p.evolutions.forEach(e => {
-            if (e.getEvolvedPokemon() == pokemonName) {
+            if (e.evolvedPokemon == pokemonName) {
                 if (maxRegion != GameConstants.Region.none && p.nativeRegion > maxRegion) {
                     return false;
                 }
@@ -303,20 +230,20 @@ class PokemonHelper {
         return evolutions;
     }
 
-    public static getPokemonLevelPrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): Evolution {
-        const evolutionPokemon = pokemonList.find((p: PokemonListData) => p.evolutions?.find(e => e.type.includes(EvolutionType.Level) && e.getEvolvedPokemon() == pokemonName));
+    public static getPokemonLevelPrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): EvoData {
+        const evolutionPokemon = pokemonList.find((p: PokemonListData) => p.evolutions?.find(e => e.trigger === EvoTrigger.LEVEL && e.evolvedPokemon == pokemonName));
         if (maxRegion != GameConstants.Region.none && pokemonMap[evolutionPokemon.name].nativeRegion > maxRegion) {
             return;
         }
-        return (evolutionPokemon as PokemonListData)?.evolutions?.find(e => e.getEvolvedPokemon() == pokemonName);
+        return (evolutionPokemon as PokemonListData)?.evolutions?.find(e => e.evolvedPokemon == pokemonName);
     }
 
-    public static getPokemonStonePrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): Evolution {
-        const evolutionPokemon = pokemonList.find((p: PokemonListData) => p.evolutions?.find(e => e.type.includes(EvolutionType.Stone) && e.getEvolvedPokemon() == pokemonName));
+    public static getPokemonStonePrevolution(pokemonName: PokemonNameType, maxRegion: GameConstants.Region = GameConstants.Region.none): EvoData {
+        const evolutionPokemon = pokemonList.find((p: PokemonListData) => p.evolutions?.find(e => e.trigger === EvoTrigger.STONE && e.evolvedPokemon == pokemonName));
         if (maxRegion != GameConstants.Region.none && pokemonMap[evolutionPokemon.name].nativeRegion > maxRegion) {
             return;
         }
-        return (evolutionPokemon as PokemonListData)?.evolutions?.find(e => e.getEvolvedPokemon() == pokemonName);
+        return (evolutionPokemon as PokemonListData)?.evolutions?.find(e => e.evolvedPokemon == pokemonName);
     }
 
     public static getPokemonBattleFrontier(pokemonName: PokemonNameType): Array<number> {
