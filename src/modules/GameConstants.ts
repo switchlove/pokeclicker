@@ -159,6 +159,7 @@ export const DUNGEON_HELD_ITEM_MODIFIER = ROUTE_HELD_ITEM_MODIFIER * 4;
 export const DUNGEON_BOSS_HELD_ITEM_MODIFIER = DUNGEON_HELD_ITEM_MODIFIER * 1.5;
 export const HELD_ITEM_CHANCE = 512;
 export const HELD_UNDERGROUND_ITEM_CHANCE = 2048;
+export const GRISEOUS_ITEM_CHANCE = 80;
 export const DNA_ITEM_CHANCE = 60;
 export const LIGHT_ITEM_CHANCE = 100;
 export const RUST_ITEM_CHANCE = 90;
@@ -535,7 +536,7 @@ export const Environments: Record<string, EnvironmentData> = {
     Fire: {
         [Region.kanto]: new Set(['Cinnabar Island', 'Mt. Ember', 'Mt. Ember Summit', 'Ruby Path']),
         [Region.johto]: new Set(),
-        [Region.hoenn]: new Set(['Lavaridge Town', 'Fiery Path', 'Mt. Chimney', 'Mt. Chimney Crater']),
+        [Region.hoenn]: new Set(['Lavaridge Town', 'Fiery Path', 'Mt. Chimney', 'Mt. Chimney Crater', 'Magma Hideout']),
         [Region.sinnoh]: new Set(['Stark Mountain']),
         [Region.unova]: new Set(['Reversal Mountain']),
         [Region.kalos]: new Set(),
@@ -557,12 +558,12 @@ export const Environments: Record<string, EnvironmentData> = {
     Cave: {
         [Region.kanto]: new Set([37, 39, 'Pewter City', 'Diglett\'s Cave', 'Mt. Moon', 'Rock Tunnel', 'Victory Road', 'Lost Cave', 'Altering Cave', 'Tanoby Ruins']),
         [Region.johto]: new Set(['Cianwood City', 'Ruins of Alph', 'Union Cave', 'Mt. Mortar', 'Dark Cave', 'Tohjo Falls', 'Victory Road Johto']),
-        [Region.hoenn]: new Set(['Rustboro City', 'Dewford Town', 'Rusturf Tunnel', 'Granite Cave', 'Meteor Falls', 'Seafloor Cavern', 'Victory Road Hoenn']),
+        [Region.hoenn]: new Set(['Rustboro City', 'Dewford Town', 'Rusturf Tunnel', 'Granite Cave', 'Meteor Falls', 'Jagged Pass', 'Seafloor Cavern', 'Victory Road Hoenn']),
         [Region.sinnoh]: new Set(['Oreburgh City', 'Oreburgh Gate', 'Wayward Cave', 'Mt. Coronet', 'Mt. Coronet South', 'Iron Island', 'Mt. Coronet North', 'Victory Road Sinnoh']),
         [Region.unova]: new Set(['Relic Castle', 'Relic Passage', 'Seaside Cave', 'Victory Road Unova', 'Twist Mountain']),
         [Region.kalos]: new Set([9, 13, 'Connecting Cave', 'Kiloude City', 'Terminus Cave', 'Victory Road Kalos']),
         [Region.alola]: new Set([12, 22, 29, 'Verdant Cavern', 'Seaward Cave', 'Ten Carat Hill', 'Diglett\'s Tunnel', 'Vast Poni Canyon']),
-        [Region.galar]: new Set(['Warm-Up Tunnel', 'Courageous Cavern', 'Brawlers Cave', 'Rock Peak Ruins', 'Split-Decision Ruins', 'Lakeside Cave', 'Tunnel to the Top', 18]),
+        [Region.galar]: new Set(['Warm-Up Tunnel', 'Courageous Cavern', 'Brawlers\' Cave', 'Rock Peak Ruins', 'Split-Decision Ruins', 'Lakeside Cave', 'Tunnel to the Top', 18]),
     },
 
     GemCave: {
@@ -579,7 +580,7 @@ export const Environments: Record<string, EnvironmentData> = {
     PowerPlant: {
         [Region.kanto]: new Set(['Vermilion City', 'Rocket Game Corner', 'Power Plant']),
         [Region.johto]: new Set(['Tin Tower', 'Team Rocket\'s Hideout', 'Radio Tower']),
-        [Region.hoenn]: new Set(['Mauville City', 'New Mauville', 'Weather Institute']),
+        [Region.hoenn]: new Set(['Mauville City', 'New Mauville', 'Weather Institute', 'Aqua Hideout']),
         [Region.sinnoh]: new Set(['Sunyshore City', 'Valley Windworks', 'Team Galactic Eterna Building', 'Team Galactic HQ']),
         [Region.unova]: new Set(['Castelia Sewers', 'Virbank City', 'Nimbasa City', 'A Totally Unsuspicious Frigate', 'Plasma Frigate']),
         [Region.kalos]: new Set(['Lumiose City', 'Kalos Power Plant', 'Poké Ball Factory', 'Team Flare Secret HQ']),
@@ -590,12 +591,12 @@ export const Environments: Record<string, EnvironmentData> = {
     Mansion: {
         [Region.kanto]: new Set(['Silph Co.', 'Pokémon Mansion']),
         [Region.johto]: new Set(['Olivine City', 'Sprout Tower', 'Burned Tower']),
-        [Region.hoenn]: new Set(['Petalburg City', 'Jagged Pass']),
+        [Region.hoenn]: new Set(['Petalburg City']),
         [Region.sinnoh]: new Set(['Veilstone City', 'Canalave City', 'Snowpoint Temple']),
         [Region.unova]: new Set(['Castelia City', 'Mistralton City', 'Opelucid City', 'Liberty Garden', 'Dragonspiral Tower', 'Dreamyard']),
         [Region.kalos]: new Set(['Parfum Palace', 'Lost Hotel']),
         [Region.alola]: new Set(['Trainers\' School', 'Thrifty Megamart', 'Po Town', 'Ruins of Conflict', 'Ruins of Life', 'Ruins of Abundance', 'Ruins of Hope']),
-        [Region.galar]: new Set(['Rose Tower', 'Hammerlocke', 'Stow-on-Side', 'Tower of Darkness', 'Tower of waters', 'Professor Magnolia\'s House', 'Wyndon', 'Wyndon Stadium', 'Master Dojo', 11]),
+        [Region.galar]: new Set(['Rose Tower', 'Hammerlocke', 'Stow-on-Side', 'Tower of Darkness', 'Tower of Waters', 'Professor Magnolia\'s House', 'Wyndon', 'Wyndon Stadium', 'Master Dojo', 11]),
     },
 
     Graveyard: {
@@ -625,11 +626,11 @@ export const EnvironmentCssClass: Record<Environment, string> = {
 };
 
 export enum Starter {
-    'None' = -1,
-    'Bulbasaur' = 0,
-    'Charmander' = 1,
-    'Squirtle' = 2,
-    'Pikachu' = 3,
+    None = -1,
+    Grass = 0,
+    Fire = 1,
+    Water = 2,
+    Special = 3,
 }
 
 export enum StoneType {
@@ -663,9 +664,11 @@ export enum StoneType {
     'White_DNA',
     'Sachet',
     'Whipped_dream',
+    'Key_stone',
     'Ice_stone',
     'Solar_light',
     'Lunar_light',
+    'Pure_light',
     'Sweet_apple',
     'Tart_apple',
     'Cracked_pot',
@@ -792,6 +795,7 @@ export enum BulletinBoards {
     Johto,
     Hoenn,
     Sevii4567,
+    Sinnoh,
     Kalos,
     Alola,
     Galar,
@@ -1205,7 +1209,7 @@ export const GalarDungeons = [
     'Energy Plant',
     'Dusty Bowl',
     'Courageous Cavern',
-    'Brawlers Cave',
+    'Brawlers\' Cave',
     'Warm-Up Tunnel',
     'Tower of Darkness',
     'Tower of Waters',
@@ -1274,7 +1278,7 @@ export const DockTowns = [
 ];
 
 export const RegionalStarters = [
-    [1, 4, 7], // Kanto
+    [1, 4, 7, 25], // Kanto
     [152, 155, 158], // Johto
     [252, 255, 258], // Hoenn
     [387, 390, 393], // Sinnoh
@@ -1285,14 +1289,25 @@ export const RegionalStarters = [
 ];
 
 export const TemporaryBattles = [
+    'Blue 1',
+    'Blue 2',
+    'Blue 3',
+    'Blue 4',
     'Fighting Dojo',
     'Snorlax route 12',
     'Snorlax route 16',
+    'Blue 5',
     'Biker Goon 1',
     'Biker Goon 2',
     'Biker Goon 3',
     'Cue Ball Paxton',
+    'Blue 6',
+    'Silver 1',
+    'Silver 2',
     'Sudowoodo',
+    'Silver 3',
+    'Silver 4',
+    'Silver 5',
     'Suicune 1',
     'Eusine',
     'Suicune 2',
@@ -1300,6 +1315,18 @@ export const TemporaryBattles = [
     'Suicune 4',
     'Suicune 5',
     'Suicune 6',
+    'Silver 6',
+    'Silver 7',
+    'May 1',
+    'May 2',
+    'May 3',
+    'Wally 1',
+    'May 4',
+    'Kecleon 1',
+    'Kecleon 2',
+    'Kecleon 3',
+    'May 5',
+    'Wally 2',
     'Sevii Rocket Grunt 1',
     'Sevii Rocket Grunt 2',
     'Sevii Rocket Grunt 3',
@@ -1313,14 +1340,29 @@ export const TemporaryBattles = [
     'Kimono Girls',
     'Spiky-eared Pichu',
     'Rocket Boss Giovanni',
+    'Barry 1',
+    'Barry 2',
+    'Barry 3',
+    'Barry 4',
     'Galactic Boss Cyrus',
+    'Barry 5',
+    'Barry 6',
+    'Barry 7',
+    'Zero',
+    'Hugh 1',
+    'Hugh 2',
     'Team Plasma Grunt 1',
+    'Colress 1',
     'Team Plasma Grunt 2',
     'Team Plasma Grunt 3',
+    'Hugh 3',
+    'Cheren',
+    'Colress 2',
     'Team Plasma Grunt 4',
     'Team Plasma Grunt 5',
     'Team Plasma Grunts 1',
     'Team Plasma Grunts 2',
+    'Hugh 4',
     'Team Plasma Grunt 6',
     'Zinzolin 1',
     'Team Plasma Grunt 7',
@@ -1328,18 +1370,36 @@ export const TemporaryBattles = [
     'Team Plasma Grunt 9',
     'Zinzolin 2',
     'Plasma Shadow 1',
-    'Colress',
+    'Colress 3',
     'Plasma Shadow 2',
     'Plasma Shadow 3',
     'Plasma Shadow 4',
     'Ghetsis 1',
     'Ghetsis 2',
+    'Hugh 5',
+    'Hugh 6',
+    'Hugh 7',
+    'Dream Researcher',
+    'Shauna 1',
+    'Sycamore 1',
+    'Tierno 1',
+    'Trevor & Tierno',
+    'Calem 1',
+    'Korrina',
     'Aipom Alley',
     'Mime Interview',
     'Underground Fighting Ring',
     'Lab Ambush',
     'Imposter',
     'Possessed Mewtwo',
+    'Calem 2',
+    'Calem 3',
+    'Calem 4',
+    'Sycamore 2',
+    'Shauna 2',
+    'Tierno 2',
+    'Trevor',
+    'Calem 5',
     'Riot',
     'Merilyn',
     'Millis and Argus Steel',
@@ -1351,7 +1411,21 @@ export const TemporaryBattles = [
     'Ash Ketchum Unova',
     'Ash Ketchum Kalos',
     'Ash Ketchum Pinkan',
+    'Calem 6',
+    'Hau 1',
+    'Hau 2',
+    'Hau 3',
+    'Dexio',
+    'Sina',
+    'Hau 4',
+    'Gladion 1',
+    'Battle Royal',
+    'Plumeria 1',
     'Ultra Wormhole',
+    'Hau 5',
+    'Plumeria 2',
+    'Gladion 2',
+    'Necrozma',
     'Ultra Megalopolis',
     'Captain Mina',
     'Captain Ilima',
@@ -1360,28 +1434,38 @@ export const TemporaryBattles = [
     'Captain Kiawe',
     'Captain Sophocles',
     'Kahuna Nanu',
+    'Gladion 3',
     'Anabel',
     'Captain Mina UB',
     'Kahuna Nanu UB',
     'Ash Ketchum Alola',
-    'Hop1',
+    'Rainbow Rocket Grunt 1',
+    'Rainbow Rocket Grunt 2',
+    'Aether Branch Chief Faba',
+    'Team Aqua Leader Archie',
+    'Team Magma Leader Maxie',
+    'Team Galactic Leader Cyrus',
+    'Team Flare Leader Lysandre',
+    'Team Plasma Leader Ghetsis',
+    'Team Rainbow Leader Giovanni',
+    'Hop 1',
     'Mirages',
-    'Hop2',
-    'Hop3',
-    'Bede1',
-    'Hop4',
-    'Bede2',
-    'Marnie1',
-    'Hop5',
-    'Bede3',
-    'Hop6',
-    'Hop7',
-    'Marnie2',
+    'Hop 2',
+    'Hop 3',
+    'Bede 1',
+    'Hop 4',
+    'Bede 2',
+    'Marnie 1',
+    'Hop 5',
+    'Bede 3',
+    'Hop 6',
+    'Hop 7',
+    'Marnie 2',
     'Eternatus',
     'The Darkest Day',
-    'Hop8',
-    'Sordward1',
-    'Shielbert1',
+    'Hop 8',
+    'Sordward 1',
+    'Shielbert 1',
     'Rampaging Tsareena',
     'Rampaging Gyarados',
     'Rampaging Torkoal',
@@ -1393,17 +1477,17 @@ export const TemporaryBattles = [
     'Rampaging Froslass',
     'Gym Leader Marnie',
     'Rampaging Haxorus',
-    'Sordward2',
-    'Shielbert2',
+    'Sordward 2',
+    'Shielbert 2',
     'Rampaging Zacian',
     'Rampaging Zamazenta',
-    'Klara1',
-    'Avery1',
+    'Klara 1',
+    'Avery 1',
     'Mustard',
-    'Klara2',
-    'Avery2',
-    'Klara3',
-    'Avery3',
+    'Klara 2',
+    'Avery 2',
+    'Klara 3',
+    'Avery 3',
     'Kubfu',
     'Zarude Tribe 1',
     'Zarude Tribe 2',
@@ -1577,6 +1661,7 @@ export enum AlolaSubRegions {
     AkalaIsland,
     UlaulaIsland,
     PoniIsland,
+    MagikarpJump,
 }
 
 export enum GalarSubRegions {
@@ -1585,6 +1670,21 @@ export enum GalarSubRegions {
     IsleofArmor,
     CrownTundra,
 }
+
+export enum FinalSubRegions {
+    Final = 0,
+}
+
+export type SubRegions =
+    | KantoSubRegions
+    | JohtoSubRegions
+    | HoennSubRegions
+    | SinnohSubRegions
+    | UnovaSubRegions
+    | KalosSubRegions
+    | AlolaSubRegions
+    | GalarSubRegions
+    | FinalSubRegions;
 
 // Gender Types
 export enum Genders {
