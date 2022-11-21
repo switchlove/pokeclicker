@@ -275,7 +275,7 @@ class DockRequirement extends Requirement {
 Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
     get: function() {
         const gym = Object.values(GymList).find(({badgeReward}) => badgeReward == this.badge);
-        if (gym instanceof Champion && player.highestRegion() > gym.parent.region) {
+        if (gym.flags.Champion && player.highestRegion() > gym.parent.region) {
             return [];
         }
         return [
