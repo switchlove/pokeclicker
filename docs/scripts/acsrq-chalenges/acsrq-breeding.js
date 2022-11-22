@@ -9,7 +9,7 @@ KeyItems.prototype.initialize = function() {
     pkrus.unlockReq = ko.computed(() =>
         App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex('Distortion World')]() > 0
         || App.game?.challenges.list.noBreeding?.active()
-        && App.game.party.getPokemon(pokemonMap[(GameConstants.Starter[player.starter()])].id)
+        && player.regionStarters[GameConstants.Region.kanto]
     );
 
     //Edit unlocker so the modal doesn't show

@@ -205,7 +205,7 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
 
 class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
     constructor(pokemon) {
-        super(pokemonNameIndex[pokemon.name.toLowerCase()]);
+        super(PokemonHelper.getPokemonByName(pokemon.name));
         this.isCompleted = () => super.isCompleted() && pokemon.options.requirement?.isCompleted();
     }
 
@@ -275,7 +275,7 @@ class DockRequirement extends Requirement {
 Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
     get: function() {
         const gym = Object.values(GymList).find(({badgeReward}) => badgeReward == this.badge);
-        if (gym instanceof Champion && player.highestRegion() > gym.parent.region) {
+        if (gym.flags.Champion && player.highestRegion() > gym.parent.region) {
             return [];
         }
         return [
@@ -483,7 +483,7 @@ ChallengeRequirements.set(TownList['Mt. Mortar'], new RouteShinyRequirement(Game
 ChallengeRequirements.set(TownList['Mahogany Town'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(TemporaryBattleList['Suicune 2'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 43), new ItemsRequirement(ItemList.Upgrade));
-ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'), new ObtainedPokemonRequirement(pokemonNameIndex.entei), new ObtainedPokemonRequirement(pokemonNameIndex.suicune), new ObtainedPokemonRequirement(pokemonNameIndex.raikou));
+ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('entei')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('suicune')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('raikou')));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new DungeonShinyRequirement('Tin Tower'));
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
@@ -761,17 +761,17 @@ for (let stone of Object.values(ItemList).filter(i => i instanceof EvolutionSton
             // only include base Pokémon we have caught
             .filter(p => PartyController.getCaughtStatusByName(p.name))
             // Map to the evolution which uses this stone type
-            .map((p) => p.evolutions.filter(e => e.type.includes(EvolutionType.Stone) && e.stone === stone.type))
+            .map((p) => p.evolutions.filter(e => e.trigger === EvoTrigger.STONE && e.stone === stone.type))
             // Flatten the array (in case of multiple evolutions)
             .flat()
             // Ensure the we actually found an evolution
             .filter(evolution => evolution)
             // Filter out evolution which can't be done in this region
-            .filter(evolution => !evolution.type.includes(EvolutionType.Region) || evolution.atLocation())
+            .filter(evolution => evolution.restrictions.every(req => req.isCompleted()))
             // Filter out any Pokémon which can't be obtained yet (future region)
-            .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon()) <= player.highestRegion())
+            .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon) <= player.highestRegion())
             // Finally get the evolution
-            .map(evolution => evolution.getEvolvedPokemon());
+            .map(evolution => evolution.getEvolvedPokemon);
 
         if (unlockedEvolutions.length == 0) {
             return undefined;
