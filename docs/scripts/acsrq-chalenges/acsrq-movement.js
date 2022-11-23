@@ -205,12 +205,12 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
 
 class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
     constructor(pokemon) {
-        super(PokemonHelper.getPokemonByName(pokemon.name));
+        super(pokemon.name);
         this.isCompleted = () => super.isCompleted() && pokemon.options.requirement?.isCompleted();
     }
 
     getProgress() {
-        return Math.min(App.game?.statistics?.shinyPokemonCaptured[this.pokemonID](), this.requiredValue);
+        return App.game.party.alreadyCaughtPokemonByName(this.pokemon, true);
     }
 }
 
