@@ -93,16 +93,16 @@ function main() {
     var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
     if (CharCard == null && App.game != undefined) {
         a6save();
-        a6menu();
-        a6phases();
-
-        if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
-            ballBot();
-        }
-
         setTimeout(() => {
-            a6settings();
-        }, 1500);
+			a6menu();
+			a6phases();
+			if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
+				ballBot();
+			}
+			setTimeout(() => {
+				a6settings();
+			}, 1500);
+		}, 250);
     } else {
         if (localSettings().state || !!sessionStorage.getItem('reload')) {
             Game.prototype.computeOfflineEarnings = () => {};
@@ -112,27 +112,48 @@ function main() {
 }
 
 function a6save() {
-    localLocal = [[["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]], ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], "", "", ["0",""], "", ["", "", ""]];
-    saveKey = "a6csrq-" + Save.key;
+    /* localLocal, i.e. what the hell does what here
+        localLocal[0][0-7] - Phase # storage for each region's routes
+        localLocal[1] - Phase # storage for dungeons, dungeon are all in one array
+        localLocal[2] - since last storage
+        localLocal[3][0-1] - last shiny storage, id and encouterType
+        localLocal[4] - used but does nothing?
+        localLocal[5][0-2] - nothing, cur mon sr'ing, sr count
+    */
+    localLocal = [
+        [
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+        ],
+        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+        "",
+        ["0",""],
+        "",
+        ["", "", ""]
+    ];
+    saveKey = "acsrq-" + Save.key;
 
-    if ( localStorage.getItem(saveKey) == null ) {
+    if ( localStorage.getItem("a6csrq-" + Save.key) != null ) {
+        localLocal = JSON.parse(localStorage.getItem("a6csrq-" + Save.key));
+        localLocal.splice(2, 1);
+        if (localLocal != null) localStorage.removeItem("a6csrq-" + Save.key);
+    } else if ( localStorage.getItem(saveKey) == null ) {
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     } else {
         localLocal = JSON.parse(localStorage.getItem(saveKey));
     }
 
-    if (localLocal[0].length == 25) {
-        newArr = [];
-        newArr.push(localLocal[0]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
-        localLocal[0] = newArr;
+    if (localLocal.length == 7) {
+
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
-    if (localLocal[0].length == 6) {
+    if (localLocal[0].length == 7) {
         newArr = [];
         newArr.push(localLocal[0][0]);
         newArr.push(localLocal[0][1]);
@@ -140,28 +161,16 @@ function a6save() {
         newArr.push(localLocal[0][3]);
         newArr.push(localLocal[0][4]);
         newArr.push(localLocal[0][5]);
+        newArr.push(localLocal[0][6]);
         newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
         localLocal[0] = newArr;
-        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-    }
-    if (localLocal[0][0].length == 25) {
-        var newArr = localLocal[0][0];
-        newArr.push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
-        localLocal[0][0] = newArr;
-        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-    }
-    if (localLocal[1].length == 10) {
-        localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
-        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-    }
-    if (localLocal[1].length == 98) {
-        localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
     if (localLocal[1].length == 135) {
         localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
+
     phases = [];
     if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -281,11 +290,11 @@ function bfClick(x) {
 }
 
 function lastPokeEncounter() {
-    if (JSON.parse(localStorage.getItem(saveKey))[4][0] != "0") {
-        lastPoke = JSON.parse(localStorage.getItem(saveKey))[4][0];
+    if (JSON.parse(localStorage.getItem(saveKey))[3][0] != "0") {
+        lastPoke = JSON.parse(localStorage.getItem(saveKey))[3][0];
     }
-    if (JSON.parse(localStorage.getItem(saveKey))[4][1] != "") {
-        lastPokeType = JSON.parse(localStorage.getItem(saveKey))[4][1];
+    if (JSON.parse(localStorage.getItem(saveKey))[3][1] != "") {
+        lastPokeType = JSON.parse(localStorage.getItem(saveKey))[3][1];
     } else {
         lastPokeType = '?: ';
     }
@@ -319,9 +328,9 @@ async function areaClears() {
         clears = App.game.statistics.routeKills[player.region][player.route()]().toLocaleString('en-US');
         if (lastArea != player.route() || lastRegion != player.region) {
             lastPoke = 0;
-            localLocal[4][0] = 0;
-            localLocal[4][1] = '';
-            localLocal[3] = 0;
+            localLocal[3][0] = 0;
+            localLocal[3][1] = '';
+            localLocal[2] = 0;
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
         lastArea = player.route();
@@ -331,9 +340,9 @@ async function areaClears() {
         clears = App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().name)]().toLocaleString('en-US');
         if (lastArea != player.town().dungeon.name || lastRegion != player.region) {
             lastPoke = 0;
-            localLocal[4][0] = 0;
-            localLocal[4][1] = '';
-            localLocal[3] = 0;
+            localLocal[3][0] = 0;
+            localLocal[3][1] = '';
+            localLocal[2] = 0;
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
         lastArea = player.town().dungeon.name;
@@ -344,9 +353,9 @@ async function areaClears() {
             clears = townContent[gymAtX].clears()
             if (lastArea != townContent[gymAtX].leaderName || lastRegion != player.region) {
                 lastPoke = 0;
-                localLocal[4][0] = 0;
-                localLocal[4][1] = '';
-                localLocal[3] = 0;
+                localLocal[3][0] = 0;
+                localLocal[3][1] = '';
+                localLocal[2] = 0;
                 localStorage.setItem(saveKey, JSON.stringify(localLocal));
             }
             lastArea = townContent[gymAtX].leaderName;
@@ -356,9 +365,9 @@ async function areaClears() {
             clears = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].clears()
             if (lastArea != townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName || lastRegion != player.region) {
                 lastPoke = 0;
-                localLocal[4][0] = 0;
-                localLocal[4][1] = '';
-                localLocal[3] = 0;
+                localLocal[3][0] = 0;
+                localLocal[3][1] = '';
+                localLocal[2] = 0;
                 localStorage.setItem(saveKey, JSON.stringify(localLocal));
             }
             lastArea = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName;
@@ -377,7 +386,7 @@ async function phaseCounter(arg) {
     var arg = arg;
 
     if (localStorage.getItem(saveKey) != null) {
-        localLocal[3] = JSON.parse(localStorage.getItem(saveKey))[3];
+        localLocal[2] = JSON.parse(localStorage.getItem(saveKey))[2];
     }
 
     var gymFound = 0;
@@ -392,7 +401,7 @@ async function phaseCounter(arg) {
         if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
             if (Safari.inProgress() != false) {
                 phaseVal = 0;
-                localLocal[5] = 0;
+                localLocal[4] = 0;
                 localStorage.setItem(saveKey, JSON.stringify(localLocal));
             }
         } else if (player.route() != 0) {
@@ -432,7 +441,7 @@ async function phaseCounter(arg) {
         if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
             if (Safari.inProgress() != false) {
                 phaseVal = document.querySelector("#phaseCount").value;
-                localLocal[5] = phaseVal;
+                localLocal[4] = phaseVal;
                 localStorage.setItem(saveKey, JSON.stringify(localLocal));
             }
         } else if (player.route() != 0) {
@@ -450,8 +459,8 @@ async function phaseCounter(arg) {
         if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
             if (Safari.inProgress() != false) {
                 phaseVal = document.querySelector("#phaseCount").value;
-                phaseVal = localLocal[5];
-                phaseVal = localLocal[5];
+                phaseVal = localLocal[4];
+                phaseVal = localLocal[4];
             }
         } else if (player.route() != 0) {
             curRoute = player.route();
@@ -472,7 +481,7 @@ async function phaseCounter(arg) {
                 if (lastEPoke == 0 && Battle.enemyPokemon().id != 0) {
                     lastEPoke = Battle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 } else if ( lastEPoke == Battle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]() + 1) ) {
                     break;
                 } else if ( lastECount == App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]() ) {
@@ -480,17 +489,17 @@ async function phaseCounter(arg) {
                 } else {
                     lastEPoke = Battle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 }
                 if (Battle.enemyPokemon().shiny == true) {
                     if (lastPoke == 0) {
                         lastPokeType = 'W: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = Battle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]();
                         phaseVal++;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
@@ -498,12 +507,12 @@ async function phaseCounter(arg) {
                         break;
                     } else {
                         lastPokeType = 'W: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = Battle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]();
                         phaseVal++;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
@@ -543,7 +552,7 @@ async function phaseCounter(arg) {
                 if (lastEPoke == 0 && DungeonBattle.enemyPokemon().id != 0) {
                     lastEPoke = DungeonBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 } else if ( lastEPoke == DungeonBattle.enemyPokemon().id && lastECount == App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
                     break;
                 } else if ( DungeonBattle.enemyPokemon().id == 0 ) {
@@ -551,26 +560,26 @@ async function phaseCounter(arg) {
                 } else {
                     lastEPoke = DungeonBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 }
                 if (DungeonBattle.enemyPokemon().shiny == true) {
                     if (lastPoke == 0) {
                         if ( DungeonRunner.fightingBoss() == true ) {
                             lastPokeType = 'B: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
                             App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         } else {
                             lastPokeType = 'W: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         }
                         lastPoke = DungeonBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]();
                         phaseVal++;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
@@ -579,20 +588,20 @@ async function phaseCounter(arg) {
                     } else {
                         if ( DungeonRunner.fightingBoss() == true ) {
                             lastPokeType = 'B: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         } else if ( DungeonBattle.trainer() != null ) {
                             App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         } else {
                             lastPokeType = 'W: ';
-                            localLocal[4][1] = lastPokeType;
+                            localLocal[3][1] = lastPokeType;
                         }
                         lastPoke = DungeonBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]();
                         phaseVal++;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
@@ -655,37 +664,37 @@ async function phaseCounter(arg) {
                 if (lastEPoke == 0) {
                     lastEPoke = SafariBattle.enemy.id;
                     lastECount = App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 } else if ( lastEPoke == SafariBattle.enemy.id && lastECount == App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]() ) {
                     break;
                 } else {
                     lastEPoke = SafariBattle.enemy.id;
                     lastECount = App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 }
                 if (SafariBattle.enemy.shiny == true) {
                     if (lastPoke == 0) {
                         lastPokeType = 'W: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = SafariBattle.enemy.id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]();
                         phaseVal++;
-                        localLocal[3] = 0;
-                        localLocal[5] = phaseVal;
+                        localLocal[2] = 0;
+                        localLocal[4] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
                     } else if ( lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]() ) {
                         break;
                     } else {
                         lastPokeType = 'W: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = SafariBattle.enemy.id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]();
                         phaseVal++;
-                        localLocal[3] = 0;
-                        localLocal[5] = phaseVal;
+                        localLocal[2] = 0;
+                        localLocal[4] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
 						isCurrentShiny = 1;
                     }
@@ -723,7 +732,7 @@ async function phaseCounter(arg) {
                 if (lastEPoke == 0 && GymBattle.enemyPokemon().id != 0) {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 } else if ( lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1) ) {
                     break;
                 } else if ( lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() ) {
@@ -731,18 +740,18 @@ async function phaseCounter(arg) {
                 } else {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 }
                 if (GymBattle.enemyPokemon().shiny == true) {
                     if (lastPoke == 0) {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().gym.town} Gym] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
                         lastPokeType = 'T: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = GymBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]();
                         phaseVal = 0;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                     } else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
@@ -750,12 +759,12 @@ async function phaseCounter(arg) {
                     } else {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().gym.town} Gym] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
                         lastPokeType = 'T: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = GymBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]();
                         phaseVal = 0;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                     }
@@ -767,7 +776,7 @@ async function phaseCounter(arg) {
                 if (lastEPoke == 0 && GymBattle.enemyPokemon().id != 0) {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 } else if ( lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1) ) {
                     break;
                 } else if ( lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() ) {
@@ -775,18 +784,18 @@ async function phaseCounter(arg) {
                 } else {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
-                    localLocal[3]++;
+                    localLocal[2]++;
                 }
                 if (GymBattle.enemyPokemon().shiny == true) {
                     if (lastPoke == 0) {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().name}] You encountered a ${player.town().gymList[0].town}'s Shiny ${this.enemyPokemon().name}.`);
                         lastPokeType = 'T: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = GymBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]();
                         phaseVal = 0;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                     } else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
@@ -794,12 +803,12 @@ async function phaseCounter(arg) {
                     } else {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().name}] You encountered a ${player.town().gymList[0].town}'s Shiny ${this.enemyPokemon().name}.`);
                         lastPokeType = 'T: ';
-                        localLocal[4][1] = lastPokeType;
+                        localLocal[3][1] = lastPokeType;
                         lastPoke = GymBattle.enemyPokemon().id;
-                        localLocal[4][0] = lastPoke;
+                        localLocal[3][0] = lastPoke;
                         lastCounts = App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]();
                         phaseVal = 0;
-                        localLocal[3] = 0;
+                        localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                     }
@@ -808,10 +817,10 @@ async function phaseCounter(arg) {
     }
     document.querySelector("#phaseCount").value = phaseVal;
 
-    if (localLocal[3].toLocaleString('en-US') == '') {
+    if (localLocal[2].toLocaleString('en-US') == '') {
         document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = 0;
     } else {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[3].toLocaleString('en-US');
+        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[2].toLocaleString('en-US');
     }
     localStorage.setItem(saveKey, JSON.stringify(localLocal));
 }
