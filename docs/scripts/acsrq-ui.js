@@ -291,6 +291,8 @@ acsrqInfo.uniqueEvent = ko.pureComputed(() => {
         'Surprise Togepi',
         //Golden Week
         'Bulbasaur (Rose)',
+        'Ivysaur (Rose)',
+        'Venusaur (Rose)',
         //Flying Pikachu
         'Flying Pikachu',
         'Red Spearow',
@@ -307,7 +309,11 @@ acsrqInfo.uniqueEvent = ko.pureComputed(() => {
         'Blastoise (clone)',
         //Halloween
         'Spooky Togepi',
+        'Spooky Togetic',
+        'Spooky Togekiss',
         'Spooky Bulbasaur',
+        'Spooky Ivysaur',
+        'Spooky Venusaur',
         'Pikachu (Gengar)',
         //Let's GO!
         'Let\'s Go Pikachu',

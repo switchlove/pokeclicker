@@ -139,20 +139,19 @@ function a6save() {
     ];
     saveKey = "acsrq-" + Save.key;
 
-    if ( localStorage.getItem("a6csrq-" + Save.key) != null ) {
+    if (localStorage.getItem("a6csrq-" + Save.key) != null) {
         localLocal = JSON.parse(localStorage.getItem("a6csrq-" + Save.key));
-        localLocal.splice(2, 1);
-        if (localLocal != null) localStorage.removeItem("a6csrq-" + Save.key);
-    } else if ( localStorage.getItem(saveKey) == null ) {
+        if (localLocal != null) {
+            localLocal.splice(2, 1);
+            localStorage.removeItem("a6csrq-" + Save.key);
+            localStorage.setItem(saveKey, JSON.stringify(localLocal));
+        }
+    } else if (localStorage.getItem(saveKey) == null) {
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     } else {
         localLocal = JSON.parse(localStorage.getItem(saveKey));
     }
 
-    if (localLocal.length == 7) {
-
-        localStorage.setItem(saveKey, JSON.stringify(localLocal));
-    }
     if (localLocal[0].length == 7) {
         newArr = [];
         newArr.push(localLocal[0][0]);
@@ -172,7 +171,7 @@ function a6save() {
     }
 
     phases = [];
-    if ( localStorage.getItem(`phaseTracker${Save.key}`) == null ) {
+    if (localStorage.getItem(`phaseTracker${Save.key}`) == null) {
         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
     } else {
         phases = JSON.parse(localStorage.getItem(`phaseTracker${Save.key}`));

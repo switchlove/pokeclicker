@@ -670,58 +670,42 @@ ChallengeRequirements.set(TownList['Vast Poni Canyon'], new RouteShinyRequiremen
 ChallengeRequirements.add(TemporaryBattleList['Ultra Megalopolis'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Poipole));
 // Post Game
 ChallengeRequirement.add(dungeonList['Pikachu Valley'].bossList[5].options, new DungeonShinyRequirement('Ruins of Conflict'));
-
 ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Pikachu Valley'].bossList[5]));
 ChallengeRequirement.add(dungeonList['Brooklet Hill'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Pikachu Valley'].bossList[5]));
-
 ChallengeRequirement.add(dungeonList['Lush Jungle'].bossList[1].options,
     new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[2]),
     new ObtainedPokemonShinyRequirement(dungeonList['Brooklet Hill'].bossList[3])
 );
-
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].enemyList[6].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Diglett\'s Tunnel'].enemyList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
-
 ChallengeRequirements.add(TownList['Ruins of Life'], new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 10));
-
 ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[14].options, new DungeonShinyRequirement('Ruins of Life'));
 ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[15].options, new DungeonShinyRequirement('Ruins of Life'));
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 17).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 23).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
-
 ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[2].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
 ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[3].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
-
 ChallengeRequirements.add(TownList['Ruins of Abundance'],
     new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[2]),
     new ObtainedPokemonShinyRequirement(dungeonList['Hokulani Observatory'].bossList[3])
 );
-
 ChallengeRequirement.add(dungeonList['Thrifty Megamart'].bossList[1].options, new DungeonShinyRequirement('Ruins of Abundance'));
 ChallengeRequirements.add(TownList['Lake of the Sunne and Moone'], new DungeonShinyRequirement('Ruins of Abundance'));
-
 ChallengeRequirement.add(dungeonList['Mina\'s Houseboat'].bossList[1].options, new DungeonShinyRequirement('Lake of the Sunne and Moone'));
-
 ChallengeRequirement.add(dungeonList['Vast Poni Canyon'].bossList[1].options, new ObtainedPokemonShinyRequirement(dungeonList['Mina\'s Houseboat'].bossList[1]));
-
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 27),
     new ObtainedPokemonShinyRequirement(dungeonList['Vast Poni Canyon'].bossList[1]),
     new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 15)
 );
-
 ChallengeRequirements.add(TownList['Ruins of Hope'],
     new RouteShinyRequirement(GameConstants.Region.alola, 27),
     new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 16)
 );
-
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 28), new DungeonShinyRequirement('Ruins of Hope'));
-
 ChallengeRequirements.add(TownList['Resolution Cave'], new DungeonShinyRequirement('Poni Meadow'));
-
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Resolution Cave'));
-
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[1].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[2].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 //#endregion
