@@ -274,10 +274,15 @@ class DockRequirement extends Requirement {
 
 Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
     get: function() {
+        if (this.option ==  GameConstants.AchievementOption.less) {
+            return []
+        }
+
         const gym = Object.values(GymList).find(({badgeReward}) => badgeReward == this.badge);
         if (gym.flags.Champion && player.highestRegion() > gym.parent.region) {
             return [];
         }
+
         return [
             ...gym.parent.requirements,
             ...gym.requirements,
@@ -286,6 +291,9 @@ Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
 });
 Object.defineProperty(TemporaryBattleRequirement.prototype, 'parent', {
     get: function() {
+        if (TemporaryBattleList[this.battleName].completeRequirements.every(r => r.isCompleted())) {
+            return [];
+        }
         return TemporaryBattleList[this.battleName].requirements;
     },
 });
@@ -426,11 +434,13 @@ FarmController.openFarmModal = function() {
 //#endregion
 
 //#region Kanto route
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 2), new RouteShinyRequirement(GameConstants.Region.kanto, 22));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 2), new TemporaryBattleRequirement('Blue 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 3),  new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.add(TownList['Mt. Moon'], new ItemsRequirement(ItemList.Magikarp));
+ChallengeRequirements.add(TemporaryBattleList['Blue 2'], new GymBadgeRequirement(BadgeEnums.Cascade));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 24), new GymBadgeRequirement(BadgeEnums.Cascade));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 5), new ItemsRequirement(ItemList.Water_stone));
+ChallengeRequirements.set(TownList['Vermilion City'], new TemporaryBattleRequirement('Blue 3'));
 ChallengeRequirements.set(GymList['Vermilion City'], new ItemsRequirement(ItemList.Thunder_stone));
 ChallengeRequirements.set(TownList['Diglett\'s Cave'], new GymBadgeRequirement(BadgeEnums.Thunder));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 11), new DungeonShinyRequirement('Diglett\'s Cave'));
@@ -755,7 +765,7 @@ for (let stone of Object.values(ItemList).filter(i => i instanceof EvolutionSton
             // Filter out any Pokémon which can't be obtained yet (future region)
             .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon) <= player.highestRegion())
             // Finally get the evolution
-            .map(evolution => evolution.getEvolvedPokemon);
+            .map(evolution => evolution.evolvedPokemon);
 
         if (unlockedEvolutions.length == 0) {
             return undefined;
