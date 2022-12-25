@@ -481,11 +481,11 @@ ChallengeRequirements.add(TownList['Sprout Tower'], new ItemsRequirement(ItemLis
 ChallengeRequirements.set(TownList['Union Cave'], new DungeonShinyRequirement('Ruins of Alph'));
 ChallengeRequirements.set(TownList['Azalea Town'], new DungeonShinyRequirement('Slowpoke Well'));
 ChallengeRequirements.add(GymList['Azalea Town'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Kings_rock));
+ChallengeRequirements.add(TemporaryBattleList['Silver 2'], new GymBadgeRequirement(BadgeEnums.Hive));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 35), new GymBadgeRequirement(BadgeEnums.Plain));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 36), new RouteShinyRequirement(GameConstants.Region.johto, 35));
 ChallengeRequirements.add(GymList['Ecruteak City'], new ItemsRequirement(ItemList.Fire_stone, ItemList.Soothe_bell));
-ChallengeRequirements.set(TownList['Burned Tower'], new GymBadgeRequirement(BadgeEnums.Fog));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 38), new DungeonShinyRequirement('Burned Tower'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 38), new TemporaryBattleRequirement('Silver 3'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 40), new ItemsRequirement(ItemList.Water_stone, ItemList.Thunder_stone, ItemList.Metal_coat), new DockRequirement());
 ChallengeRequirements.add(GymList['Cianwood City'], new ItemsRequirement(ItemList.Sun_stone, ItemList.Moon_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 42), new RouteShinyRequirement(GameConstants.Region.johto, 48));
@@ -493,12 +493,12 @@ ChallengeRequirements.set(TownList['Mt. Mortar'], new RouteShinyRequirement(Game
 ChallengeRequirements.set(TownList['Mahogany Town'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(TemporaryBattleList['Suicune 2'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 43), new ItemsRequirement(ItemList.Upgrade));
-ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('entei')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('suicune')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('raikou')));
+ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new DungeonShinyRequirement('Tin Tower'));
+ChallengeRequirements.add(TownList['Blackthorn City'], new QuestLineCompletedRequirement('Whirl Guardian'));
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
 ChallengeRequirements.set(TownList['Tohjo Falls'], new DungeonShinyRequirement('Dark Cave'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 28), new QuestLineCompletedRequirement('Unfinished Business'));
 //#endregion
 //#region Hoenn
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));
