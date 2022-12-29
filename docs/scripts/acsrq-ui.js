@@ -471,7 +471,7 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
 //#region Footer
 acsrqFooter = function () {
     $('#battleContainer')[0].insertAdjacentHTML('beforeend', `
-        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot && acsrqFooter.showShiny">
+        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot || acsrqFooter.showShiny">
             <table width="100%" class="table table-sm m-0">
                 <colgroup>
                     <col width="40%">

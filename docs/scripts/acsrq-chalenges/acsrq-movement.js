@@ -554,7 +554,8 @@ ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 41), new G
 ChallengeRequirements.set(TownList['Trovita Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 42));
 //#endregion
 //#region Sinnoh
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 203), new ItemsRequirement(ItemList.Mystery_egg));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 201), new TemporaryBattleRequirement('Barry 1'));
+ChallengeRequirements.add(TemporaryBattleList['Barry 2'], new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.add(GymList['Oreburgh City'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 204), new GymBadgeRequirement(BadgeEnums.Coal));
 ChallengeRequirements.add(TownList['Valley Windworks'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Kings_rock));
@@ -566,6 +567,7 @@ ChallengeRequirements.add(GymList['Hearthome City'], new ItemsRequirement(ItemLi
 ChallengeRequirements.add(TownList['Solaceon Ruins'], new ItemsRequirement(ItemList.Dawn_stone, ItemList.Dusk_stone, ItemList.Shiny_stone, ItemList.Spiritomb));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 210), new DungeonShinyRequirement('Solaceon Ruins'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 214), new GymBadgeRequirement(BadgeEnums.Cobble));
+ChallengeRequirements.add(TownList['Pastoria City'], new TemporaryBattleRequirement('Barry 4'));
 ChallengeRequirements.add(GymList['Pastoria City'], new ItemsRequirement(ItemList.Water_stone, ItemList.Prism_scale, ItemList.Skorupi));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 212), new GymBadgeRequirement(BadgeEnums.Fen));
 ChallengeRequirements.set(TownList['Celestic Town'], new RouteShinyRequirement(GameConstants.Region.sinnoh, 212));
@@ -573,22 +575,22 @@ ChallengeRequirements.add(TemporaryBattleList['Galactic Boss Cyrus'], new ItemsR
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 211), new QuestLineStepCompletedRequirement('A new world', 3));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 219), new RouteShinyRequirement(GameConstants.Region.sinnoh, 211));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 218), new ItemsRequirement(...PalParkShop.items));
+ChallengeRequirements.add(TownList['Canalave City'], new TemporaryBattleRequirement('Barry 5'));
 ChallengeRequirements.add(GymList['Canalave City'], new ItemsRequirement(ItemList.Metal_coat), new DockRequirement());
 ChallengeRequirements.add(TownList['Iron Island'], new GymBadgeRequirement(BadgeEnums.Mine));
 ChallengeRequirements.add(TownList['Lake Valor'], new DungeonShinyRequirement('Iron Island'));
 ChallengeRequirements.add(GymList['Snowpoint City'], new ItemsRequirement(ItemList.Upgrade));
 ChallengeRequirements.add(GymList['Sunyshore City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
-ChallengeRequirements.set(TownList['Sendoff Spring'], new DungeonShinyRequirement('Flower Paradise'));
-ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement.set(dungeonList['Distortion World'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirements.set(TownList['Hall of Origin'], new DungeonShinyRequirement('Sendoff Spring'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Flower Paradise'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Flower Paradise'));
+ChallengeRequirements.set(TownList['Hall of Origin'], new DungeonShinyRequirement('Flower Paradise'));
 ChallengeRequirements.set(TownList['Snowpoint Temple'], new DungeonShinyRequirement('Hall of Origin'));
 ChallengeRequirements.set(TownList['Newmoon Island'], new DungeonShinyRequirement('Snowpoint Temple'));
 ChallengeRequirements.set(TownList['Fullmoon Island'], new DungeonShinyRequirement('Newmoon Island'));
-ChallengeRequirements.set(TownList['Fight Area'], new DungeonShinyRequirement('Fullmoon Island'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 225), new DungeonShinyRequirement('Fullmoon Island'));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 226), new ItemsRequirement(ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.add(TownList['Fight Area'], new QuestLineStartedRequirement('Zero\'s Ambition'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 225), new QuestLineCompletedRequirement('Zero\'s Ambition'));
+ChallengeRequirements.add(TemporaryBattleList['Barry 7'], new ItemsRequirement(ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 226), new TemporaryBattleRequirement('Barry 7'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 228),  new DungeonShinyRequirement('Stark Mountain'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 230), new ItemsRequirement(ItemList.Dubious_disc, ItemList.Protector, ItemList.Reaper_cloth));
 //#endregion
