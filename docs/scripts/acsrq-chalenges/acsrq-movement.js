@@ -647,12 +647,13 @@ ChallengeRequirements.add(GymList['Santalune City'], new ItemsRequirement(ItemLi
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 22), new GymBadgeRequirement(BadgeEnums.Bug));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 4), new RouteShinyRequirement(GameConstants.Region.kalos, 22));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 5), new ItemsRequirement(...FriseurFurfrouShop.items));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new ItemsRequirement(ItemList.Thunder_stone));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new TemporaryBattleRequirement('Tierno 1'), new ItemsRequirement(ItemList.Thunder_stone));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 7), new ItemsRequirement(ItemList['Furfrou (Star)'], ItemList['Furfrou (La Reine)']));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 9), new ItemsRequirement(ItemList.Water_stone));
 ChallengeRequirements.add(GymList['Cyllage City'], new ItemsRequirement(ItemList.Upgrade, ItemList.Prism_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 10), new GymBadgeRequirement(BadgeEnums.Cliff));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 11), new ItemsRequirement(ItemList.Fire_stone, ItemList.Kings_rock));
+ChallengeRequirements.add(TemporaryBattleList['Calem 1'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Metal_coat));
 ChallengeRequirements.add(GymList['Shalour City'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Metal_coat));
 ChallengeRequirements.add(GymList['Coumarine City'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Electirizer, ItemList.Magmarizer));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 23), new GymBadgeRequirement(BadgeEnums.Plant), new DockRequirement());
@@ -662,10 +663,11 @@ ChallengeRequirements.set(TownList['Frost Cavern'], new DungeonShinyRequirement(
 ChallengeRequirements.set(TownList['Dendemille Town'], new DungeonShinyRequirement('Frost Cavern'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 16), new DungeonShinyRequirement('Frost Cavern'), new ItemsRequirement(ItemList.Dusk_stone, ItemList.Shiny_stone, ItemList.Dawn_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 17), new RouteShinyRequirement(GameConstants.Region.kalos, 16));
+ChallengeRequirements.add(TownList['Anistar City'], new TemporaryBattleRequirement('Calem 4'));
 ChallengeRequirements.add(GymList['Anistar City'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Razor_claw, ItemList.Razor_fang));
 ChallengeRequirements.set(TownList['Couriway Town'], new DungeonShinyRequirement('Terminus Cave'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 19), new DungeonShinyRequirement('Terminus Cave'), new ItemsRequirement(ItemsRequirement.Dragon_scale));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 19), new ItemsRequirement(ItemsRequirement.Dragon_scale));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new TemporaryBattleRequirement('Trevor'), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new GymBadgeRequirement(BadgeEnums.Iceberg));
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
 //#endregion
