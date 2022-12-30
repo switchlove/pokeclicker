@@ -206,7 +206,7 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
 class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
     constructor(pokemon) {
         super(pokemon.name);
-        this.isCompleted = () => super.isCompleted() && pokemon.options.requirement?.isCompleted();
+        this.isCompleted = () => super.isCompleted() && (pokemon.options?.requirement?.isCompleted() ?? true);
     }
 
     getProgress() {
@@ -595,22 +595,27 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 228),  ne
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 230), new ItemsRequirement(ItemList.Dubious_disc, ItemList.Protector, ItemList.Reaper_cloth));
 //#endregion
 //#region Unova
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 19), new TemporaryBattleRequirement('Hugh 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 20), new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.set(TownList['Castelia City'], new DungeonShinyRequirement('Liberty Garden'));
 ChallengeRequirements.set(TownList['Castelia Sewers'], new DungeonShinyRequirement('Liberty Garden'), new DockRequirement(), new ItemsRequirement(ItemList.Kings_rock, ItemList.Linking_cord));
+ChallengeRequirements.set(GymList['Castelia City'], new DungeonShinyRequirement('Castelia Sewers'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 4), new GymBadgeRequirement(BadgeEnums.Insect));
 ChallengeRequirements.set(TownList['Nimbasa City'], new DungeonShinyRequirement('Relic Castle'));
 ChallengeRequirements.add(GymList['Nimbasa City'], new ItemsRequirement(ItemList.Metal_coat));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 16), new GymBadgeRequirement(BadgeEnums.Bolt));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 5), new DungeonShinyRequirement('Lostlorn Forest'));
 ChallengeRequirements.add(GymList['Driftveil City'], new ItemsRequirement(ItemList.Zorua, ItemList.Razor_claw, ItemList.Razor_fang));
+ChallengeRequirements.add(TownList['Relic Passage'], new TemporaryBattleRequirement('Hugh 3'));
 ChallengeRequirements.add(TownList['A Totally Unsuspicious Frigate'], new DungeonShinyRequirement('Relic Passage'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 6), new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 7));
+ChallengeRequirements.add(TemporaryBattleList['Cheren'], new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 7));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 6), new TemporaryBattleRequirement('Colress 2'));
 ChallengeRequirements.set(TownList['Chargestone Cave'], new DungeonShinyRequirement('Mistralton Cave'));
 ChallengeRequirements.add(GymList['Mistralton City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Upgrade));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 7), new GymBadgeRequirement(BadgeEnums.Jet));
 ChallengeRequirements.set(TownList['Lentimas Town'], new DungeonShinyRequirement('Celestial Tower'));
 ChallengeRequirements.set(TownList['Reversal Mountain'], new DungeonShinyRequirement('Celestial Tower'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 14), new TemporaryBattleRequirement('Hugh 4'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 13), new RouteShinyRequirement(GameConstants.Region.unova, 14));
 ChallengeRequirements.add(GymList['Opelucid City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 9), new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 14));
@@ -618,14 +623,18 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 24), new R
 ChallengeRequirements.add(GymList['Humilau City'], new ItemsRequirement(ItemList.Prism_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 22), new GymBadgeRequirement(BadgeEnums.Wave));
 ChallengeRequirements.set(TownList['Victory Road Unova'], new DungeonShinyRequirement('Abundant Shrine'));
+ChallengeRequirements.add(TemporaryBattleList['Hugh 6'], new ObtainedPokemonShinyRequirement(PokemonHelper.getPokemonByName('Kyurem')));
+ChallengeRequirements.add(TownList['Black and White Park'], new TemporaryBattleRequirement('Hugh 6'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 15), new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
-ChallengeRequirements.set(TownList['Twist Mountain'], new RouteShinyRequirement(GameConstants.Region.unova, 15));
+ChallengeRequirements.add(TemporaryBattleList['Hugh 7'], new RouteShinyRequirement(GameConstants.Region.unova, 15));
+ChallengeRequirements.set(TownList['Twist Mountain'], new TemporaryBattleRequirement('Hugh 7'));
 ChallengeRequirements.set(TownList['Dragonspiral Tower'], new DungeonShinyRequirement('Twist Mountain'));
 ChallengeRequirements.set(TownList['Icirrus City'], new DungeonShinyRequirement('Dragonspiral Tower'),  new ItemsRequirement(ItemList.Black_DNA, ItemList.White_DNA));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 8), new DungeonShinyRequirement('Dragonspiral Tower'),  new ItemsRequirement(ItemList.Black_DNA, ItemList.White_DNA, ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(TownList['Pinwheel Forest'], new RouteShinyRequirement(GameConstants.Region.unova, 8));
 ChallengeRequirements.set(TownList['Moor of Icirrus'], new DungeonShinyRequirement('Pinwheel Forest'));
-ChallengeRequirements.add(TownList['Nacrene City'], new ItemsRequirement(...AnvilleTownShop.items));
+ChallengeRequirements.add(TownList['Anville Town'], new DungeonShinyRequirement('Pledge Grove'));
+ChallengeRequirements.set(TownList['Nacrene City'], new DungeonShinyRequirement('Pledge Grove'), new ItemsRequirement(...AnvilleTownShop.items));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 3), new ItemsRequirement(...AnvilleTownShop.items, ItemList.Soothe_bell));
 ChallengeRequirements.add(TownList.Dreamyard, new ItemsRequirement(ItemList.Leaf_stone, ItemList.Fire_stone, ItemList.Water_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 2), new DungeonShinyRequirement('Dreamyard'));
