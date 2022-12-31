@@ -733,6 +733,63 @@ ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 29), new D
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[1].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[2].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 //#endregion
+//#region Galar
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.galar, 1), new TemporaryBattleRequirement('Mirages'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.galar, 2), new ItemsRequirement(ItemList.Mystery_egg));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 5), new RouteShinyRequirement(GameConstants.Region.galar, 4));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 6), new RouteShinyRequirement(GameConstants.Region.galar, 5));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 11), new RouteShinyRequirement(GameConstants.Region.galar, 6));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 9), new RouteShinyRequirement(GameConstants.Region.galar, 11));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 8), new RouteShinyRequirement(GameConstants.Region.galar, 9));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 7), new RouteShinyRequirement(GameConstants.Region.galar, 8));
+ChallengeRequirements.set(TownList['Motostoke'], new RouteShinyRequirement(GameConstants.Region.galar, 7));
+ChallengeRequirements.add(TemporaryBattleList['Hop 3'], new RouteShinyRequirement(GameConstants.Region.galar, 7), new ItemsRequirement(ItemList.Fire_stone, ItemList.Linking_cord, ItemList.Magmarizer));
+ChallengeRequirements.add(GymList['Turffield'], new ItemsRequirement(ItemList.Sweet_apple, ItemList.Tart_apple, ItemList.Leaf_stone, ItemList.Sun_stone));
+ChallengeRequirements.add(GymList['Hulbury'], new DockRequirement(), new ItemsRequirement(ItemList.Water_stone, ItemList.Kings_rock, ItemList.Prism_scale, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
+ChallengeRequirements.set(TownList['Dusty Bowl'], new RouteShinyRequirement(GameConstants.Region.galar, 19));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 20), new DungeonShinyRequirement('Dusty Bowl'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 22), new RouteShinyRequirement(GameConstants.Region.galar, 20));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 23), new RouteShinyRequirement(GameConstants.Region.galar, 22), new ItemsRequirement(ItemList.Metal_coat, ItemList.Upgrade, ItemList.Dragon_scale));
+ChallengeRequirements.add(TownList['Stow-on-Side'], new TemporaryBattleRequirement('Hop 5'));
+ChallengeRequirements.add(GymList['Stow-on-Side1'], new ItemsRequirement(ItemList.Soothe_bell, ItemList.Dawn_stone, ItemList.Dubious_disc, ItemList.Reaper_cloth, ItemList.Dracozolt, ItemList.Arctozolt, ItemList.Dracovish, ItemList.Arctovish));
+ChallengeRequirements.add(GymList['Stow-on-Side2'],  new ItemsRequirement(ItemList.Soothe_bell, ItemList.Dawn_stone, ItemList.Dubious_disc, ItemList.Reaper_cloth, ItemList.Dracozolt, ItemList.Arctozolt, ItemList.Dracovish, ItemList.Arctovish));
+ChallengeRequirements.add(GymList['Ballonlea'],  new ItemsRequirement(ItemList.Cracked_pot, ItemList.Moon_stone, ItemList.Shiny_stone, ItemList.Sachet, ItemList.Whipped_dream));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 10), new RouteShinyRequirement(GameConstants.Region.galar, 27));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 21), new RouteShinyRequirement(GameConstants.Region.galar, 10));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 26), new RouteShinyRequirement(GameConstants.Region.galar, 21));
+ChallengeRequirements.add(GymList['Circhester1'], new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Protector, ItemList.Ice_stone));
+ChallengeRequirements.add(GymList['Circhester2'], new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Protector, ItemList.Ice_stone));
+ChallengeRequirements.add(GymList['Spikemuth'], new DockRequirement(), new ItemsRequirement(ItemList.Thunder_stone, ItemList.Dusk_stone, ItemList.Electirizer));
+//Isle of Armor
+ChallengeRequirements.set(TownList['Armor Station'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(TemporaryBattleList['Klara 1'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(TemporaryBattleList['Avery 1'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 41), new DockRequirement(), new ItemsRequirement(ItemList.Galarica_cuff, ItemList.Galarica_wreath), new QuestLineStartedRequirement('The Dojo\'s Armor'), new QuestLineStartedRequirement('Secrets of the Jungle'));
+ChallengeRequirements.set(TownList['Courageous Cavern'], new RouteShinyRequirement(GameConstants.Region.galar, 41));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 34), new DungeonShinyRequirement('Courageous Cavern'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 37), new RouteShinyRequirement(GameConstants.Region.galar, 34));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 42), new RouteShinyRequirement(GameConstants.Region.galar, 37));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 36), new RouteShinyRequirement(GameConstants.Region.galar, 42));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 35), new RouteShinyRequirement(GameConstants.Region.galar, 36));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 38), new RouteShinyRequirement(GameConstants.Region.galar, 35));
+ChallengeRequirements.set(TownList['Brawlers\' Cave'], new RouteShinyRequirement(GameConstants.Region.galar, 38));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 40), new DungeonShinyRequirement('Brawlers\' Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 44), new RouteShinyRequirement(GameConstants.Region.galar, 40));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 45), new RouteShinyRequirement(GameConstants.Region.galar, 44));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 43), new RouteShinyRequirement(GameConstants.Region.galar, 45));
+ChallengeRequirements.set(TownList['Warm-Up Tunnel'], new RouteShinyRequirement(GameConstants.Region.galar, 43));
+//Crown Tundra
+ChallengeRequirements.set(TownList['Crown Tundra Station'], new DockRequirement(), new QuestLineCompletedRequirement('The Dojo\'s Armor'), new QuestLineCompletedRequirement('Secrets of the Jungle'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 47), new QuestLineStartedRequirement('The Crown of Galar'), new QuestLineStartedRequirement('The Birds of the Dyna Tree'), new QuestLineStartedRequirement('The Ancient Golems'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 49), new DungeonShinyRequirement('Iron Ruins'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 50), new RouteShinyRequirement(GameConstants.Region.galar, 49));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 54), new RouteShinyRequirement(GameConstants.Region.galar, 52));
+ChallengeRequirements.add(TownList['Iceberg Ruins'],  new QuestLineStepCompletedRequirement('The Ancient Golems', 2));
+ChallengeRequirements.add(TownList['Rock Peak Ruins'],  new QuestLineStepCompletedRequirement('The Ancient Golems', 2));
+ChallengeRequirements.set(TownList['Tunnel to the Top'],  new DungeonShinyRequirement('Split-Decision Ruins'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 53),  new DungeonShinyRequirement('Crown Shrine'));
+ChallengeRequirements.set(TownList['Dyna Tree Hill'],  new DungeonShinyRequirement('Lakeside Cave'));
+//#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
 for (let town of Object.values(TownList)) {
