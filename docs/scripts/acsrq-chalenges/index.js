@@ -21,7 +21,7 @@ Challenges = class Challenges extends challenges {
 //#region Trainer Card - One to govern them all
 const trainerCard = Profile.getTrainerCard;
 Profile.getTrainerCard = function (...args) {
-    const vanilla = Object.entries(args[10]).filter(([k, _]) => !['shinyMovement', 'noBreeding'].includes(k));
+    const vanilla = Object.entries(args[11]).filter(([k, _]) => !['shinyMovement', 'noBreeding'].includes(k));
     let card = trainerCard(...args);
 
     if (vanilla.every(([_,v]) => v)) {

@@ -291,6 +291,8 @@ acsrqInfo.uniqueEvent = ko.pureComputed(() => {
         'Surprise Togepi',
         //Golden Week
         'Bulbasaur (Rose)',
+        'Ivysaur (Rose)',
+        'Venusaur (Rose)',
         //Flying Pikachu
         'Flying Pikachu',
         'Red Spearow',
@@ -307,7 +309,11 @@ acsrqInfo.uniqueEvent = ko.pureComputed(() => {
         'Blastoise (clone)',
         //Halloween
         'Spooky Togepi',
+        'Spooky Togetic',
+        'Spooky Togekiss',
         'Spooky Bulbasaur',
+        'Spooky Ivysaur',
+        'Spooky Venusaur',
         'Pikachu (Gengar)',
         //Let's GO!
         'Let\'s Go Pikachu',
@@ -464,8 +470,8 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
 //#endregion
 //#region Footer
 acsrqFooter = function () {
-    $('#battleContainer .card-footer')[0].insertAdjacentHTML('beforebegin', `
-        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot && acsrqFooter.showShiny">
+    $('#battleContainer')[0].insertAdjacentHTML('beforeend', `
+        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot() || acsrqFooter.showShiny()">
             <table width="100%" class="table table-sm m-0">
                 <colgroup>
                     <col width="40%">
@@ -635,7 +641,7 @@ DungeonRunner.initializeDungeon = function(dungeon) {
                 chestToOpen = Settings.getSetting('chestCollect').observableValue()
                     ? Settings.getSetting('maxChests').observableValue()
                     : 0;
-                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.size}`;
+                return `${DungeonRunner.chestsOpened()}/${chestToOpen}/${DungeonRunner.map.totalChests()}`;
             }),
         });
 
