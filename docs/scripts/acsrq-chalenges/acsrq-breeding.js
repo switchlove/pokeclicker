@@ -9,7 +9,7 @@ KeyItems.prototype.initialize = function() {
     pkrus.unlockReq = ko.computed(() =>
         App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex('Distortion World')]() > 0
         || App.game?.challenges.list.noBreeding?.active()
-        && App.game.party.getPokemon(pokemonMap[(GameConstants.Starter[player.starter()])].id)
+        && player.regionStarters[GameConstants.Region.kanto]
     );
 
     //Edit unlocker so the modal doesn't show
@@ -47,16 +47,10 @@ PartyPokemon.prototype.calculateAttack = eval(`(${PartyPokemon.prototype.calcula
 })`);
 
 //Evs have no cap
-PartyPokemon.prototype.calculateEVAttackBonus = function() {
-    if (this.pokerus < GameConstants.Pokerus.Contagious) {
-        return 1;
-    }
-    if (App.game?.challenges.list.noBreeding?.active()) {
-        return 1 + (this.evs() / 100);
-    } else {
-        return (this.evs() < 50) ? (1 + 0.01 * this.evs()) : (1 + Math.min(1, Math.pow((this.evs() - 30),0.075) - 0.75));
-    }
-};
+PartyPokemon.prototype.calculateEVAttackBonus = eval(`(${PartyPokemon.prototype.calculateEVAttackBonus.toString()
+    .replace('calculateEVAttackBonus', 'function')
+    .replace('(this.evs() < 50) ?', '(this.evs() < 50 || App.game?.challenges.list.noBreeding?.active()) ?')
+})`);
 
 //Allow breeding from level 40
 BreedingController.visible = eval(`(${

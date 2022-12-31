@@ -21,7 +21,7 @@ function srBot() {
         return;
     }
 
-    srCount = localLocal[6][2] ?? 0;
+    srCount = localLocal[5][2] ?? 0;
     sessionStorage.removeItem('reload');
     srBot[Settings.getSetting('srOpts').value]?.();
 
@@ -174,7 +174,7 @@ srBot.hatch = function () {
         App.game.breeding.hatchPokemonEgg(0);
     }
 
-    localLocal[6][1] = egg.pokemon;
+    localLocal[5][1] = egg.pokemon;
     return srBot.log(egg.pokemon);
 };
 
@@ -194,11 +194,11 @@ srBot.log = function (pokeName, ...msgs) {
     });
 
     if (shiny) {
-        localLocal[6] = [,'', 0];
+        localLocal[5] = [,'', 0];
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         Save.store(player);
     } else {
-        localLocal[6][2] = ++srCount;
+        localLocal[5][2] = ++srCount;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         clearInterval(srBot.interval); // safe guard in case off lag.
         location.reload();

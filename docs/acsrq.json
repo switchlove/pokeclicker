@@ -1,14 +1,16 @@
 {
-    "version": "0.0.15",
+    "version": "0.0.16",
     "files": [
         "scripts/acsrq.js",
         "scripts/acsrq-dungeon.js",
         "scripts/acsrq-movement.js",
         "scripts/acsrq-srBot.js",
         "scripts/acsrq-ui.js",
+        "scripts/acsrq-chalenges/index.js",
+        "scripts/acsrq-chalenges/acsrq-breeding.js",
+        "scripts/acsrq-chalenges/acsrq-movement.js",
         "scripts/modules.min.js",
         "scripts/script.min.js",
-        "scripts/randomizer.js",
         "index.html"
     ]
 }
