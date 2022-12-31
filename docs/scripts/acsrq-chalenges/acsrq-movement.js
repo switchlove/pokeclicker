@@ -206,7 +206,7 @@ class DungeonShinyRequirement extends ClearDungeonRequirement {
 class ObtainedPokemonShinyRequirement extends ObtainedPokemonRequirement {
     constructor(pokemon) {
         super(pokemon.name);
-        this.isCompleted = () => super.isCompleted() && pokemon.options.requirement?.isCompleted();
+        this.isCompleted = () => super.isCompleted() && (pokemon.options?.requirement?.isCompleted() ?? true);
     }
 
     getProgress() {
@@ -274,10 +274,15 @@ class DockRequirement extends Requirement {
 
 Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
     get: function() {
+        if (this.option ==  GameConstants.AchievementOption.less) {
+            return []
+        }
+
         const gym = Object.values(GymList).find(({badgeReward}) => badgeReward == this.badge);
-        if (gym.flags.Champion && player.highestRegion() > gym.parent.region) {
+        if (gym.flags.champion && player.highestRegion() > gym.parent.region) {
             return [];
         }
+
         return [
             ...gym.parent.requirements,
             ...gym.requirements,
@@ -286,6 +291,9 @@ Object.defineProperty(GymBadgeRequirement.prototype, 'parent', {
 });
 Object.defineProperty(TemporaryBattleRequirement.prototype, 'parent', {
     get: function() {
+        if (TemporaryBattleList[this.battleName].completeRequirements.every(r => r.isCompleted())) {
+            return [];
+        }
         return TemporaryBattleList[this.battleName].requirements;
     },
 });
@@ -426,11 +434,13 @@ FarmController.openFarmModal = function() {
 //#endregion
 
 //#region Kanto route
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kanto, 2), new RouteShinyRequirement(GameConstants.Region.kanto, 22));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 2), new TemporaryBattleRequirement('Blue 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 3),  new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.add(TownList['Mt. Moon'], new ItemsRequirement(ItemList.Magikarp));
+ChallengeRequirements.add(TemporaryBattleList['Blue 2'], new GymBadgeRequirement(BadgeEnums.Cascade));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 24), new GymBadgeRequirement(BadgeEnums.Cascade));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 5), new ItemsRequirement(ItemList.Water_stone));
+ChallengeRequirements.set(TownList['Vermilion City'], new TemporaryBattleRequirement('Blue 3'));
 ChallengeRequirements.set(GymList['Vermilion City'], new ItemsRequirement(ItemList.Thunder_stone));
 ChallengeRequirements.set(TownList['Diglett\'s Cave'], new GymBadgeRequirement(BadgeEnums.Thunder));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 11), new DungeonShinyRequirement('Diglett\'s Cave'));
@@ -471,11 +481,11 @@ ChallengeRequirements.add(TownList['Sprout Tower'], new ItemsRequirement(ItemLis
 ChallengeRequirements.set(TownList['Union Cave'], new DungeonShinyRequirement('Ruins of Alph'));
 ChallengeRequirements.set(TownList['Azalea Town'], new DungeonShinyRequirement('Slowpoke Well'));
 ChallengeRequirements.add(GymList['Azalea Town'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Kings_rock));
+ChallengeRequirements.add(TemporaryBattleList['Silver 2'], new GymBadgeRequirement(BadgeEnums.Hive));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 35), new GymBadgeRequirement(BadgeEnums.Plain));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 36), new RouteShinyRequirement(GameConstants.Region.johto, 35));
 ChallengeRequirements.add(GymList['Ecruteak City'], new ItemsRequirement(ItemList.Fire_stone, ItemList.Soothe_bell));
-ChallengeRequirements.set(TownList['Burned Tower'], new GymBadgeRequirement(BadgeEnums.Fog));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 38), new DungeonShinyRequirement('Burned Tower'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 38), new TemporaryBattleRequirement('Silver 3'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 40), new ItemsRequirement(ItemList.Water_stone, ItemList.Thunder_stone, ItemList.Metal_coat), new DockRequirement());
 ChallengeRequirements.add(GymList['Cianwood City'], new ItemsRequirement(ItemList.Sun_stone, ItemList.Moon_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 42), new RouteShinyRequirement(GameConstants.Region.johto, 48));
@@ -483,21 +493,21 @@ ChallengeRequirements.set(TownList['Mt. Mortar'], new RouteShinyRequirement(Game
 ChallengeRequirements.set(TownList['Mahogany Town'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(TemporaryBattleList['Suicune 2'], new DungeonShinyRequirement('Mt. Mortar'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.johto, 43), new ItemsRequirement(ItemList.Upgrade));
-ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('entei')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('suicune')), new ObtainedPokemonRequirement(PokemonHelper.getPokemonByName('raikou')));
+ChallengeRequirements.set(TownList['Tin Tower'], new DungeonShinyRequirement('Whirl Islands'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 44), new DungeonShinyRequirement('Tin Tower'));
+ChallengeRequirements.add(TownList['Blackthorn City'], new QuestLineCompletedRequirement('Whirl Guardian'));
 ChallengeRequirements.add(GymList['Blackthorn City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 45), new GymBadgeRequirement(BadgeEnums.Rising));
 ChallengeRequirements.set(TownList['Tohjo Falls'], new DungeonShinyRequirement('Dark Cave'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.johto, 28), new QuestLineCompletedRequirement('Unfinished Business'));
 //#endregion
 //#region Hoenn
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 102), new RouteShinyRequirement(GameConstants.Region.hoenn, 103));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 102),  new TemporaryBattleRequirement('May 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 104), new ItemsRequirement(ItemList.Kings_rock));
 ChallengeRequirements.add(GymList['Rustboro City'], new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 116), new GymBadgeRequirement(BadgeEnums.Stone));
 ChallengeRequirements.set(TownList['Granite Cave'], new GymBadgeRequirement(BadgeEnums.Knuckle));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 110), new DockRequirement(), new ItemsRequirement(ItemList.Linking_cord));
-ChallengeRequirements.add(GymList['Mauville City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
+ChallengeRequirements.add(GymList['Mauville City'], new RouteShinyRequirement(GameConstants.Region.hoenn, 110), new ItemsRequirement(ItemList.Thunder_stone, ItemList.Metal_coat));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 117), new GymBadgeRequirement(BadgeEnums.Dynamo));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 111), new RouteShinyRequirement(GameConstants.Region.hoenn, 117), new ItemsRequirement(ItemList.Soothe_bell));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 114), new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
@@ -509,21 +519,24 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 107), new 
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 108), new RouteShinyRequirement(GameConstants.Region.hoenn, 107));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 109), new RouteShinyRequirement(GameConstants.Region.hoenn, 108));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 118), new RouteShinyRequirement(GameConstants.Region.hoenn, 109));
-ChallengeRequirements.add(GymList['Fortree City'], new ItemsRequirement(ItemList.Leaf_stone));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 120), new GymBadgeRequirement(BadgeEnums.Feather));
+ChallengeRequirements.add(TemporaryBattleList['Kecleon 1'], new ItemsRequirement(ItemList.Leaf_stone));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 120), new GymBadgeRequirement(BadgeEnums.Feather));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 123), new DungeonShinyRequirement('Mt. Pyre'));
 ChallengeRequirements.set(TownList['Magma Hideout'], new RouteShinyRequirement(GameConstants.Region.hoenn, 123));
+ChallengeRequirements.set(TemporaryBattleList['May 5'], new DungeonShinyRequirement('Magma Hideout'));
 ChallengeRequirements.set(TownList['Lilycove City'], new DungeonShinyRequirement('Magma Hideout'));
+ChallengeRequirements.add(TownList['Aqua Hideout'], new TemporaryBattleRequirement('May 5'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 125), new RouteShinyRequirement(GameConstants.Region.hoenn, 126));
 ChallengeRequirements.set(TownList['Mossdeep City'], new DungeonShinyRequirement('Shoal Cave'));
 ChallengeRequirements.add(GymList['Mossdeep City'], new ItemsRequirement(ItemList.Beldum, ItemList.Prism_scale, ItemList.Upgrade));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 127), new GymBadgeRequirement(BadgeEnums.Mind), new ItemsRequirement(ItemList.Water_stone));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 129), new DungeonShinyRequirement('Seafloor Cavern'));
-ChallengeRequirements.set(TownList['Cave of Origin'], new RouteShinyRequirement(GameConstants.Region.hoenn, 131));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 127), new GymBadgeRequirement(BadgeEnums.Mind));
+ChallengeRequirements.set(TownList['Sootopolis City'], new RouteShinyRequirement(GameConstants.Region.hoenn, 127));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 128), new ItemsRequirement(ItemList.Water_stone));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.hoenn, 129), new DungeonShinyRequirement('Cave of Origin'));
 ChallengeRequirements.set(TownList['Pacifidlog Town'], new GymBadgeRequirement(BadgeEnums.Rain));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.hoenn, 132), new GymBadgeRequirement(BadgeEnums.Rain), new ItemsRequirement(ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
-ChallengeRequirements.set(TownList['Ever Grande City'], new DungeonShinyRequirement('Sealed Chamber'));
-ChallengeRequirements.set(TownList['Victory Road Hoenn'], new DungeonShinyRequirement('Sealed Chamber'), new ItemsRequirement(ItemList.Dragon_scale));
+ChallengeRequirements.set(TownList['Ever Grande City'], new DungeonShinyRequirement('Sealed Chamber'), new QuestLineCompletedRequirement('The Three Golems'));
+ChallengeRequirements.set(TownList['Victory Road Hoenn'], new DungeonShinyRequirement('Sealed Chamber'), new QuestLineCompletedRequirement('The Three Golems'), new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[1].options, new DungeonShinyRequirement('Pinkan Mountain'));
 ChallengeRequirement.add(dungeonList['Cave of Origin'].bossList[2].options, new DungeonShinyRequirement('Pinkan Mountain'));
 ChallengeRequirements.add(TownList['Battle Frontier'], new DungeonShinyRequirement('Pinkan Mountain'));
@@ -541,7 +554,8 @@ ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 41), new G
 ChallengeRequirements.set(TownList['Trovita Island'], new RouteShinyRequirement(GameConstants.Region.kanto, 42));
 //#endregion
 //#region Sinnoh
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 203), new ItemsRequirement(ItemList.Mystery_egg));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 201), new TemporaryBattleRequirement('Barry 1'));
+ChallengeRequirements.add(TemporaryBattleList['Barry 2'], new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.add(GymList['Oreburgh City'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 204), new GymBadgeRequirement(BadgeEnums.Coal));
 ChallengeRequirements.add(TownList['Valley Windworks'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Kings_rock));
@@ -553,6 +567,7 @@ ChallengeRequirements.add(GymList['Hearthome City'], new ItemsRequirement(ItemLi
 ChallengeRequirements.add(TownList['Solaceon Ruins'], new ItemsRequirement(ItemList.Dawn_stone, ItemList.Dusk_stone, ItemList.Shiny_stone, ItemList.Spiritomb));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 210), new DungeonShinyRequirement('Solaceon Ruins'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 214), new GymBadgeRequirement(BadgeEnums.Cobble));
+ChallengeRequirements.add(TownList['Pastoria City'], new TemporaryBattleRequirement('Barry 4'));
 ChallengeRequirements.add(GymList['Pastoria City'], new ItemsRequirement(ItemList.Water_stone, ItemList.Prism_scale, ItemList.Skorupi));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 212), new GymBadgeRequirement(BadgeEnums.Fen));
 ChallengeRequirements.set(TownList['Celestic Town'], new RouteShinyRequirement(GameConstants.Region.sinnoh, 212));
@@ -560,42 +575,47 @@ ChallengeRequirements.add(TemporaryBattleList['Galactic Boss Cyrus'], new ItemsR
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 211), new QuestLineStepCompletedRequirement('A new world', 3));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 219), new RouteShinyRequirement(GameConstants.Region.sinnoh, 211));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 218), new ItemsRequirement(...PalParkShop.items));
+ChallengeRequirements.add(TownList['Canalave City'], new TemporaryBattleRequirement('Barry 5'));
 ChallengeRequirements.add(GymList['Canalave City'], new ItemsRequirement(ItemList.Metal_coat), new DockRequirement());
 ChallengeRequirements.add(TownList['Iron Island'], new GymBadgeRequirement(BadgeEnums.Mine));
 ChallengeRequirements.add(TownList['Lake Valor'], new DungeonShinyRequirement('Iron Island'));
 ChallengeRequirements.add(GymList['Snowpoint City'], new ItemsRequirement(ItemList.Upgrade));
 ChallengeRequirements.add(GymList['Sunyshore City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
-ChallengeRequirements.set(TownList['Sendoff Spring'], new DungeonShinyRequirement('Flower Paradise'));
-ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirement.set(dungeonList['Distortion World'].bossList[1].options, new DungeonShinyRequirement('Sendoff Spring'));
-ChallengeRequirements.set(TownList['Hall of Origin'], new DungeonShinyRequirement('Sendoff Spring'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[1].options, new DungeonShinyRequirement('Flower Paradise'));
+ChallengeRequirement.set(dungeonList['Spear Pillar'].bossList[2].options, new DungeonShinyRequirement('Flower Paradise'));
+ChallengeRequirements.set(TownList['Hall of Origin'], new DungeonShinyRequirement('Flower Paradise'));
 ChallengeRequirements.set(TownList['Snowpoint Temple'], new DungeonShinyRequirement('Hall of Origin'));
 ChallengeRequirements.set(TownList['Newmoon Island'], new DungeonShinyRequirement('Snowpoint Temple'));
 ChallengeRequirements.set(TownList['Fullmoon Island'], new DungeonShinyRequirement('Newmoon Island'));
-ChallengeRequirements.set(TownList['Fight Area'], new DungeonShinyRequirement('Fullmoon Island'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 225), new DungeonShinyRequirement('Fullmoon Island'));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 226), new ItemsRequirement(ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.add(TownList['Fight Area'], new QuestLineStartedRequirement('Zero\'s Ambition'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 225), new QuestLineCompletedRequirement('Zero\'s Ambition'));
+ChallengeRequirements.add(TemporaryBattleList['Barry 7'], new ItemsRequirement(ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 226), new TemporaryBattleRequirement('Barry 7'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.sinnoh, 228),  new DungeonShinyRequirement('Stark Mountain'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.sinnoh, 230), new ItemsRequirement(ItemList.Dubious_disc, ItemList.Protector, ItemList.Reaper_cloth));
 //#endregion
 //#region Unova
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 19), new TemporaryBattleRequirement('Hugh 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 20), new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.set(TownList['Castelia City'], new DungeonShinyRequirement('Liberty Garden'));
 ChallengeRequirements.set(TownList['Castelia Sewers'], new DungeonShinyRequirement('Liberty Garden'), new DockRequirement(), new ItemsRequirement(ItemList.Kings_rock, ItemList.Linking_cord));
+ChallengeRequirements.set(GymList['Castelia City'], new DungeonShinyRequirement('Castelia Sewers'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 4), new GymBadgeRequirement(BadgeEnums.Insect));
 ChallengeRequirements.set(TownList['Nimbasa City'], new DungeonShinyRequirement('Relic Castle'));
 ChallengeRequirements.add(GymList['Nimbasa City'], new ItemsRequirement(ItemList.Metal_coat));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 16), new GymBadgeRequirement(BadgeEnums.Bolt));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 5), new DungeonShinyRequirement('Lostlorn Forest'));
 ChallengeRequirements.add(GymList['Driftveil City'], new ItemsRequirement(ItemList.Zorua, ItemList.Razor_claw, ItemList.Razor_fang));
+ChallengeRequirements.add(TownList['Relic Passage'], new TemporaryBattleRequirement('Hugh 3'));
 ChallengeRequirements.add(TownList['A Totally Unsuspicious Frigate'], new DungeonShinyRequirement('Relic Passage'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 6), new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 7));
+ChallengeRequirements.add(TemporaryBattleList['Cheren'], new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 7));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 6), new TemporaryBattleRequirement('Colress 2'));
 ChallengeRequirements.set(TownList['Chargestone Cave'], new DungeonShinyRequirement('Mistralton Cave'));
 ChallengeRequirements.add(GymList['Mistralton City'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Upgrade));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 7), new GymBadgeRequirement(BadgeEnums.Jet));
 ChallengeRequirements.set(TownList['Lentimas Town'], new DungeonShinyRequirement('Celestial Tower'));
 ChallengeRequirements.set(TownList['Reversal Mountain'], new DungeonShinyRequirement('Celestial Tower'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 14), new TemporaryBattleRequirement('Hugh 4'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 13), new RouteShinyRequirement(GameConstants.Region.unova, 14));
 ChallengeRequirements.add(GymList['Opelucid City'], new ItemsRequirement(ItemList.Dragon_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 9), new QuestLineStepCompletedRequirement('Quest for the DNA Splicers', 14));
@@ -603,14 +623,18 @@ ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 24), new R
 ChallengeRequirements.add(GymList['Humilau City'], new ItemsRequirement(ItemList.Prism_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 22), new GymBadgeRequirement(BadgeEnums.Wave));
 ChallengeRequirements.set(TownList['Victory Road Unova'], new DungeonShinyRequirement('Abundant Shrine'));
+ChallengeRequirements.add(TemporaryBattleList['Hugh 6'], new ObtainedPokemonShinyRequirement(PokemonHelper.getPokemonByName('Kyurem')));
+ChallengeRequirements.add(TownList['Black and White Park'], new TemporaryBattleRequirement('Hugh 6'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 15), new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone));
-ChallengeRequirements.set(TownList['Twist Mountain'], new RouteShinyRequirement(GameConstants.Region.unova, 15));
+ChallengeRequirements.add(TemporaryBattleList['Hugh 7'], new RouteShinyRequirement(GameConstants.Region.unova, 15));
+ChallengeRequirements.set(TownList['Twist Mountain'], new TemporaryBattleRequirement('Hugh 7'));
 ChallengeRequirements.set(TownList['Dragonspiral Tower'], new DungeonShinyRequirement('Twist Mountain'));
 ChallengeRequirements.set(TownList['Icirrus City'], new DungeonShinyRequirement('Dragonspiral Tower'),  new ItemsRequirement(ItemList.Black_DNA, ItemList.White_DNA));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 8), new DungeonShinyRequirement('Dragonspiral Tower'),  new ItemsRequirement(ItemList.Black_DNA, ItemList.White_DNA, ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(TownList['Pinwheel Forest'], new RouteShinyRequirement(GameConstants.Region.unova, 8));
 ChallengeRequirements.set(TownList['Moor of Icirrus'], new DungeonShinyRequirement('Pinwheel Forest'));
-ChallengeRequirements.add(TownList['Nacrene City'], new ItemsRequirement(...AnvilleTownShop.items));
+ChallengeRequirements.add(TownList['Anville Town'], new DungeonShinyRequirement('Pledge Grove'));
+ChallengeRequirements.set(TownList['Nacrene City'], new DungeonShinyRequirement('Pledge Grove'), new ItemsRequirement(...AnvilleTownShop.items));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.unova, 3), new ItemsRequirement(...AnvilleTownShop.items, ItemList.Soothe_bell));
 ChallengeRequirements.add(TownList.Dreamyard, new ItemsRequirement(ItemList.Leaf_stone, ItemList.Fire_stone, ItemList.Water_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.unova, 2), new DungeonShinyRequirement('Dreamyard'));
@@ -623,12 +647,13 @@ ChallengeRequirements.add(GymList['Santalune City'], new ItemsRequirement(ItemLi
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 22), new GymBadgeRequirement(BadgeEnums.Bug));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 4), new RouteShinyRequirement(GameConstants.Region.kalos, 22));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 5), new ItemsRequirement(...FriseurFurfrouShop.items));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new ItemsRequirement(ItemList.Thunder_stone));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 6), new TemporaryBattleRequirement('Tierno 1'), new ItemsRequirement(ItemList.Thunder_stone));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 7), new ItemsRequirement(ItemList['Furfrou (Star)'], ItemList['Furfrou (La Reine)']));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 9), new ItemsRequirement(ItemList.Water_stone));
 ChallengeRequirements.add(GymList['Cyllage City'], new ItemsRequirement(ItemList.Upgrade, ItemList.Prism_scale));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 10), new GymBadgeRequirement(BadgeEnums.Cliff));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 11), new ItemsRequirement(ItemList.Fire_stone, ItemList.Kings_rock));
+ChallengeRequirements.add(TemporaryBattleList['Calem 1'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Metal_coat));
 ChallengeRequirements.add(GymList['Shalour City'], new ItemsRequirement(ItemList.Linking_cord, ItemList.Metal_coat));
 ChallengeRequirements.add(GymList['Coumarine City'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Electirizer, ItemList.Magmarizer));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 23), new GymBadgeRequirement(BadgeEnums.Plant), new DockRequirement());
@@ -638,35 +663,36 @@ ChallengeRequirements.set(TownList['Frost Cavern'], new DungeonShinyRequirement(
 ChallengeRequirements.set(TownList['Dendemille Town'], new DungeonShinyRequirement('Frost Cavern'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 16), new DungeonShinyRequirement('Frost Cavern'), new ItemsRequirement(ItemList.Dusk_stone, ItemList.Shiny_stone, ItemList.Dawn_stone));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 17), new RouteShinyRequirement(GameConstants.Region.kalos, 16));
+ChallengeRequirements.add(TownList['Anistar City'], new TemporaryBattleRequirement('Calem 4'));
 ChallengeRequirements.add(GymList['Anistar City'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Razor_claw, ItemList.Razor_fang));
 ChallengeRequirements.set(TownList['Couriway Town'], new DungeonShinyRequirement('Terminus Cave'));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 19), new DungeonShinyRequirement('Terminus Cave'), new ItemsRequirement(ItemsRequirement.Dragon_scale));
-ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 19), new ItemsRequirement(ItemsRequirement.Dragon_scale));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kalos, 20), new TemporaryBattleRequirement('Trevor'), new ItemsRequirement(ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.kalos, 21), new GymBadgeRequirement(BadgeEnums.Iceberg));
 ChallengeRequirements.set(TownList['Victory Road Kalos'], new RouteShinyRequirement(GameConstants.Region.kalos, 21));
 //#endregion
 //#region Alola
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 2), new ItemsRequirement(ItemList.Mystery_egg, ItemList.Shiny_stone, ItemList.Dusk_stone, ItemList.Dawn_stone), new DockRequirement());
 ChallengeRequirements.set(TownList['Melemele Woods'], new DungeonShinyRequirement('Hau\'oli Cemetery'));
-ChallengeRequirements.set(TownList['Iki Town'], new DungeonShinyRequirement('Seaward Cave'));
+ChallengeRequirements.set(TemporaryBattleList['Hau 3'], new DungeonShinyRequirement('Seaward Cave'));
 ChallengeRequirement.set(SubRegions.getSubRegionById(GameConstants.Region.alola, 1), new DungeonShinyRequirement('Ten Carat Hill'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 4), new ItemsRequirement(ItemList.Water_stone, ItemList.Kings_rock, ItemList.Metal_coat));
-ChallengeRequirements.set(TownList['Paniola Ranch'], new DungeonShinyRequirement('Pikachu Valley'));
+ChallengeRequirements.set(TemporaryBattleList['Hau 4'], new DungeonShinyRequirement('Pikachu Valley'));
 ChallengeRequirements.set(TownList['Paniola Town'], new DungeonShinyRequirement('Pikachu Valley'));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 20), new RouteShinyRequirement(GameConstants.Region.alola, 19));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 6), new RouteShinyRequirement(GameConstants.Region.alola, 20));
+ChallengeRequirements.add(TownList['Konikoni City'], new TemporaryBattleRequirement('Plumeria 1'));
 ChallengeRequirements.add(GymList['Konikoni City'], new ItemsRequirement(ItemList.Fire_stone, ItemList.Linking_cord, ItemList.Soothe_bell));
-ChallengeRequirements.set(TownList['Memorial Hill'], new GymBadgeRequirement(BadgeEnums.RockiumZ));
-ChallengeRequirements.set(TownList['Aether Paradise'],  new RouteShinyRequirement(GameConstants.Region.alola, 21));
 ChallengeRequirements.add(TemporaryBattleList['Ultra Wormhole'], new ItemsRequirement(ItemList.Upgrade, ItemList['Type: Null']));
-ChallengeRequirements.add(TownList['Malie Garden'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Electirizer, ItemList.Magmarizer));
+ChallengeRequirements.add(TemporaryBattleList['Hau 5'], new ItemsRequirement(ItemList.Thunder_stone, ItemList.Electirizer, ItemList.Magmarizer));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 11), new DungeonShinyRequirement('Hokulani Observatory'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 14), new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Ice_stone));
-ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 15), new RouteShinyRequirement(GameConstants.Region.alola, 23));
+ChallengeRequirements.set(TemporaryBattleList['Plumeria 2'], new RouteShinyRequirement(GameConstants.Region.alola, 23));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 24), new ItemsRequirement(ItemList.Deepsea_scale, ItemList.Deepsea_tooth, ItemList.Prism_scale, ItemList.Sachet, ItemList.Whipped_dream));
 ChallengeRequirements.add(TownList['Exeggutor Island Hill'], new ItemsRequirement(ItemList.Leaf_stone, ItemList.Dragon_scale, ItemList.Protector, ItemList.Dubious_disc, ItemList.Reaper_cloth));
 ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.alola, 26), new DungeonShinyRequirement('Exeggutor Island Hill'));
 ChallengeRequirements.set(TownList['Vast Poni Canyon'], new RouteShinyRequirement(GameConstants.Region.alola, 26));
+ChallengeRequirements.add(TemporaryBattleList['Necrozma'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Poipole));
 ChallengeRequirements.add(TemporaryBattleList['Ultra Megalopolis'], new ItemsRequirement(ItemList.Moon_stone, ItemList.Sun_stone, ItemList.Poipole));
 // Post Game
 ChallengeRequirement.add(dungeonList['Pikachu Valley'].bossList[5].options, new DungeonShinyRequirement('Ruins of Conflict'));
@@ -680,9 +706,7 @@ ChallengeRequirement.add(dungeonList['Wela Volcano Park'].enemyList[6].options, 
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Wela Volcano Park'].bossList[3].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
 ChallengeRequirement.add(dungeonList['Diglett\'s Tunnel'].enemyList[2].options, new ObtainedPokemonShinyRequirement(dungeonList['Lush Jungle'].bossList[1]));
-ChallengeRequirements.add(TownList['Ruins of Life'], new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 10));
-ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[14].options, new DungeonShinyRequirement('Ruins of Life'));
-ChallengeRequirement.add(dungeonList['Malie Garden'].enemyList[15].options, new DungeonShinyRequirement('Ruins of Life'));
+ChallengeRequirements.add(TownList['Ruins of Life'], new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 4));
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 17).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
 ChallengeReq.add(Routes.getRoute(GameConstants.Region.alola, 23).pokemon.special[0], new DungeonShinyRequirement('Ruins of Life'));
 ChallengeRequirement.add(dungeonList['Hokulani Observatory'].bossList[2].options, new QuestLineStepCompletedRequirement('Ultra Beast Hunt', 12));
@@ -708,6 +732,63 @@ ChallengeRequirements.add(TownList['Resolution Cave'], new DungeonShinyRequireme
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.alola, 29), new DungeonShinyRequirement('Resolution Cave'));
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[1].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
 ChallengeRequirement.add(dungeonList['Lake of the Sunne and Moone'].bossList[2].options, new RouteShinyRequirement(GameConstants.Region.alola, 30));
+//#endregion
+//#region Galar
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.galar, 1), new TemporaryBattleRequirement('Mirages'));
+ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.galar, 2), new ItemsRequirement(ItemList.Mystery_egg));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 5), new RouteShinyRequirement(GameConstants.Region.galar, 4));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 6), new RouteShinyRequirement(GameConstants.Region.galar, 5));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 11), new RouteShinyRequirement(GameConstants.Region.galar, 6));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 9), new RouteShinyRequirement(GameConstants.Region.galar, 11));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 8), new RouteShinyRequirement(GameConstants.Region.galar, 9));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 7), new RouteShinyRequirement(GameConstants.Region.galar, 8));
+ChallengeRequirements.set(TownList['Motostoke'], new RouteShinyRequirement(GameConstants.Region.galar, 7));
+ChallengeRequirements.add(TemporaryBattleList['Hop 3'], new RouteShinyRequirement(GameConstants.Region.galar, 7), new ItemsRequirement(ItemList.Fire_stone, ItemList.Linking_cord, ItemList.Magmarizer));
+ChallengeRequirements.add(GymList['Turffield'], new ItemsRequirement(ItemList.Sweet_apple, ItemList.Tart_apple, ItemList.Leaf_stone, ItemList.Sun_stone));
+ChallengeRequirements.add(GymList['Hulbury'], new DockRequirement(), new ItemsRequirement(ItemList.Water_stone, ItemList.Kings_rock, ItemList.Prism_scale, ItemList.Deepsea_tooth, ItemList.Deepsea_scale));
+ChallengeRequirements.set(TownList['Dusty Bowl'], new RouteShinyRequirement(GameConstants.Region.galar, 19));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 20), new DungeonShinyRequirement('Dusty Bowl'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 22), new RouteShinyRequirement(GameConstants.Region.galar, 20));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 23), new RouteShinyRequirement(GameConstants.Region.galar, 22), new ItemsRequirement(ItemList.Metal_coat, ItemList.Upgrade, ItemList.Dragon_scale));
+ChallengeRequirements.add(TownList['Stow-on-Side'], new TemporaryBattleRequirement('Hop 5'));
+ChallengeRequirements.add(GymList['Stow-on-Side1'], new ItemsRequirement(ItemList.Soothe_bell, ItemList.Dawn_stone, ItemList.Dubious_disc, ItemList.Reaper_cloth, ItemList.Dracozolt, ItemList.Arctozolt, ItemList.Dracovish, ItemList.Arctovish));
+ChallengeRequirements.add(GymList['Stow-on-Side2'],  new ItemsRequirement(ItemList.Soothe_bell, ItemList.Dawn_stone, ItemList.Dubious_disc, ItemList.Reaper_cloth, ItemList.Dracozolt, ItemList.Arctozolt, ItemList.Dracovish, ItemList.Arctovish));
+ChallengeRequirements.add(GymList['Ballonlea'],  new ItemsRequirement(ItemList.Cracked_pot, ItemList.Moon_stone, ItemList.Shiny_stone, ItemList.Sachet, ItemList.Whipped_dream));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 10), new RouteShinyRequirement(GameConstants.Region.galar, 27));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 21), new RouteShinyRequirement(GameConstants.Region.galar, 10));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 26), new RouteShinyRequirement(GameConstants.Region.galar, 21));
+ChallengeRequirements.add(GymList['Circhester1'], new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Protector, ItemList.Ice_stone));
+ChallengeRequirements.add(GymList['Circhester2'], new ItemsRequirement(ItemList.Razor_claw, ItemList.Razor_fang, ItemList.Protector, ItemList.Ice_stone));
+ChallengeRequirements.add(GymList['Spikemuth'], new DockRequirement(), new ItemsRequirement(ItemList.Thunder_stone, ItemList.Dusk_stone, ItemList.Electirizer));
+//Isle of Armor
+ChallengeRequirements.set(TownList['Armor Station'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(TemporaryBattleList['Klara 1'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(TemporaryBattleList['Avery 1'], new QuestLineCompletedRequirement('Sword and Shield'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 41), new DockRequirement(), new ItemsRequirement(ItemList.Galarica_cuff, ItemList.Galarica_wreath), new QuestLineStartedRequirement('The Dojo\'s Armor'), new QuestLineStartedRequirement('Secrets of the Jungle'));
+ChallengeRequirements.set(TownList['Courageous Cavern'], new RouteShinyRequirement(GameConstants.Region.galar, 41));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 34), new DungeonShinyRequirement('Courageous Cavern'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 37), new RouteShinyRequirement(GameConstants.Region.galar, 34));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 42), new RouteShinyRequirement(GameConstants.Region.galar, 37));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 36), new RouteShinyRequirement(GameConstants.Region.galar, 42));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 35), new RouteShinyRequirement(GameConstants.Region.galar, 36));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 38), new RouteShinyRequirement(GameConstants.Region.galar, 35));
+ChallengeRequirements.set(TownList['Brawlers\' Cave'], new RouteShinyRequirement(GameConstants.Region.galar, 38));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 40), new DungeonShinyRequirement('Brawlers\' Cave'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 44), new RouteShinyRequirement(GameConstants.Region.galar, 40));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 45), new RouteShinyRequirement(GameConstants.Region.galar, 44));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 43), new RouteShinyRequirement(GameConstants.Region.galar, 45));
+ChallengeRequirements.set(TownList['Warm-Up Tunnel'], new RouteShinyRequirement(GameConstants.Region.galar, 43));
+//Crown Tundra
+ChallengeRequirements.set(TownList['Crown Tundra Station'], new DockRequirement(), new QuestLineCompletedRequirement('The Dojo\'s Armor'), new QuestLineCompletedRequirement('Secrets of the Jungle'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 47), new QuestLineStartedRequirement('The Crown of Galar'), new QuestLineStartedRequirement('The Birds of the Dyna Tree'), new QuestLineStartedRequirement('The Ancient Golems'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 49), new DungeonShinyRequirement('Iron Ruins'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 50), new RouteShinyRequirement(GameConstants.Region.galar, 49));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 54), new RouteShinyRequirement(GameConstants.Region.galar, 52));
+ChallengeRequirements.add(TownList['Iceberg Ruins'],  new QuestLineStepCompletedRequirement('The Ancient Golems', 2));
+ChallengeRequirements.add(TownList['Rock Peak Ruins'],  new QuestLineStepCompletedRequirement('The Ancient Golems', 2));
+ChallengeRequirements.set(TownList['Tunnel to the Top'],  new DungeonShinyRequirement('Split-Decision Ruins'));
+ChallengeRequirements.set(Routes.getRoute(GameConstants.Region.galar, 53),  new DungeonShinyRequirement('Crown Shrine'));
+ChallengeRequirements.set(TownList['Dyna Tree Hill'],  new DungeonShinyRequirement('Lakeside Cave'));
 //#endregion
 
 //#region Fix hint!!! Needs yo be at the end!!
@@ -755,7 +836,7 @@ for (let stone of Object.values(ItemList).filter(i => i instanceof EvolutionSton
             // Filter out any Pokémon which can't be obtained yet (future region)
             .filter(evolution => PokemonHelper.calcNativeRegion(evolution.getEvolvedPokemon) <= player.highestRegion())
             // Finally get the evolution
-            .map(evolution => evolution.getEvolvedPokemon);
+            .map(evolution => evolution.evolvedPokemon);
 
         if (unlockedEvolutions.length == 0) {
             return undefined;
