@@ -74,5 +74,14 @@ Update.prototype.check = function () {
         }, GameConstants.SECOND);
     }
 
+    if (saveData.challenges.list.realEvolutions == undefined) {
+        setTimeout(async () => {
+            // Check if player wants to activate the new challenge modes
+            if (!await Notifier.confirm({ title: 'Real evolutions', message: 'Your Pokémon go away, when they evolve.\n\nPlease choose if you would like this challenge mode to be disabled or enabled.\n\nCan be disabled later. Can NOT be enabled later!', confirm: 'Disable', cancel: 'Enable' })) {
+                App.game.challenges.list.realEvolutions.activate();
+            }
+        }, GameConstants.SECOND);
+    }
+
     update.call(this);
 };
