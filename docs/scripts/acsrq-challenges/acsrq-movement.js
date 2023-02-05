@@ -434,6 +434,7 @@ FarmController.openFarmModal = function() {
 //#endregion
 
 //#region Kanto route
+ChallengeRequirements.set(TemporaryBattleList['Blue 1'], new RouteShinyRequirement(GameConstants.Region.kanto, 22));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 2), new TemporaryBattleRequirement('Blue 1'));
 ChallengeRequirements.add(Routes.getRoute(GameConstants.Region.kanto, 3),  new ItemsRequirement(ItemList.Mystery_egg));
 ChallengeRequirements.add(TownList['Mt. Moon'], new ItemsRequirement(ItemList.Magikarp));

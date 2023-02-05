@@ -68,7 +68,7 @@ srBot.evo = function () {
     const needed = evoIds.flatMap(
         i => PokemonHelper.getPokemonsWithEvolution(i).flatMap(
             p => p.evolutions.filter(
-                e => e.stone == i && e.isSatisfied() && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
+                e => e.stone == i && EvolutionHandler.isSatisfied(e) && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
             )
         )
     );
