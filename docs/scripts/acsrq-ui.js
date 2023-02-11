@@ -83,6 +83,7 @@ Settings.add(new Setting('srOpts', 'Soft Reset Type', [
     new SettingOption('Evo Items', 'evo'),
     new SettingOption('Fossils', 'fos'),
     new SettingOption('Shop Mon', 'poke'),
+    new SettingOption('Trades', 'trade'),
     new SettingOption('Regular Eggs', 'egg'),
 ], 'none'));
 Settings.add(new RangeSetting('maxEggs', 'Max Eggs', 1, 4, 1, 1));
@@ -111,6 +112,7 @@ Settings.add(new Setting('fossilOpts', 'Fossil to use',[
     ...UndergroundItems.list.filter(i => i.valueType == UndergroundItemValueType.Fossil).map(f => new SettingOption(f.displayName, f.name)),
 ], ''));
 Settings.add(new Setting('evoItemCount', 'Evo items to use', [], 1));
+Settings.add(new Setting('tradeItemCount', 'Number of trades to do', [], 1));
 Settings.add(new Setting('ballBuyOpts', 'Auto-purchase pokeballs?', [
     new SettingOption('None', GameConstants.Pokeball.None),
     new SettingOption('Pokeball', GameConstants.Pokeball.Pokeball),
@@ -434,6 +436,7 @@ acsrqSettings = function () {
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'fossilOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'fos\''),
                 acsrqSettings.Template('MultipleChoiceSettingTemplate', 'evoOpts', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
                 acsrqSettings.Number('evoItemCount', 'Settings.getSetting(\'srOpts\').observableValue() === \'evo\''),
+                acsrqSettings.Number('tradeItemCount', 'Settings.getSetting(\'srOpts\').observableValue() === \'trade\''),
                 acsrqSettings.Range('maxEggs', '[\'fos\', \'egg\'].includes(Settings.getSetting(\'srOpts\').observableValue())'),
             ], false),
     ];

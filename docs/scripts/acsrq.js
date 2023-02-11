@@ -141,11 +141,11 @@ function a6save() {
     ];
     saveKey = `acsrq-${Save.key}`;
 
-    if (localStorage.getItem(`a6csrq-${Save.key}`) != null) {
-        localLocal = JSON.parse(localStorage.getItem(`a6csrq-${Save.key}`));
+    if (localStorage.getItem(`acsrq-${Save.key}`) != null) {
+        localLocal = JSON.parse(localStorage.getItem(`acsrq-${Save.key}`));
         if (localLocal != null) {
-            localLocal.splice(2, 1);
-            localStorage.removeItem(`a6csrq-${Save.key}`);
+            /*localLocal.splice(2, 1);
+            localStorage.removeItem(`acsrq-${Save.key}`);*/
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
     } else if (localStorage.getItem(saveKey) == null) {
@@ -538,7 +538,7 @@ async function phaseCounter(arg) {
                         }
                         catchValue = 0;
                         isCurrentShiny = 0;
-                        newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, 'Wild', App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
+                        newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, 'Wild', PokemonHelper.getPokemonById(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
                         phases.push(newPhase);
                         localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
                         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -650,7 +650,7 @@ async function phaseCounter(arg) {
                         }
                         catchValue = 0;
                         isCurrentShiny = 0;
-                        newPhase = [phaseVal, player.town().dungeon.name, encounterType, App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
+                        newPhase = [phaseVal, player.town().dungeon.name, encounterType, PokemonHelper.getPokemonById(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
                         phases.push(newPhase);
                         localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
                         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -718,7 +718,7 @@ async function phaseCounter(arg) {
                         }
                         catchValue = 0;
                         isCurrentShiny = 0;
-                        newPhase = [phaseVal, 'Safari Zone', 'Wild', App.game.party.getPokemon(lastPoke).name, catchStatus, 'N/A'];
+                        newPhase = [phaseVal, 'Safari Zone', 'Wild', PokemonHelper.getPokemonById(lastPoke).name, catchStatus, 'N/A'];
                         phases.push(newPhase);
                         localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
                         localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
@@ -1142,6 +1142,7 @@ async function plantBot() {
 
 async function mutateBot() {
     const all = Array.from({length: App.game.farming.plotList.length}, (_,i) => i);
+    // 'BerryName': { BerryID:[PlotID], BerryID:[PlotID] },
     const mutationLayouts = {
         'Persim': { 2:[6], 6:[12] },
         'Razz': { 0:[6], 5:[12] },
@@ -1171,9 +1172,9 @@ async function mutateBot() {
         'Watmel': { 27:all },
         'Durin': { 28:all },
         'Belue': { 29:all },
-        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 17:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
+        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 16:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
         'Occa': { 30:[5,9,22], 25:[0,4,17], 14:[2,15,19], 9:[7,20,24] },
-        'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 43:[7,20,24] },
+        'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 44:[7,20,24] },
         'Wacan': { 22:[5,9,22], 18:[0,4,17], 13:[2,15,19], 24:[7,20,24] },
         'Rindo': { 17:[6,9,21,24], 14:[0,3,15,18] },
         'Yache': { 37:[0,2,4,10,12,14,20,22,24] },
@@ -1187,7 +1188,7 @@ async function mutateBot() {
         'Kasib': { 0:all },
         'Haban': { 36:[12], 39:[1,9,15,23], 37:[3,5,19,21], 38:[2,10,14,22] },
         'Colbur': { 45:[6,9,21,24], 28:[1,4,16,19], 48:[5,8,20,23] },
-        'Babiri': { 43:[0,1,2,3,4,7,17,20,21,22,23,24], 48:[5,9,10,11,12,13,14,15,19] },
+        'Babiri': { 43:[0,1,2,3,4,7,17,20,21,22,23,24], 47:[5,9,10,11,12,13,14,15,19] },
         'Chilan': { 41:all },
         'Roseli': { 11:[5,9,22], 16:[0,4,17], 27:[2,15,19], 32:[7,20,24] },
         'Micle': { 31:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
@@ -1199,7 +1200,7 @@ async function mutateBot() {
         'Liechi': { 37:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Ganlon': { 43:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Salac': { 44:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Petaya': { 49:[24], 51:[16], 40:[14], 43:[15], 47:[10], 41:[21], 45:[12], 39:[22], 50:[4], 37:[13], 53:[17], 36:[0], 44:[11], 52:[23], 56:[18], 38:[19], 42:[2], 48:[20] },
+        'Petaya': { 49:[24], 51:[16], 40:[14], 43:[15], 47:[10], 41:[21], 45:[12], 39:[22], 50:[4], 37:[13], 53:[17], 36:[0], 44:[11], 52:[23], 46:[18], 38:[19], 42:[2], 48:[20] },
         'Apicot': { 52:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Lansat': { 53:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
     };
