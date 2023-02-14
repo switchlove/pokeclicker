@@ -1,5 +1,5 @@
 {
-    "version": "0.0.17",
+    "version": "0.0.17a",
     "files": [
         "scripts/acsrq.js",
         "scripts/acsrq-dungeon.js",
