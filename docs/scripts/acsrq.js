@@ -214,7 +214,18 @@ async function a6settings() {
                         safariClick(1);
                         break;
                     case 'safariOptSC':
-                        safariClick(!Safari.completed(true));
+                        if (Safari.completed(true)) {
+                            safariClick(0);
+                            safariCheck.checked = false;
+                            Notifier.notify({
+                                title: `[SCRIPT] ACSRQ - Safari Bot`,
+                                message: `Safari Bot has completed it's run!`,
+                                type: NotificationConstants.NotificationOption.success,
+                                timeout: 15 * GameConstants.SECOND,
+                            });
+                        } else {
+                            safariClick(1);
+                        }
                         break;
                     default:
                         safariClick(0);
@@ -1097,17 +1108,17 @@ async function plantBot() {
     } else {
         const layouts = {
             'S+C': {
-                65: [5,6,7,8,9,15,16,17,18,19],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
+                66: [5,6,7,8,9,15,16,17,18,19],
+                41: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
             },
             'S+L': {
-                65: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
+                66: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
                 19: [6,8,16,18],
             },
             'S+L+C': {
-                65: [5,7,9,15,17,19],
+                66: [5,7,9,15,17,19],
                 19: [6,8,16,18],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
+                41: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
             },
         };
 
