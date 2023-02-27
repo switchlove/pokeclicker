@@ -3,7 +3,7 @@ var srCount;
 window.addEventListener('load', () => setTimeout(() => srBot.interval = setInterval(srBot, 3000), 3000));
 
 //#region LocalSettings
-const settingKey = 'a6csrq-settings';
+const settingKey = 'acsrq-settings';
 const localSettings = ko.observable(JSON.parse(localStorage.getItem(settingKey)) ?? {key: '', state: 0});
 localSettings.subscribe(() => localStorage.setItem(settingKey, ko.toJSON(localSettings)));
 window.addEventListener('storage', (e) => {
@@ -60,6 +60,44 @@ srBot.poke = function () {
     return srBot.log(smnName, `Needed - ${smnNeed}`);
 };
 
+/** srBot option Trades */
+srBot.trade = function () {
+    const tradeKey = [];
+    const shops = player.town().content.filter(c => c instanceof BerryMasterShop);
+    if (player.route() || !shops.length) {
+        return;
+    }
+
+    let smnUsed = false;
+    for (let sdx = 0; sdx < shops.length; sdx++) {
+        for (let idx = 0; idx < BerryDeal.list[shops[sdx].location]().length; idx++) {
+            tradeKey.push(BerryDeal.list[shops[sdx].location]()[idx].item.itemType.name)
+        }
+    }
+    
+    const items = shops.map( shop => BerryDeal.list[shop.location]().filter(i => i instanceof BerryDeal && !App.game.party.alreadyCaughtPokemonByName(i.item.itemType.name, true)));
+    for (let sdx = 0; sdx < shops.length; sdx++) {
+        ShopHandler.showShop(shops[sdx]);
+    
+        for (let idx = 0; idx < items[sdx].length; idx++) {
+            if (BerryDeal.canUse(shops[sdx].location, idx)) {
+                var smnName = items[sdx][idx].item.itemType.name;
+                BerryDeal.use(shops[sdx].location, tradeKey.indexOf(items[sdx][idx].item.itemType.name), Number(Settings.getSetting('tradeItemCount').value));
+                smnUsed = true;
+                break;
+            }
+        }
+    }
+    
+    localSettings().state = smnUsed;
+    if (!smnUsed) {
+        return;
+    }
+
+    const smnNeed = items.flat().length;
+    return srBot.log(smnName, `Needed - ${smnNeed}`);
+};
+
 /** srBot option evolution stones */
 srBot.evo = function () {
     const option = new RegExp(Settings.getSetting('evoOpts').value);
@@ -68,7 +106,7 @@ srBot.evo = function () {
     const needed = evoIds.flatMap(
         i => PokemonHelper.getPokemonsWithEvolution(i).flatMap(
             p => p.evolutions.filter(
-                e => e.stone == i && e.isSatisfied() && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
+                e => e.stone == i && EvolutionHandler.isSatisfied(e) && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
             )
         )
     );

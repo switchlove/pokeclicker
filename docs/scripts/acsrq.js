@@ -1,3 +1,4 @@
+/* eslint-disable no-tabs */
 var clickEngagedD, clickEngagedG, clickEngagedS, clickEngagedBF, clickEngagedSR, chestOpened, curDungeon, curRoute, dMax, dMaxY, lastArea, lastPokeType, lastRegion, leftStep, localLocal, menuPos, phases, phaseVal, save, saveKey, saveLoaded;
 
 var bossA = 0;
@@ -33,11 +34,12 @@ function sleep(ms) {
 
 var getJSON = async url => {
     const response = await fetch(url);
-    if(!response.ok)
+    if (!response.ok) {
         throw new Error(response.statusText);
+    }
     const data = response.json();
     return data;
-}
+};
 
 window.addEventListener('load', () => {
     setTimeout(() => {
@@ -56,16 +58,16 @@ window.addEventListener('load', () => {
     };
     //#endregion
 
-    setInterval(function(){
+    setInterval(() => {
         if (Settings.getSetting('noWander').observableValue() == true) {
-            var wanLog = []
-            for(var x = 0; x < App.game.logbook.logs().length; x++){
-                if(App.game.logbook.logs()[x].description.includes("wandered")){
-                    if(App.game.logbook.logs()[x].description.includes("shiny")){
+            var wanLog = [];
+            for (var x = 0; x < App.game.logbook.logs().length; x++) {
+                console.log(x);
+                if (App.game.logbook.logs()[x].description().includes('wandered')) {
+                    if (App.game.logbook.logs()[x].description().includes('shiny')) {
                         wanLog.push(App.game.logbook.logs()[x]);
                     }
-                }
-                else{
+                } else {
                     wanLog.push(App.game.logbook.logs()[x]);
                 }
             }
@@ -73,36 +75,36 @@ window.addEventListener('load', () => {
         }
     }, 5000);
 
-    setInterval(function(){
-        if (clickEngagedG){
+    setInterval(() => {
+        if (clickEngagedG) {
             gymBot();
         }
-        if (clickEngagedBF){
+        if (clickEngagedBF) {
             bfBot();
         }
     }, 100);
 
-    setInterval(function(){
-        if (clickEngagedS){
+    setInterval(() => {
+        if (clickEngagedS) {
             safariBot();
         }
     }, 250);
 });
 
 function main() {
-    var CharCard = document.querySelector("#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div");
+    var CharCard = document.querySelector('#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div');
     if (CharCard == null && App.game != undefined) {
         a6save();
         setTimeout(() => {
-			a6menu();
-			a6phases();
-			if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
-				ballBot();
-			}
-			setTimeout(() => {
-				a6settings();
-			}, 1500);
-		}, 250);
+            a6menu();
+            a6phases();
+            if (Settings.getSetting('ballBuyOpts').observableValue() != 'none' && Settings.getSetting('ballPurAmount').observableValue() != 0) {
+                ballBot();
+            }
+            setTimeout(() => {
+                a6settings();
+            }, 1500);
+        }, 250);
     } else {
         if (localSettings().state || !!sessionStorage.getItem('reload')) {
             Game.prototype.computeOfflineEarnings = () => {};
@@ -122,28 +124,28 @@ function a6save() {
     */
     localLocal = [
         [
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-            ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+            ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
         ],
-        ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-        "",
-        ["0",""],
-        "",
-        ["", "", ""]
+        ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
+        '',
+        ['0',''],
+        '',
+        ['', '', ''],
     ];
-    saveKey = "acsrq-" + Save.key;
+    saveKey = `acsrq-${Save.key}`;
 
-    if (localStorage.getItem("a6csrq-" + Save.key) != null) {
-        localLocal = JSON.parse(localStorage.getItem("a6csrq-" + Save.key));
+    if (localStorage.getItem(`acsrq-${Save.key}`) != null) {
+        localLocal = JSON.parse(localStorage.getItem(`acsrq-${Save.key}`));
         if (localLocal != null) {
-            localLocal.splice(2, 1);
-            localStorage.removeItem("a6csrq-" + Save.key);
+            /*localLocal.splice(2, 1);
+            localStorage.removeItem(`acsrq-${Save.key}`);*/
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
     } else if (localStorage.getItem(saveKey) == null) {
@@ -161,12 +163,12 @@ function a6save() {
         newArr.push(localLocal[0][4]);
         newArr.push(localLocal[0][5]);
         newArr.push(localLocal[0][6]);
-        newArr.push(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0","0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]);
+        newArr.push(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
         localLocal[0] = newArr;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
     if (localLocal[1].length == 135) {
-        localLocal[1].push("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0");
+        localLocal[1].push('0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0');
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
 
@@ -212,7 +214,18 @@ async function a6settings() {
                         safariClick(1);
                         break;
                     case 'safariOptSC':
-                        safariClick(!Safari.completed(true));
+                        if (Safari.completed(true)) {
+                            safariClick(0);
+                            safariCheck.checked = false;
+                            Notifier.notify({
+                                title: `[SCRIPT] ACSRQ - Safari Bot`,
+                                message: `Safari Bot has completed it's run!`,
+                                type: NotificationConstants.NotificationOption.success,
+                                timeout: 15 * GameConstants.SECOND,
+                            });
+                        } else {
+                            safariClick(1);
+                        }
                         break;
                     default:
                         safariClick(0);
@@ -264,11 +277,11 @@ async function a6settings() {
     // });
 
     if (rVer != lVer) {
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#A93226';
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#A93226';
+        document.querySelector('#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)').style.color = '#A93226';
+        document.querySelector('#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)').style.color = '#A93226';
     } else if (rVer == lVer) {
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)").style.color = '#229954';
-        document.querySelector("#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)").style.color = '#229954';
+        document.querySelector('#settingsAcsrqDebug > table > tbody > tr:nth-child(1) > td:nth-child(2)').style.color = '#229954';
+        document.querySelector('#settingsAcsrqDebug > table > tbody > tr:nth-child(2) > td:nth-child(2)').style.color = '#229954';
     }
 }
 
@@ -289,20 +302,20 @@ function bfClick(x) {
 }
 
 function lastPokeEncounter() {
-    if (JSON.parse(localStorage.getItem(saveKey))[3][0] != "0") {
+    if (JSON.parse(localStorage.getItem(saveKey))[3][0] != '0') {
         lastPoke = JSON.parse(localStorage.getItem(saveKey))[3][0];
     }
-    if (JSON.parse(localStorage.getItem(saveKey))[3][1] != "") {
+    if (JSON.parse(localStorage.getItem(saveKey))[3][1] != '') {
         lastPokeType = JSON.parse(localStorage.getItem(saveKey))[3][1];
     } else {
         lastPokeType = '?: ';
     }
 
     if (lastPoke == 0) {
-        document.querySelector("#lastEncounterPoke > td:nth-child(1)").innerHTML = 'N/A';
+        document.querySelector('#lastEncounterPoke > td:nth-child(1)').innerHTML = 'N/A';
     } else {
-        var pkName = PokemonHelper.getPokemonById(lastPoke).name.split(" ")[0];
-        document.querySelector("#lastEncounterPoke > td:nth-child(1)").innerHTML = lastPokeType + pkName;
+        var pkName = PokemonHelper.getPokemonById(lastPoke).name.split(' ')[0];
+        document.querySelector('#lastEncounterPoke > td:nth-child(1)').innerHTML = lastPokeType + pkName;
     }
 }
 
@@ -318,7 +331,7 @@ async function areaClears() {
         }
     }
 
-    if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
+    if (document.querySelector('#safariModal').style.display != 'none' && document.querySelector('#safariModal').style.display != '') {
         clears = 0;
         if (Safari.inProgress() != false) {
             await phaseCounter(3);
@@ -349,7 +362,7 @@ async function areaClears() {
         await phaseCounter(2);
     } else if (App.game.gameState == 6) {
         if (gymsFound == 1) {
-            clears = townContent[gymAtX].clears()
+            clears = townContent[gymAtX].clears();
             if (lastArea != townContent[gymAtX].leaderName || lastRegion != player.region) {
                 lastPoke = 0;
                 localLocal[3][0] = 0;
@@ -361,7 +374,7 @@ async function areaClears() {
             lastRegion = player.region;
             await phaseCounter(4);
         } else if (gymsFound > 1) {
-            clears = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].clears()
+            clears = townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].clears();
             if (lastArea != townContent[Settings.getSetting('gymE4Opts').observableValue() - 1].leaderName || lastRegion != player.region) {
                 lastPoke = 0;
                 localLocal[3][0] = 0;
@@ -378,7 +391,7 @@ async function areaClears() {
     } else {
         clears = 0;
     }
-    document.querySelector("#areaClears > td:nth-child(1)").innerHTML = clears;
+    document.querySelector('#areaClears > td:nth-child(1)').innerHTML = clears;
 }
 
 async function phaseCounter(arg) {
@@ -396,8 +409,8 @@ async function phaseCounter(arg) {
         }
     }
 
-    if (phaseVal == '' || phaseVal == null || phaseVal == undefined){
-        if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
+    if (phaseVal == '' || phaseVal == null || phaseVal == undefined) {
+        if (document.querySelector('#safariModal').style.display != 'none' && document.querySelector('#safariModal').style.display != '') {
             if (Safari.inProgress() != false) {
                 phaseVal = 0;
                 localLocal[4] = 0;
@@ -436,28 +449,28 @@ async function phaseCounter(arg) {
         } else if (gymFound >= 1) {
             phaseVal = 0;
         }
-    } else if (document.querySelector("#phaseCount").value != phaseVal) {
-        if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
+    } else if (document.querySelector('#phaseCount').value != phaseVal) {
+        if (document.querySelector('#safariModal').style.display != 'none' && document.querySelector('#safariModal').style.display != '') {
             if (Safari.inProgress() != false) {
-                phaseVal = document.querySelector("#phaseCount").value;
+                phaseVal = document.querySelector('#phaseCount').value;
                 localLocal[4] = phaseVal;
                 localStorage.setItem(saveKey, JSON.stringify(localLocal));
             }
         } else if (player.route() != 0) {
-            phaseVal = document.querySelector("#phaseCount").value;
+            phaseVal = document.querySelector('#phaseCount').value;
             cArea = player.route() - 1;
             localLocal[0][player.region][cArea] = phaseVal;
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         } else if (player.town().dungeon != undefined) {
-            phaseVal = document.querySelector("#phaseCount").value;
+            phaseVal = document.querySelector('#phaseCount').value;
             cArea = GameConstants.getDungeonIndex(player.town().name);
             localLocal[1][cArea] = phaseVal;
             localStorage.setItem(saveKey, JSON.stringify(localLocal));
         }
     } else if (curRoute != player.route() || curDungeon != GameConstants.getDungeonIndex(player.town().name)) {
-        if (document.querySelector("#safariModal").style.display != "none" && document.querySelector("#safariModal").style.display != "") {
+        if (document.querySelector('#safariModal').style.display != 'none' && document.querySelector('#safariModal').style.display != '') {
             if (Safari.inProgress() != false) {
-                phaseVal = document.querySelector("#phaseCount").value;
+                phaseVal = document.querySelector('#phaseCount').value;
                 phaseVal = localLocal[4];
                 phaseVal = localLocal[4];
             }
@@ -501,7 +514,7 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
                     } else if ( lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -514,36 +527,36 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
 
                     }
                 } else {
-					if (isCurrentShiny == 1) {
-						var catchStatus = "";
-						phaseLogs = App.game.logbook.logs();
-						for (var x = 0; x < 3; x++) {
-							var phaseLog = phaseLogs[x];
-							if(phaseLog.type.label == "ESCAPED") {
-								catchStatus = "Failed";
-								break;
-							} else if (phaseLog.type.label == "CAUGHT") {
-								catchStatus = "Captured";
-								break;
-							}
-						}
-                        if (catchStatus == "") {
-                            catchStatus = "No Attempt";
+                    if (isCurrentShiny == 1) {
+                        var catchStatus = '';
+                        phaseLogs = App.game.logbook.logs();
+                        for (var x = 0; x < 3; x++) {
+                            var phaseLog = phaseLogs[x];
+                            if (phaseLog.type.label == 'ESCAPED') {
+                                catchStatus = 'Failed';
+                                break;
+                            } else if (phaseLog.type.label == 'CAUGHT') {
+                                catchStatus = 'Captured';
+                                break;
+                            }
                         }
-						catchValue = 0;
-						isCurrentShiny = 0;
-						newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
-						phases.push(newPhase);
-						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-						hasRun = 0;
-						a6phases();
-					}
-				}
+                        if (catchStatus == '') {
+                            catchStatus = 'No Attempt';
+                        }
+                        catchValue = 0;
+                        isCurrentShiny = 0;
+                        newPhase = [phaseVal, Routes.getRoute(player.region, player.route()).routeName, 'Wild', PokemonHelper.getPokemonById(lastPoke).name, catchStatus, App.game.statistics.routeKills[player.region][player.route()]()];
+                        phases.push(newPhase);
+                        localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+                        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+                        hasRun = 0;
+                        a6phases();
+                    }
+                }
             }
             break;
         case 2: //dungeons
@@ -581,7 +594,7 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
                     } else if ( lastPoke == DungeonBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
                         break;
                     } else {
@@ -603,59 +616,59 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
                     }
                 } else {
-					if (isCurrentShiny == 1) {
-						var encounterType = "";
-						var catchStatus = "";
-						phaseLogs = App.game.logbook.logs();
-						phaseLoop:
-						for (var x = 0; x < 3; x++) {
-							var phaseLog = phaseLogs[x];
-							if (phaseLog.type.label == "SHINY" && lastPokeType == 'B: ') {
-								if (phaseLog.description.includes("trainer")) {
-									catchStatus = "Boss Trainer";
-									encounterType = "Boss"
-									break phaseLoop;
-								} else {
-									if (phaseLogs[x-1].type.label == "CAUGHT") {
-										catchStatus = "Boss Captured";
-										encounterType = "Boss";
-										break phaseLoop;
-									} else if (phaseLogs[x-1].type.label == "ESCAPED") {
-										catchStatus = "Boss Failed";
-										encounterType = "Boss";
-										break phaseLoop;
-									}
-								}
-							} else if (phaseLog.type.label == "SHINY" && lastPokeType == 'T: ') {
-								catchStatus = "Trainer";
-								encounterType = "Trainer";
-								break phaseLoop;
-							} else if(phaseLog.type.label == "CAUGHT" && lastPokeType == 'W: ') {
-								catchStatus = "Captured";
-								encounterType = "Wild";
-								break phaseLoop;
-							} else if(phaseLog.type.label == "ESCAPED" && lastPokeType == 'W: ') {
-								catchStatus = "Failed";
-								encounterType = "Wild";
-								break phaseLoop;
-							}
-						}
-                        if (catchStatus == "") {
-                            catchStatus = "No Attempt";
+                    if (isCurrentShiny == 1) {
+                        var encounterType = '';
+                        var catchStatus = '';
+                        phaseLogs = App.game.logbook.logs();
+                        phaseLoop:
+                        for (var x = 0; x < 3; x++) {
+                            var phaseLog = phaseLogs[x];
+                            if (phaseLog.type.label == 'SHINY' && lastPokeType == 'B: ') {
+                                if (phaseLog.description.includes('trainer')) {
+                                    catchStatus = 'Boss Trainer';
+                                    encounterType = 'Boss';
+                                    break phaseLoop;
+                                } else {
+                                    if (phaseLogs[x - 1].type.label == 'CAUGHT') {
+                                        catchStatus = 'Boss Captured';
+                                        encounterType = 'Boss';
+                                        break phaseLoop;
+                                    } else if (phaseLogs[x - 1].type.label == 'ESCAPED') {
+                                        catchStatus = 'Boss Failed';
+                                        encounterType = 'Boss';
+                                        break phaseLoop;
+                                    }
+                                }
+                            } else if (phaseLog.type.label == 'SHINY' && lastPokeType == 'T: ') {
+                                catchStatus = 'Trainer';
+                                encounterType = 'Trainer';
+                                break phaseLoop;
+                            } else if (phaseLog.type.label == 'CAUGHT' && lastPokeType == 'W: ') {
+                                catchStatus = 'Captured';
+                                encounterType = 'Wild';
+                                break phaseLoop;
+                            } else if (phaseLog.type.label == 'ESCAPED' && lastPokeType == 'W: ') {
+                                catchStatus = 'Failed';
+                                encounterType = 'Wild';
+                                break phaseLoop;
+                            }
                         }
-						catchValue = 0;
-						isCurrentShiny = 0;
-						newPhase = [phaseVal, player.town().dungeon.name, encounterType, App.game.party.getPokemon(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
-						phases.push(newPhase);
-						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-						hasRun = 0;
-						a6phases();
-					}
-				}
+                        if (catchStatus == '') {
+                            catchStatus = 'No Attempt';
+                        }
+                        catchValue = 0;
+                        isCurrentShiny = 0;
+                        newPhase = [phaseVal, player.town().dungeon.name, encounterType, PokemonHelper.getPokemonById(lastPoke).name, catchStatus, App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]()];
+                        phases.push(newPhase);
+                        localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+                        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+                        hasRun = 0;
+                        a6phases();
+                    }
+                }
             }
             break;
         case 3: //safari
@@ -682,7 +695,7 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[4] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
                     } else if ( lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]() ) {
                         break;
                     } else {
@@ -695,35 +708,35 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[4] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-						isCurrentShiny = 1;
+                        isCurrentShiny = 1;
                     }
                 } else {
-					if (isCurrentShiny == 1) {
-						var catchStatus = "";
-						phaseLogs = App.game.logbook.logs();
-						for (var x = 0; x < 3; x++) {
-							var phaseLog = phaseLogs[x];
-							if (phaseLog.type.label == "ESCAPED") {
-								catchStatus = "Failed";
-								break;
-							} else if (phaseLog.type.label == "CAUGHT") {
-								catchStatus = "Captured";
-								break;
-							}
-						}
-                        if (catchStatus == "") {
-                            catchStatus = "No Attempt";
+                    if (isCurrentShiny == 1) {
+                        var catchStatus = '';
+                        phaseLogs = App.game.logbook.logs();
+                        for (var x = 0; x < 3; x++) {
+                            var phaseLog = phaseLogs[x];
+                            if (phaseLog.type.label == 'ESCAPED') {
+                                catchStatus = 'Failed';
+                                break;
+                            } else if (phaseLog.type.label == 'CAUGHT') {
+                                catchStatus = 'Captured';
+                                break;
+                            }
                         }
-						catchValue = 0;
-						isCurrentShiny = 0;
-						newPhase = [phaseVal, "Safari Zone", "Wild", App.game.party.getPokemon(lastPoke).name, catchStatus, "N/A"];
-						phases.push(newPhase);
-						localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-						localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-						hasRun = 0;
-						a6phases();
-					}
-				}
+                        if (catchStatus == '') {
+                            catchStatus = 'No Attempt';
+                        }
+                        catchValue = 0;
+                        isCurrentShiny = 0;
+                        newPhase = [phaseVal, 'Safari Zone', 'Wild', PokemonHelper.getPokemonById(lastPoke).name, catchStatus, 'N/A'];
+                        phases.push(newPhase);
+                        localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+                        localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+                        hasRun = 0;
+                        a6phases();
+                    }
+                }
             }
             break;
         case 4: //gym
@@ -814,43 +827,44 @@ async function phaseCounter(arg) {
                 }
             }
     }
-    document.querySelector("#phaseCount").value = phaseVal;
+    document.querySelector('#phaseCount').value = phaseVal;
 
     if (localLocal[2].toLocaleString('en-US') == '') {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = 0;
+        document.querySelector('#lastEncounter > td:nth-child(1)').innerHTML = 0;
     } else {
-        document.querySelector("#lastEncounter > td:nth-child(1)").innerHTML = localLocal[2].toLocaleString('en-US');
+        document.querySelector('#lastEncounter > td:nth-child(1)').innerHTML = localLocal[2].toLocaleString('en-US');
     }
     localStorage.setItem(saveKey, JSON.stringify(localLocal));
 }
 
-function removePhase(id){
-	var newArray = [];
-	for(var x = 0; x < phases.length; x++){
-		if(x !== id){
-			newArray.push(phases[x]);
-		}
-	}
-	phases = newArray;
-	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-	hasRun = 0;
-	a6phases();
+function removePhase(id) {
+    var newArray = [];
+    for (var x = 0; x < phases.length; x++) {
+        if (x !== id) {
+            newArray.push(phases[x]);
+        }
+    }
+    phases = newArray;
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    hasRun = 0;
+    a6phases();
 }
 
-function removeAllPhases(){
-	phases = [];
-	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
-	localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
-	hasRun = 0;
-	a6phases();
+function removeAllPhases() {
+    phases = [];
+    localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+    localStorage.setItem(`phaseTracker${Save.key}`, JSON.stringify(phases));
+    hasRun = 0;
+    a6phases();
 }
 
 async function a6export() {
     hasExported = 0;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     var test_array = phases;
-    var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
-    var data = encodeURI('data:text/csv;charset=utf-8,' + csv);
+    var csv = test_array.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"` : String(item)).join(',')).join('\n');
+    var data = encodeURI(`data:text/csv;charset=utf-8,${csv}`);
 
     const link = document.createElement('a');
     link.setAttribute('href', data);
@@ -878,17 +892,18 @@ function a6phases() {
     	if (hasRun == 0) {
             let phaseTable = $('#phaseTable tbody')[0];
             phaseTable.innerHTML = '';
-    		for(var x = 0; x < phases.length; x++){
+    		for (var x = 0; x < phases.length; x++) {
     			var tablePhase = document.createElement('tr');
-    			var phaseId = "phase" + x;
-    			tablePhaseQuery = "<tr><td>" + phases[x][0] + "</td>" + "<td>" + phases[x][1] + "</td>" + "<td>" + phases[x][2] + "</td>" + "<td>" + phases[x][3] + "</td>" + "<td>" + phases[x][4] + "</td>" + "<td>" + phases[x][5] + "</td>" + "<td>" + "<button type=\"button\" class=\"btn btn-primary\" onclick=\"removePhase(" + x + ")\">Remove</button>" + "</td></tr>";
+    			var phaseId = `phase${x}`;
+    			// eslint-disable-next-line no-useless-concat
+    			tablePhaseQuery = `<tr><td>${phases[x][0]}</td>` + `<td>${phases[x][1]}</td>` + `<td>${phases[x][2]}</td>` + `<td>${phases[x][3]}</td>` + `<td>${phases[x][4]}</td>` + `<td>${phases[x][5]}</td>` + '<td>' + `<button type="button" class="btn btn-primary" onclick="removePhase(${x})">Remove</button>` + '</td></tr>';
     			tablePhase.innerHTML = tablePhaseQuery;
-    			tablePhase.style.display = "none";
+    			tablePhase.style.display = 'none';
     			phaseTable.append(tablePhase);
     			var childNumber = x + 1;
     			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
-    				var displayQuery = "#phaseTable tbody > tr:nth-child(" + childNumber + ")";
-    				document.querySelector(displayQuery).removeAttribute("style");
+    				var displayQuery = `#phaseTable tbody > tr:nth-child(${childNumber})`;
+    				document.querySelector(displayQuery).removeAttribute('style');
     				hasRun = 1;
     			}
     		}
@@ -905,10 +920,10 @@ async function gymBot() {
 
     const opts = Settings.getSetting('gymOpts').value;
     const gyms = player.town().content.filter(c => c instanceof Gym && c.isUnlocked());
-    const idx = Settings.getSetting('gymE4Opts').value -1;
+    const idx = Settings.getSetting('gymE4Opts').value - 1;
     const gym = gyms[idx] || gyms[0];
 
-    if (!gym || opts == "gymOptC" && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
+    if (!gym || opts == 'gymOptC' && (gym.clears() || 0) >= Settings.getSetting('maxClears').value) {
         return;
     }
 
@@ -918,57 +933,60 @@ async function gymBot() {
 async function safariBot() {
     let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
     let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
-    const dirOrder = (()=> {
-        const lastDir = Safari.lastDirection
+    const dirOrder = (() => {
+        const lastDir = Safari.lastDirection;
         switch (lastDir) {
             case 'left': priority = 'right'; break;
             case 'up': priority = 'down'; break;
             case 'right': priority = 'left'; break;
             case 'down': priority = 'up'; break;
         }
-        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])]
+        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])];
     })();
 
-    let nearestGrass = {x:0, y:0, d:Infinity}
+    let nearestGrass = {x:0, y:0, d:Infinity};
     const walkable = [
         0, //ground
         10, //grass
-        11,12,13,14,21,22,23,24,15,16,17,18,19 //sand
+        11,12,13,14,21,22,23,24,15,16,17,18,19, //sand
     ];
 
     movementMatrix = (origin) => {
         let queue = new Set([JSON.stringify(origin)]);
-        for(let p = 0; p < queue.size; p++) {
+        for (let p = 0; p < queue.size; p++) {
             let {x, y} = JSON.parse([...queue][p]);
-            if (!walkable.includes(Safari.grid[y][x]))
+            if (!walkable.includes(Safari.grid[y][x])) {
                 continue;
-
+            }
             const next = dirOrder.map((dir) => {
-                const xy = Safari.directionToXY(dir)
-                xy.x += x
-                xy.y += y
+                const xy = Safari.directionToXY(dir);
+                xy.x += x;
+                xy.y += y;
                 return xy;
-            }).filter(({x,y})=> y < bound.y && y >= 0 && x < bound.x && x >= 0 );
-            for (let n = 0; n < next.length; n++)
+            }).filter(({x,y}) => y < bound.y && y >= 0 && x < bound.x && x >= 0 );
+            for (let n = 0; n < next.length; n++) {
                 queue.add(JSON.stringify(next[n]));
+            }
 
-            if (x == origin.x && y == origin.y)
+            if (x == origin.x && y == origin.y) {
                 matrix[y][x] = 0;
-            else {
+            } else {
                 matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
 
                 if (Safari.completed(true)) {
-                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d)
+                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d) {
                         nearestGrass = {x, y, d: matrix[y][x]};
+                    }
                 } else {
-                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10))
+                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10)) {
                         nearestGrass = {x, y, d: matrix[y][x]};
+                    }
                 }
             }
         }
-    }
+    };
 
-    if (Safari.inProgress() && document.querySelector("#safariModal").classList.contains('show')) {
+    if (Safari.inProgress() && document.querySelector('#safariModal').classList.contains('show')) {
         if (Safari.inBattle()) {
             if (!SafariBattle.busy()) {
                 if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
@@ -979,14 +997,14 @@ async function safariBot() {
                     }
                 } else {
                     SafariBattle.run();
-                    setTimeout(()=> {
+                    setTimeout(() => {
                         SafariBattle.busy(false);
                     }, 1600); // anti soft lock
                 }
             }
         } else {
-            let dest = {d: Infinity}
-            movementMatrix(Safari.playerXY)
+            let dest = {d: Infinity};
+            movementMatrix(Safari.playerXY);
 
             const pkm = Safari.pokemonGrid();
             for (let i = 0; i < pkm.length; i++) {
@@ -999,8 +1017,9 @@ async function safariBot() {
                     dest.d = dist;
                 }
             }
-            if (dest.d == Infinity)
+            if (dest.d == Infinity) {
                 dest = nearestGrass;
+            }
 
             movementMatrix(dest);
             const next = dirOrder.map(dir => {
@@ -1008,21 +1027,23 @@ async function safariBot() {
                 xy.x += Safari.playerXY.x;
                 xy.y += Safari.playerXY.y;
 
-                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0)
+                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0) {
                     return null;
-                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]}
+                }
+                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]};
             }).filter((n) => n && n.d > 0);
 
-            if (next[0])
+            if (next[0]) {
                 Safari.step(next[0].dir);
+            }
         }
     }
 }
 
 async function bfBot() {
     if (App.game.gameState == 8) {
-        switch(Settings.getSetting('bfOpts').observableValue()) {
-            case "bfOptL":
+        switch (Settings.getSetting('bfOpts').observableValue()) {
+            case 'bfOptL':
                 if (BattleFrontierRunner.started() == true) {
                     if (BattleFrontierRunner.stage() >= Number(Settings.getSetting('maxLvl').observableValue())) {
                         BattleFrontierRunner.end();
@@ -1031,7 +1052,7 @@ async function bfBot() {
                     BattleFrontierRunner.start();
                 }
                 break;
-            case "bfOptT":
+            case 'bfOptT':
                 if (BattleFrontierRunner.started() == true) {
                     if (Number(BattleFrontierRunner.timeLeftSeconds()) <= Number(Settings.getSetting('maxTime').observableValue())) {
                         BattleFrontierRunner.end();
@@ -1040,7 +1061,7 @@ async function bfBot() {
                     BattleFrontierRunner.start();
                 }
                 break;
-            case "bfOptN":
+            case 'bfOptN':
                 if (BattleFrontierRunner.started() != true) {
                     BattleFrontierRunner.start();
                 }
@@ -1049,7 +1070,7 @@ async function bfBot() {
 }
 
 function plantLayout(layout) {
-    const berrieOrder = Object.keys(layout).sort((a, b) =>  App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3])
+    const berrieOrder = Object.keys(layout).sort((a, b) =>  App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3]);
 
     for (let i = 0; i < berrieOrder.length; i++) {
         if (App.game.farming.plotList[layout[berrieOrder[i]][0]].berry == -1) {
@@ -1060,7 +1081,7 @@ function plantLayout(layout) {
                 }
             }
 
-            layout[berrieOrder[i]].forEach(plot => App.game.farming.plant(plot, berrieOrder[i]))
+            layout[berrieOrder[i]].forEach(plot => App.game.farming.plant(plot, berrieOrder[i]));
         }
     }
 }
@@ -1070,7 +1091,7 @@ async function plantBot() {
     var berryId = BerryType[selectedBerry];
 
     if (berryId >= 0 && App.game.farming.unlockedBerries[berryId]()) {
-        if (App.game.farming.plotList[12].isEmpty() == true){
+        if (App.game.farming.plotList[12].isEmpty() == true) {
             if (App.game.farming.berryList[berryId]() > 1) {
                 if (App.game.farming.plotList[12].isEmpty() == true) {
                     FarmController.selectedBerry(berryId);
@@ -1086,20 +1107,20 @@ async function plantBot() {
         }
     } else {
         const layouts = {
-            "S+C": {
-                65: [5,6,7,8,9,15,16,17,18,19],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24]
+            'S+C': {
+                66: [5,6,7,8,9,15,16,17,18,19],
+                41: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
             },
-            "S+L": {
-                65: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
-                19: [6,8,16,18]
-            },
-            "S+L+C": {
-                65: [5,7,9,15,17,19],
+            'S+L': {
+                66: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
                 19: [6,8,16,18],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24]
-            }
-        }
+            },
+            'S+L+C': {
+                66: [5,7,9,15,17,19],
+                19: [6,8,16,18],
+                41: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
+            },
+        };
 
         if (selectedBerry.endsWith('+P')) {
             const tp = App.game.farming.plotList[7];
@@ -1132,6 +1153,7 @@ async function plantBot() {
 
 async function mutateBot() {
     const all = Array.from({length: App.game.farming.plotList.length}, (_,i) => i);
+    // 'BerryName': { BerryID:[PlotID], BerryID:[PlotID] },
     const mutationLayouts = {
         'Persim': { 2:[6], 6:[12] },
         'Razz': { 0:[6], 5:[12] },
@@ -1161,9 +1183,9 @@ async function mutateBot() {
         'Watmel': { 27:all },
         'Durin': { 28:all },
         'Belue': { 29:all },
-        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 17:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
+        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 16:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
         'Occa': { 30:[5,9,22], 25:[0,4,17], 14:[2,15,19], 9:[7,20,24] },
-        'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 43:[7,20,24] },
+        'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 44:[7,20,24] },
         'Wacan': { 22:[5,9,22], 18:[0,4,17], 13:[2,15,19], 24:[7,20,24] },
         'Rindo': { 17:[6,9,21,24], 14:[0,3,15,18] },
         'Yache': { 37:[0,2,4,10,12,14,20,22,24] },
@@ -1177,7 +1199,7 @@ async function mutateBot() {
         'Kasib': { 0:all },
         'Haban': { 36:[12], 39:[1,9,15,23], 37:[3,5,19,21], 38:[2,10,14,22] },
         'Colbur': { 45:[6,9,21,24], 28:[1,4,16,19], 48:[5,8,20,23] },
-        'Babiri': { 43:[0,1,2,3,4,7,17,20,21,22,23,24], 48:[5,9,10,11,12,13,14,15,19] },
+        'Babiri': { 43:[0,1,2,3,4,7,17,20,21,22,23,24], 47:[5,9,10,11,12,13,14,15,19] },
         'Chilan': { 41:all },
         'Roseli': { 11:[5,9,22], 16:[0,4,17], 27:[2,15,19], 32:[7,20,24] },
         'Micle': { 31:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
@@ -1189,10 +1211,10 @@ async function mutateBot() {
         'Liechi': { 37:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Ganlon': { 43:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Salac': { 44:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Petaya': { 49:[24], 51:[16], 40:[14], 43:[15], 47:[10], 41:[21], 45:[12], 39:[22], 50:[4], 37:[13], 53:[17], 36:[0], 44:[11], 52:[23], 56:[18], 38:[19], 42:[2], 48:[20] },
+        'Petaya': { 49:[24], 51:[16], 40:[14], 43:[15], 47:[10], 41:[21], 45:[12], 39:[22], 50:[4], 37:[13], 53:[17], 36:[0], 44:[11], 52:[23], 46:[18], 38:[19], 42:[2], 48:[20] },
         'Apicot': { 52:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
         'Lansat': { 53:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-    }
+    };
 
     const selectedBerry = Settings.getSetting('botstate.mutate').value;
     plantLayout(mutationLayouts[selectedBerry]);
@@ -1206,14 +1228,14 @@ async function mutateBot() {
 
 async function autoBreed() {
     if (App.game.breeding.hasFreeEggSlot() == true) {
-        if(Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'attack'){
+        if (Settings.getSetting('breedingOpts').observableValue() == 'none' || Settings.getSetting('breedingOpts').observableValue() == 'attack') {
             PartyController.hatcherySortedList = [...App.game.party.caughtPokemon];
             let sortededHatcheryList = PartyController.hatcherySortedList.sort(PartyController.compareBy(Settings.getSetting('hatcherySort').observableValue(), Settings.getSetting('hatcherySortDirection').observableValue()));
             let filteredEggList = sortededHatcheryList.filter(partyPokemon => {
                 if (!BreedingController.visible(partyPokemon)()) {
                     return false;
                 }
-                if(Settings.getSetting('breedingOpts').observableValue() == 'attack') {
+                if (Settings.getSetting('breedingOpts').observableValue() == 'attack') {
                     var breedAtk = Settings.getSetting('minBreedAttack').observableValue();
                     if (partyPokemon._attack() > breedAtk) {
                         return false;
@@ -1225,42 +1247,42 @@ async function autoBreed() {
             if (filteredEggList[0] != undefined) {
                 App.game.breeding.addPokemonToHatchery(filteredEggList[0]);
             }
-        } else if(Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
-            if (player.itemList["Mystery_egg"]() >= 1) {
-                ItemList["Mystery_egg"].use();
+        } else if (Settings.getSetting('breedingOpts').observableValue() == 'mystery') {
+            if (player.itemList.Mystery_egg() >= 1) {
+                ItemList.Mystery_egg.use();
             } else {
                 Settings.setSettingByName('breedingOpts','none');
                 Notifier.notify({
-                    title: `[SCRIPT] ACSRQ`,
-                    message: `You're out of eggs!`,
+                    title: '[SCRIPT] ACSRQ',
+                    message: 'You\'re out of eggs!',
                     type: NotificationConstants.NotificationOption.warning,
                     timeout: 5 * GameConstants.SECOND,
                 });
             }
             [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-        } else if(Settings.getSetting('breedingOpts').observableValue() == 'typed') {
+        } else if (Settings.getSetting('breedingOpts').observableValue() == 'typed') {
             var typeEggU = Settings.getSetting('typedEggOpts').observableValue();
-            typeEggU = typeEggU.charAt(0).toUpperCase() + typeEggU.slice(1) + '_egg';
+            typeEggU = `${typeEggU.charAt(0).toUpperCase() + typeEggU.slice(1)}_egg`;
             if (player._itemList[typeEggU]() >= 1) {
                 ItemList[typeEggU].use();
             } else {
                 Settings.setSettingByName('breedingOpts','none');
                 Notifier.notify({
-                    title: `[SCRIPT] ACSRQ`,
-                    message: `You're out of eggs!`,
+                    title: '[SCRIPT] ACSRQ',
+                    message: 'You\'re out of eggs!',
                     type: NotificationConstants.NotificationOption.warning,
                     timeout: 5 * GameConstants.SECOND,
                 });
             }
             [3, 2, 1, 0].forEach((index) => App.game.breeding.hatchPokemonEgg(index));
-        } else if(Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
+        } else if (Settings.getSetting('breedingOpts').observableValue() == 'fossil') {
             var fossilU = Settings.getSetting('fossilOpts').observableValue();
             if (player.mineInventory().find(i => i.name == fossilU).amount() >= 1) {
                 Underground.sellMineItem(player.mineInventory().find(i => i.name == fossilU).id);
             } else {
                 Settings.setSettingByName('breedingOpts','none');
                 Notifier.notify({
-                    title: `[SCRIPT] ACSRQ`,
+                    title: '[SCRIPT] ACSRQ',
                     message: `You're out of ${fossilU}s!`,
                     type: NotificationConstants.NotificationOption.warning,
                     timeout: 5 * GameConstants.SECOND,
@@ -1278,9 +1300,9 @@ async function ballBot() {
     const purAmount = Number(Settings.getSetting('ballPurAmount').observableValue());
     const minAmount = Number(Settings.getSetting('minBallAmount').observableValue());
 
-    if (buyOpts == -1 || App.game.pokeballs.pokeballs[buyOpts].quantity() > minAmount)
+    if (buyOpts == -1 || App.game.pokeballs.pokeballs[buyOpts].quantity() > minAmount) {
         return;
-
+    }
     let shop;
     if (App.game.statistics.gymsDefeated[GameConstants.getGymIndex('Champion Lance')]()) {
         shop = pokeMartShop;
