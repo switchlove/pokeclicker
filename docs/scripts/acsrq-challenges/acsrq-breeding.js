@@ -68,21 +68,13 @@ PartyPokemon.prototype.calculateAttack = eval(
 );
 
 //Evs have no cap
-// PartyPokemon.prototype.calculateEVAttackBonus = eval(
-//   `(${PartyPokemon.prototype.calculateEVAttackBonus
-//     .toString()
-//     .replace("calculateEVAttackBonus", "function")
-//     .replace(
-//       "(this.evs() < 50) ?",
-//       "(this.evs() < 50 || App.game?.challenges.list.noBreeding?.active()) ?"
-//     )})`
-// );
-
-PartyPokemon = eval(
-  `${PartyPokemon.toString().replace(
-    "(this.evs() < 50) ?",
-    "(this.evs() < 50 || App.game?.challenges.list.noBreeding?.active()) ?"
-  )}`
+PartyPokemon.prototype.constructor = eval(
+  `${PartyPokemon.prototype.constructor
+    .toString()
+    .replace(
+      "(this.evs() < 50) ?",
+      "(this.evs() < 50 || App.game?.challenges.list.noBreeding?.active()) ?"
+    )}`
 );
 
 //Allow breeding from level 40
