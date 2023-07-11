@@ -392,20 +392,6 @@ acsrqInfo = function () {
         "foreach: Settings.getSetting('ballBuyOpts').options.map(({value}) => App.game.pokeballs.pokeballs[value]).filter(_=>_) -->"
       )
   );
-
-  const selectedPokeballDisplayTemplate = $(
-    "#selectedPokeballDisplayTemplate"
-  )[0];
-  selectedPokeballDisplayTemplate.insertAdjacentHTML(
-    "afterend",
-    selectedPokeballDisplayTemplate.outerHTML
-      .replace(
-        "selectedPokeballDisplayTemplate",
-        "autoBuyPokeballDisplayTemplate"
-      )
-      .replace("pokeballSelector", "autoBuyPokeballSelector")
-      .replace("<img class", '<img style="height: 27px" class')
-  );
   //#endregion
 
   const scriptingBody = [
@@ -439,15 +425,15 @@ acsrqInfo = function () {
     ),
     `<tr>${acsrqInfo.Row(
       "Pokeball",
-      `<knockout data-bind="
-            template: {
-                name: 'autoBuyPokeballDisplayTemplate',
-                data: {
-                    'value': Settings.getSetting(\'ballBuyOpts\').observableValue(),
-                    'field': Settings.getSetting(\'ballBuyOpts\').observableValue,
-                    'title': 'Auto Buy Pokéball'
-                }
-            }"></knockout>`
+      `<img class="pokeball-small clickable pokeball-selected" data-bind="
+          attr: { src: 'assets/images/pokeball/' + GameConstants.Pokeball[acsrqInfo.ball.ball()] + '.svg' },
+          tooltip: {
+              title: acsrqInfo.ball.ball() === GameConstants.Pokeball.None ? 'None' : ItemList[GameConstants.Pokeball[acsrqInfo.ball.ball()]].displayName,
+              trigger: 'hover', animation: false,
+              placement: 'right'
+          },
+          click: function() {App.game.pokeballs.selectedSelection(acsrqInfo.ball.ball); App.game.pokeballs.selectedTitle(acsrqInfo.ball.name); $('#pokeballSelectorModal').modal('show')}" 
+        src="assets/images/pokeball/Pokeball.svg" data-original-title="" title="">`
     )}</tr>`,
     acsrqInfo.Select("botstate.mutate"),
     acsrqInfo.Select("botstate.plant"),
@@ -457,6 +443,12 @@ acsrqInfo = function () {
     scriptingBody.join("")
   );
 };
+
+
+acsrqInfo.ball = {
+  name: 'autoBuy',
+  ball: Settings.getSetting('ballBuyOpts').observableValue,
+}
 
 acsrqInfo.boostedRoute = ko.pureComputed(() => {
   return RoamingPokemonList.getIncreasedChanceRouteBySubRegionGroup(
@@ -544,22 +536,22 @@ acsrqInfo.Row = (label, item = "") => `
 acsrqInfo.Checkbox = (bot, visible = true, enable = true) => `
     <tr data-bind="visible: ${visible}, template: {data: Settings.getSetting('${bot}')}">
     ${acsrqInfo.Row(
-      '<label class="m-0" style="font-size: 14px;" data-bind="attr: { for: \'checkbox-\' + $data.name }, text: $data.displayName"></label>',
-      `<input class="clickable" type="checkbox"
+  '<label class="m-0" style="font-size: 14px;" data-bind="attr: { for: \'checkbox-\' + $data.name }, text: $data.displayName"></label>',
+  `<input class="clickable" type="checkbox"
                 data-bind="checked: $data.observableValue(), attr: {name, id: 'checkbox-' + $data.name}, enable: ${enable}"
                 onchange="Settings.setSettingByName(this.name, this.checked)"/>`
-    )}
+)}
     </tr>
 `;
 
 acsrqInfo.Select = (bot) => `
     <tr data-bind="visible: App.game.farming.canAccess(), template: {data: Settings.getSetting('${bot}')}">
     ${acsrqInfo.Row(
-      '<knockout data-bind="text: $data.displayName"></knockout>',
-      `<select onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name, id: 'select-' + $data.name}">
+  '<knockout data-bind="text: $data.displayName"></knockout>',
+  `<select onchange="Settings.setSettingByName(this.name, this.value)" data-bind="foreach: $data.options, attr: {name, id: 'select-' + $data.name}">
             <option data-bind="text: $data.text, value: $data.value, attr:{ selected: $parent.observableValue() == $data.value}"></option>
         </select>`
-    )}
+)}
     </tr>
 `;
 //#endregion
@@ -754,9 +746,7 @@ acsrqSettings.Section = (title, content, showByDefault = true) => {
     ? table
     : `
         <span class="btn btn-block btn-dark clickable" data-toggle="collapse" href="#settingsAcsrq${title}" >${title}</span>
-        <div class="collapse ${
-          showByDefault ? "show" : ""
-        }" id="settingsAcsrq${title}">${table}</div>`;
+        <div class="collapse ${showByDefault ? "show" : ""}" id="settingsAcsrq${title}">${table}</div>`;
 };
 //#endregion
 //#region Footer
@@ -1030,11 +1020,11 @@ Settings.getSetting("breedingSearchFilter").observableValue.subscribe(
     );
     if (`/(${field.value})/i` != newValue) {
       field.value = newValue.slice(1, -1);
-      BreedingFilters.search.value(new RegExp(newValue, "i"));
+      BreedingFilters.name.value(new RegExp(newValue, "i"));
     }
   }
 );
-BreedingFilters.search.value.subscribe((newValue) => {
+BreedingFilters.name.value.subscribe((newValue) => {
   Settings.getSetting("breedingSearchFilter").set(newValue.source);
 });
 //#endregion
