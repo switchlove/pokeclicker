@@ -114,7 +114,7 @@ class ChallengeRequirements extends Requirement {
     }
   }
 
-  set requiredValue(value) {}
+  set requiredValue(value) { }
   get requiredValue() {
     return this.requirements.length;
   }
@@ -496,7 +496,7 @@ KeyItems.prototype.initialize = function () {
           item.description,
           () =>
             App.game.statistics.routeKills[GameConstants.Region.kanto][1]() >=
-              GameConstants.ROUTE_KILLS_NEEDED &&
+            GameConstants.ROUTE_KILLS_NEEDED &&
             (!App.game?.challenges.list.shinyMovement?.active() ||
               RouteHelper.routeCompleted(1, GameConstants.Region.kanto, true)),
           false,
@@ -511,7 +511,7 @@ KeyItems.prototype.initialize = function () {
           item.description,
           () =>
             App.game.statistics.routeKills[GameConstants.Region.kanto][12]() >=
-              GameConstants.ROUTE_KILLS_NEEDED &&
+            GameConstants.ROUTE_KILLS_NEEDED &&
             (!App.game?.challenges.list.shinyMovement?.active() ||
               RouteHelper.routeCompleted(12, GameConstants.Region.kanto, true)),
           undefined,
@@ -526,7 +526,7 @@ KeyItems.prototype.initialize = function () {
           item.description,
           () =>
             App.game.statistics.routeKills[GameConstants.Region.kanto][5]() >=
-              GameConstants.ROUTE_KILLS_NEEDED &&
+            GameConstants.ROUTE_KILLS_NEEDED &&
             (!App.game?.challenges.list.shinyMovement?.active() ||
               RouteHelper.routeCompleted(5, GameConstants.Region.kanto, true)),
           undefined,
@@ -1255,10 +1255,10 @@ ChallengeRequirements.add(
   TownList["A Totally Unsuspicious Frigate"],
   new DungeonShinyRequirement("Relic Passage")
 );
-ChallengeRequirements.add(
-  TemporaryBattleList["Cheren"],
-  new QuestLineStepCompletedRequirement("Quest for the DNA Splicers", 7)
-);
+// ChallengeRequirements.add(
+//   TemporaryBattleList["Cheren"],
+//   new QuestLineStepCompletedRequirement("Quest for the DNA Splicers", 7)
+// );
 ChallengeRequirements.add(
   Routes.getRoute(GameConstants.Region.unova, 6),
   new TemporaryBattleRequirement("Colress 2")
@@ -1297,7 +1297,7 @@ ChallengeRequirements.add(
 );
 ChallengeRequirements.set(
   Routes.getRoute(GameConstants.Region.unova, 9),
-  new QuestLineStepCompletedRequirement("Quest for the DNA Splicers", 14)
+  // new QuestLineStepCompletedRequirement("Quest for the DNA Splicers", 14)
 );
 ChallengeRequirements.set(
   Routes.getRoute(GameConstants.Region.unova, 24),

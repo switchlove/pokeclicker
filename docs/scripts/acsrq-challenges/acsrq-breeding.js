@@ -14,7 +14,7 @@ KeyItems.prototype.initialize = function () {
       (App.game?.challenges.list.noBreeding?.active() &&
         App.game.party.getPokemon(
           GameConstants.RegionalStarters[GameConstants.Region.kanto][
-            player.regionStarters[GameConstants.Region.kanto]()
+          player.regionStarters[GameConstants.Region.kanto]()
           ]
         ))
   );
@@ -74,18 +74,11 @@ PartyPokemon.prototype.constructor = eval(
     .replace(
       "(this.evs() < 50) ?",
       "(this.evs() < 50 || App.game?.challenges.list.noBreeding?.active()) ?"
-    )}`
-);
-
-//Allow breeding from level 40
-BreedingController.visible = eval(
-  `(${BreedingController.visible
-    .toString()
-    .replace("visible", "function")
-    .replace(
+    )
+    .replace( //Allow breeding from level 40
       "partyPokemon.level < 100",
       "partyPokemon.level < (App.game?.challenges.list.noBreeding?.active() ? 40 : 100)"
-    )})`
+    )}`
 );
 
 const party = Party.prototype.constructor;
