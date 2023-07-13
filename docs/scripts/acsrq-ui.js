@@ -237,7 +237,7 @@ Settings.add(
 Settings.add(
   new Setting(
     "safariCatch",
-    "Safari bot level farming catching options",
+    "Safari bot catching options",
     [
       new SettingOption("New Shiny", "safariCatchN"),
       new SettingOption("Already Caught", "safariCatchAC"),
