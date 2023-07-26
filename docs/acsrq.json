@@ -2,6 +2,7 @@
     "version": "0.0.17-alpha.1",
     "files": [
         "scripts/acsrq.js",
+        "scripts/acsrq-safari.js",
         "scripts/acsrq-dungeon.js",
         "scripts/acsrq-movement.js",
         "scripts/acsrq-srBot.js",

@@ -234,6 +234,18 @@ Settings.add(
     "safariOptSC"
   )
 );
+Settings.add(
+  new Setting(
+    "safariCatch",
+    "Safari bot catching options",
+    [
+      new SettingOption("New Shiny", "safariCatchN"),
+      new SettingOption("Already Caught", "safariCatchAC"),
+      new SettingOption("Everything", "safariCatchE"),
+    ],
+    "safariCatchN"
+  )
+);
 //#endregion
 //#region Bot state Settings
 Settings.add(new BooleanSetting("botstate.breeding", "Breeding Bot", false));
@@ -417,7 +429,7 @@ acsrqInfo = function () {
     acsrqInfo.Checkbox(
       "botstate.safari",
       "App.game.keyItems.hasKeyItem(KeyItemType.Safari_ticket)",
-      "Safari.inProgress()"
+      "player.town().content.findIndex(o => o instanceof SafariTownContent) >= 0"
     ),
     acsrqInfo.Checkbox(
       "botstate.sr",
@@ -671,7 +683,10 @@ acsrqSettings = function () {
     ),
     acsrqSettings.Section(
       "Safari",
-      [acsrqSettings.Template("MultipleChoiceSettingTemplate", "safariOpts")],
+      [
+        acsrqSettings.Template("MultipleChoiceSettingTemplate", "safariOpts"),
+        acsrqSettings.Template("MultipleChoiceSettingTemplate", "safariCatch")
+      ],
       false
     ),
     acsrqSettings.Section(
@@ -725,8 +740,8 @@ acsrqSettings.Number = (setting, visible = true) => `
     <tr data-bind="template: { data: Settings.getSetting('${setting}') }, visible: ${visible}">
         <td class="p-2" data-bind="text: $data.displayName + ':'">setting name</td>
         <td class="p-0">
-            <input class="form-control" type="number" min=0 step=1
-                data-bind="value: $data.observableValue(), attr: {name}"
+            <input class="form-control" type="number"
+                data-bind="value: $data.observableValue(), attr: {name, min: $data.minValue || 0, max: $data.maxValue, step: $data.step || 1}"
                 onchange="Settings.setSettingByName(this.name, this.value)"/>
         </td>
     </tr>

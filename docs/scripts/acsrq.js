@@ -22,7 +22,7 @@ var rVer = '0.0.0';
 
 Element.prototype.appendBefore = function (element) {
     element.parentNode.insertBefore(this, element);
-},false;
+}, false;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -50,7 +50,7 @@ window.addEventListener('load', () => {
     }, 1000);
 
     //#region PreventAutoSave
-    Game.prototype.save = function() {
+    Game.prototype.save = function () {
         player._lastSeen = Date.now();
         if (!Settings.getSetting('disableSave').value) {
             Save.store(player);
@@ -62,7 +62,6 @@ window.addEventListener('load', () => {
         if (Settings.getSetting('noWander').observableValue() == true) {
             var wanLog = [];
             for (var x = 0; x < App.game.logbook.logs().length; x++) {
-                console.log(x);
                 if (App.game.logbook.logs()[x].description().includes('wandered')) {
                     if (App.game.logbook.logs()[x].description().includes('shiny')) {
                         wanLog.push(App.game.logbook.logs()[x]);
@@ -83,12 +82,6 @@ window.addEventListener('load', () => {
             bfBot();
         }
     }, 100);
-
-    setInterval(() => {
-        if (clickEngagedS) {
-            safariBot();
-        }
-    }, 250);
 });
 
 function main() {
@@ -107,7 +100,7 @@ function main() {
         }, 250);
     } else {
         if (localSettings().state || !!sessionStorage.getItem('reload')) {
-            Game.prototype.computeOfflineEarnings = () => {};
+            Game.prototype.computeOfflineEarnings = () => { };
             $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
@@ -135,7 +128,7 @@ function a6save() {
         ],
         ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0'],
         '',
-        ['0',''],
+        ['0', ''],
         '',
         ['', '', ''],
     ];
@@ -163,7 +156,7 @@ function a6save() {
         newArr.push(localLocal[0][4]);
         newArr.push(localLocal[0][5]);
         newArr.push(localLocal[0][6]);
-        newArr.push(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
+        newArr.push(['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']);
         localLocal[0] = newArr;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
     }
@@ -207,33 +200,7 @@ async function a6settings() {
 
         //Safari Bot
         const safariCheck = document.getElementById('checkbox-botstate.safari');
-        if (!safariCheck.disabled && safariCheck.checked) {
-            if (Safari.inProgress()) {
-                switch (Settings.getSetting('safariOpts').observableValue()) {
-                    case 'safariOptN':
-                        safariClick(1);
-                        break;
-                    case 'safariOptSC':
-                        safariClick(!Safari.completed(true));
-                        break;
-                    default:
-                        safariClick(0);
-                }
-            } else if (!Safari.completed(true)) {
-                safariClick(0);
-            }
-        } else if (safariCheck.checked && clickEngagedS && !Safari.completed(true)) {
-            if ($('#safariModal')[0].classList.contains('show')) {
-                Safari.payEntranceFee();
-            } else if (App.game.gameState != 5) {
-                App.game.gameState = 5;
-                setTimeout(() => {
-                    Safari.openModal();
-                }, 500);
-            }
-        } else {
-            safariClick(0);
-        }
+        safariClick(!safariCheck.disabled && safariCheck.checked);
 
         //BF Bot
         const bfCheck = document.getElementById('checkbox-botstate.bf');
@@ -314,7 +281,7 @@ async function areaClears() {
     var gymAtX = 0;
 
     for (let x = 0; x < townContent.length; x++) {
-        if (townContent[x].leaderName != null ) {
+        if (townContent[x].leaderName != null) {
             gymsFound++;
             gymAtX = x;
         }
@@ -483,9 +450,9 @@ async function phaseCounter(arg) {
                     lastEPoke = Battle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]();
                     localLocal[2]++;
-                } else if ( lastEPoke == Battle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]() + 1) ) {
+                } else if (lastEPoke == Battle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]() + 1)) {
                     break;
-                } else if ( lastECount == App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]() ) {
+                } else if (lastECount == App.game.statistics.pokemonEncountered[Battle.enemyPokemon().id]()) {
                     break;
                 } else {
                     lastEPoke = Battle.enemyPokemon().id;
@@ -504,7 +471,7 @@ async function phaseCounter(arg) {
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                         isCurrentShiny = 1;
-                    } else if ( lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]() ) {
+                    } else if (lastPoke == Battle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[Battle.enemyPokemon().id]()) {
                         break;
                     } else {
                         lastPokeType = 'W: ';
@@ -554,9 +521,9 @@ async function phaseCounter(arg) {
                     lastEPoke = DungeonBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]();
                     localLocal[2]++;
-                } else if ( lastEPoke == DungeonBattle.enemyPokemon().id && lastECount == App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
+                } else if (lastEPoke == DungeonBattle.enemyPokemon().id && lastECount == App.game.statistics.pokemonEncountered[DungeonBattle.enemyPokemon().id]()) {
                     break;
-                } else if ( DungeonBattle.enemyPokemon().id == 0 ) {
+                } else if (DungeonBattle.enemyPokemon().id == 0) {
                     break;
                 } else {
                     lastEPoke = DungeonBattle.enemyPokemon().id;
@@ -565,10 +532,10 @@ async function phaseCounter(arg) {
                 }
                 if (DungeonBattle.enemyPokemon().shiny == true) {
                     if (lastPoke == 0) {
-                        if ( DungeonRunner.fightingBoss() == true ) {
+                        if (DungeonRunner.fightingBoss() == true) {
                             lastPokeType = 'B: ';
                             localLocal[3][1] = lastPokeType;
-                        } else if ( DungeonBattle.trainer() != null ) {
+                        } else if (DungeonBattle.trainer() != null) {
                             App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[3][1] = lastPokeType;
@@ -584,13 +551,13 @@ async function phaseCounter(arg) {
                         localLocal[1][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                         isCurrentShiny = 1;
-                    } else if ( lastPoke == DungeonBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]() ) {
+                    } else if (lastPoke == DungeonBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[DungeonBattle.enemyPokemon().id]()) {
                         break;
                     } else {
-                        if ( DungeonRunner.fightingBoss() == true ) {
+                        if (DungeonRunner.fightingBoss() == true) {
                             lastPokeType = 'B: ';
                             localLocal[3][1] = lastPokeType;
-                        } else if ( DungeonBattle.trainer() != null ) {
+                        } else if (DungeonBattle.trainer() != null) {
                             App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().dungeon.name}] You encountered a trainer's Shiny ${DungeonBattle.enemyPokemon().name}.`);
                             lastPokeType = 'T: ';
                             localLocal[3][1] = lastPokeType;
@@ -666,7 +633,7 @@ async function phaseCounter(arg) {
                     lastEPoke = SafariBattle.enemy.id;
                     lastECount = App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]();
                     localLocal[2]++;
-                } else if ( lastEPoke == SafariBattle.enemy.id && lastECount == App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]() ) {
+                } else if (lastEPoke == SafariBattle.enemy.id && lastECount == App.game.statistics.pokemonEncountered[SafariBattle.enemy.id]()) {
                     break;
                 } else {
                     lastEPoke = SafariBattle.enemy.id;
@@ -685,7 +652,7 @@ async function phaseCounter(arg) {
                         localLocal[4] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
                         isCurrentShiny = 1;
-                    } else if ( lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]() ) {
+                    } else if (lastPoke == SafariBattle.enemy.id && lastCounts == App.game.statistics.shinyPokemonEncountered[SafariBattle.enemy.id]()) {
                         break;
                     } else {
                         lastPokeType = 'W: ';
@@ -734,9 +701,9 @@ async function phaseCounter(arg) {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
                     localLocal[2]++;
-                } else if ( lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1) ) {
+                } else if (lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1)) {
                     break;
-                } else if ( lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() ) {
+                } else if (lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]()) {
                     break;
                 } else {
                     lastEPoke = GymBattle.enemyPokemon().id;
@@ -755,7 +722,7 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    } else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
+                    } else if (lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]()) {
                         break;
                     } else {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().gym.town} Gym] You encountered a trainer's Shiny ${this.enemyPokemon().name}.`);
@@ -778,9 +745,9 @@ async function phaseCounter(arg) {
                     lastEPoke = GymBattle.enemyPokemon().id;
                     lastECount = App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]();
                     localLocal[2]++;
-                } else if ( lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1) ) {
+                } else if (lastEPoke == GymBattle.enemyPokemon().id && lastECount == (App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() + 1)) {
                     break;
-                } else if ( lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]() ) {
+                } else if (lastECount == App.game.statistics.pokemonEncountered[GymBattle.enemyPokemon().id]()) {
                     break;
                 } else {
                     lastEPoke = GymBattle.enemyPokemon().id;
@@ -799,7 +766,7 @@ async function phaseCounter(arg) {
                         localLocal[2] = 0;
                         localLocal[0][player.region][cArea] = phaseVal;
                         localStorage.setItem(saveKey, JSON.stringify(localLocal));
-                    } else if ( lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]() ) {
+                    } else if (lastPoke == GymBattle.enemyPokemon().id && lastCounts == App.game.statistics.shinyPokemonEncountered[GymBattle.enemyPokemon().id]()) {
                         break;
                     } else {
                         App.game.logbook.newLog(LogBookTypes.SHINY, `[${player.town().name}] You encountered a ${player.town().gymList[0].town}'s Shiny ${this.enemyPokemon().name}.`);
@@ -867,37 +834,37 @@ async function a6export() {
 function a6phases() {
     if (Settings.getSetting('trackPhases').observableValue() == true) {
         var newArray = [];
-    	var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
-    	if (phaseCountDifference > 0) {
-    		for (var phase = 0; phase < phases.length; phase++) {
-    			if (phaseCountDifference > 0) {
-    				phaseCountDifference--;
-    			} else {
-    				newArray.push(phases[phase]);
-    			}
-    		}
-    		phases = newArray;
-    	}
-    	if (hasRun == 0) {
+        var phaseCountDifference = phases.length - Settings.getSetting('phaseCount').observableValue();
+        if (phaseCountDifference > 0) {
+            for (var phase = 0; phase < phases.length; phase++) {
+                if (phaseCountDifference > 0) {
+                    phaseCountDifference--;
+                } else {
+                    newArray.push(phases[phase]);
+                }
+            }
+            phases = newArray;
+        }
+        if (hasRun == 0) {
             let phaseTable = $('#phaseTable tbody')[0];
             phaseTable.innerHTML = '';
-    		for (var x = 0; x < phases.length; x++) {
-    			var tablePhase = document.createElement('tr');
-    			var phaseId = `phase${x}`;
-    			// eslint-disable-next-line no-useless-concat
-    			tablePhaseQuery = `<tr><td>${phases[x][0]}</td>` + `<td>${phases[x][1]}</td>` + `<td>${phases[x][2]}</td>` + `<td>${phases[x][3]}</td>` + `<td>${phases[x][4]}</td>` + `<td>${phases[x][5]}</td>` + '<td>' + `<button type="button" class="btn btn-primary" onclick="removePhase(${x})">Remove</button>` + '</td></tr>';
-    			tablePhase.innerHTML = tablePhaseQuery;
-    			tablePhase.style.display = 'none';
-    			phaseTable.append(tablePhase);
-    			var childNumber = x + 1;
-    			if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
-    				var displayQuery = `#phaseTable tbody > tr:nth-child(${childNumber})`;
-    				document.querySelector(displayQuery).removeAttribute('style');
-    				hasRun = 1;
-    			}
-    		}
-    	}
-    	localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
+            for (var x = 0; x < phases.length; x++) {
+                var tablePhase = document.createElement('tr');
+                var phaseId = `phase${x}`;
+                // eslint-disable-next-line no-useless-concat
+                tablePhaseQuery = `<tr><td>${phases[x][0]}</td>` + `<td>${phases[x][1]}</td>` + `<td>${phases[x][2]}</td>` + `<td>${phases[x][3]}</td>` + `<td>${phases[x][4]}</td>` + `<td>${phases[x][5]}</td>` + '<td>' + `<button type="button" class="btn btn-primary" onclick="removePhase(${x})">Remove</button>` + '</td></tr>';
+                tablePhase.innerHTML = tablePhaseQuery;
+                tablePhase.style.display = 'none';
+                phaseTable.append(tablePhase);
+                var childNumber = x + 1;
+                if (x < Number(Settings.getSetting('phaseCount').observableValue())) {
+                    var displayQuery = `#phaseTable tbody > tr:nth-child(${childNumber})`;
+                    document.querySelector(displayQuery).removeAttribute('style');
+                    hasRun = 1;
+                }
+            }
+        }
+        localStorage[`phaseTracker${Save.key}`] = JSON.stringify(phases);
     }
 }
 
@@ -917,116 +884,6 @@ async function gymBot() {
     }
 
     GymRunner.startGym(gym);
-}
-
-async function safariBot() {
-    let bound = {x: Safari.grid[0].length, y: Safari.grid.length};
-    let matrix = Array.from({length: bound.y}, () => Array.from({length: bound.x}, () => Infinity));
-    const dirOrder = (() => {
-        const lastDir = Safari.lastDirection;
-        switch (lastDir) {
-            case 'left': priority = 'right'; break;
-            case 'up': priority = 'down'; break;
-            case 'right': priority = 'left'; break;
-            case 'down': priority = 'up'; break;
-        }
-        return [...new Set([priority, lastDir, 'up', 'down', 'left', 'right'])];
-    })();
-
-    let nearestGrass = {x:0, y:0, d:Infinity};
-    const walkable = [
-        0, //ground
-        10, //grass
-        11,12,13,14,21,22,23,24,15,16,17,18,19, //sand
-    ];
-
-    movementMatrix = (origin) => {
-        let queue = new Set([JSON.stringify(origin)]);
-        for (let p = 0; p < queue.size; p++) {
-            let {x, y} = JSON.parse([...queue][p]);
-            if (!walkable.includes(Safari.grid[y][x])) {
-                continue;
-            }
-            const next = dirOrder.map((dir) => {
-                const xy = Safari.directionToXY(dir);
-                xy.x += x;
-                xy.y += y;
-                return xy;
-            }).filter(({x,y}) => y < bound.y && y >= 0 && x < bound.x && x >= 0 );
-            for (let n = 0; n < next.length; n++) {
-                queue.add(JSON.stringify(next[n]));
-            }
-
-            if (x == origin.x && y == origin.y) {
-                matrix[y][x] = 0;
-            } else {
-                matrix[y][x] = Math.min(...next.map(({x, y}) => matrix[y][x])) + 1;
-
-                if (Safari.completed(true)) {
-                    if (Safari.grid[y][x] != 10 && matrix[y][x] < nearestGrass.d) {
-                        nearestGrass = {x, y, d: matrix[y][x]};
-                    }
-                } else {
-                    if (Safari.grid[y][x] == 10 && matrix[y][x] < nearestGrass.d && next.map(({x,y}) => Safari.grid[y][x]).includes(10)) {
-                        nearestGrass = {x, y, d: matrix[y][x]};
-                    }
-                }
-            }
-        }
-    };
-
-    if (Safari.inProgress() && document.querySelector('#safariModal').classList.contains('show')) {
-        if (Safari.inBattle()) {
-            if (!SafariBattle.busy()) {
-                if (SafariBattle.enemy.shiny && !App.game.party.alreadyCaughtPokemon(SafariBattle.enemy.id, true)) {
-                    if (SafariBattle.enemy.eatingBait != 2 && App.game.farming.berryList[11]() > 25) {
-                        SafariBattle.throwBait(2);
-                    } else if (Safari.balls() > 0) { //prevent balls to be negativ and lock the safari
-                        SafariBattle.throwBall();
-                    }
-                } else {
-                    SafariBattle.run();
-                    setTimeout(() => {
-                        SafariBattle.busy(false);
-                    }, 1600); // anti soft lock
-                }
-            }
-        } else {
-            let dest = {d: Infinity};
-            movementMatrix(Safari.playerXY);
-
-            const pkm = Safari.pokemonGrid();
-            for (let i = 0; i < pkm.length; i++) {
-                const dist = matrix[pkm[i].y][pkm[i].x];
-                if (
-                    pkm[i].shiny && !App.game.party.alreadyCaughtPokemon(pkm[i].id, true) &&
-                    dist < dest.d && dist < pkm[i].steps
-                ) {
-                    dest = pkm[i];
-                    dest.d = dist;
-                }
-            }
-            if (dest.d == Infinity) {
-                dest = nearestGrass;
-            }
-
-            movementMatrix(dest);
-            const next = dirOrder.map(dir => {
-                const xy = Safari.directionToXY(dir);
-                xy.x += Safari.playerXY.x;
-                xy.y += Safari.playerXY.y;
-
-                if (xy.y >= bound.y || xy.y < 0 || xy.x >= bound.x || xy.x < 0) {
-                    return null;
-                }
-                return {dir, ...xy, d: matrix[Safari.playerXY.y][Safari.playerXY.x] - matrix[xy.y][xy.x]};
-            }).filter((n) => n && n.d > 0);
-
-            if (next[0]) {
-                Safari.step(next[0].dir);
-            }
-        }
-    }
 }
 
 async function bfBot() {
@@ -1059,7 +916,7 @@ async function bfBot() {
 }
 
 function plantLayout(layout) {
-    const berrieOrder = Object.keys(layout).sort((a, b) =>  App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3]);
+    const berrieOrder = Object.keys(layout).sort((a, b) => App.game.farming.berryData[b].growthTime[3] - App.game.farming.berryData[a].growthTime[3]);
 
     for (let i = 0; i < berrieOrder.length; i++) {
         if (App.game.farming.plotList[layout[berrieOrder[i]][0]].berry == -1) {
@@ -1097,17 +954,17 @@ async function plantBot() {
     } else {
         const layouts = {
             'S+C': {
-                65: [5,6,7,8,9,15,16,17,18,19],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
+                65: [5, 6, 7, 8, 9, 15, 16, 17, 18, 19],
+                40: [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24],
             },
             'S+L': {
-                65: [0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24],
-                19: [6,8,16,18],
+                65: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24],
+                19: [6, 8, 16, 18],
             },
             'S+L+C': {
-                65: [5,7,9,15,17,19],
-                19: [6,8,16,18],
-                40: [0,1,2,3,4,10,11,12,13,14,20,21,22,23,24],
+                65: [5, 7, 9, 15, 17, 19],
+                19: [6, 8, 16, 18],
+                40: [0, 1, 2, 3, 4, 10, 11, 12, 13, 14, 20, 21, 22, 23, 24],
             },
         };
 
@@ -1115,101 +972,101 @@ async function plantBot() {
             const tp = App.game.farming.plotList[7];
             const bp = App.game.farming.plotList[17];
 
-            if (tp.berry == -1 || bp.berry == BerryType.Petaya && bp.age >= bp.berryData.growthTime[4] - 10 - bp.berryData?.growthTime[3]  && tp.berry != BerryType.Petaya) {
+            if (tp.berry == -1 || bp.berry == BerryType.Petaya && bp.age >= bp.berryData.growthTime[4] - 10 - bp.berryData?.growthTime[3] && tp.berry != BerryType.Petaya) {
                 App.game.farming.harvest(7);
-                App.game.farming.plant(7,BerryType.Petaya);
+                App.game.farming.plant(7, BerryType.Petaya);
             } else if (tp.berry == BerryType.Petaya && tp.age > tp.berryData.growthTime[4] - 10) {
                 App.game.farming.harvest(7);
-                App.game.farming.plant(7,BerryType.Starf);
+                App.game.farming.plant(7, BerryType.Starf);
             }
 
             if (tp.berry == BerryType.Petaya && tp.age >= tp.berryData.growthTime[4] - 10 - tp.berryData?.growthTime[3] && bp.berry != BerryType.Petaya) {
                 App.game.farming.harvest(17);
-                App.game.farming.plant(17,BerryType.Petaya);
+                App.game.farming.plant(17, BerryType.Petaya);
             } else if (bp.berry == -1 || bp.berry == BerryType.Petaya && bp.age > bp.berryData.growthTime[4] - 10) {
                 App.game.farming.harvest(17);
-                App.game.farming.plant(17,BerryType.Starf);
+                App.game.farming.plant(17, BerryType.Starf);
             }
         }
 
         plantLayout(layouts[selectedBerry.replace('+P', '')]);
         if (!App.game.farming.berryInFarm(BerryType.Petaya, PlotStage.Berry, true)
-        && App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
+            && App.game.farming.plotList.some(p => p.berry != -1 && (p.age > p.berryData.growthTime[4] - 5))) {
             App.game.farming.harvestAll();
         }
     }
 }
 
 async function mutateBot() {
-    const all = Array.from({length: App.game.farming.plotList.length}, (_,i) => i);
+    const all = Array.from({ length: App.game.farming.plotList.length }, (_, i) => i);
     // 'BerryName': { BerryID:[PlotID], BerryID:[PlotID] },
     const mutationLayouts = {
-        'Persim': { 2:[6], 6:[12] },
-        'Razz': { 0:[6], 5:[12] },
-        'Bluk': { 1:[6], 5:[12] },
-        'Nanab': { 2:[6], 4:[12] },
-        'Wepear': { 3:[6], 6:[12] },
-        'Pinap': { 7:[6], 4:[12] },
-        'Figy': { 0:[7,11,12] },
-        'Wiki': { 1:[7,11,12] },
-        'Mago': { 2:[7,11,12] },
-        'Aguav': { 3:[7,11,12] },
-        'Iapapa': { 4:[7,11,12] },
-        'Lum': { 7:[6], 6:[7], 5:[11], 4:[8], 3:[16], 2:[13], 1:[17], 0:[18]},
+        'Persim': { 2: [6], 6: [12] },
+        'Razz': { 0: [6], 5: [12] },
+        'Bluk': { 1: [6], 5: [12] },
+        'Nanab': { 2: [6], 4: [12] },
+        'Wepear': { 3: [6], 6: [12] },
+        'Pinap': { 7: [6], 4: [12] },
+        'Figy': { 0: [7, 11, 12] },
+        'Wiki': { 1: [7, 11, 12] },
+        'Mago': { 2: [7, 11, 12] },
+        'Aguav': { 3: [7, 11, 12] },
+        'Iapapa': { 4: [7, 11, 12] },
+        'Lum': { 7: [6], 6: [7], 5: [11], 4: [8], 3: [16], 2: [13], 1: [17], 0: [18] },
         // 3x3 throigh Grepa, then 5x5
-        'Pomeg': { 18:[12], 16:[6] },
-        'Kelpsy': { 8:[12], 1:[6] },
-        'Qualot': { 16:[12], 13:[6] },
-        'Hondew': { 15:[12], 17:[13], 14:[8] },
-        'Grepa': { 17:[12], 14:[6] },
-        'Tamato': { 20:[6,9,21,24], 9:[0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23] },
-        'Cornn': { 15:[6,9,21,24], 10:[5,8,20,23], 5:[1,4,16,19] },
-        'Magost': { 16:[6,9,21,24], 11:[5,8,20,23], 2:[1,4,16,19] },
-        'Rabuta': { 17:[6,9,21,24], 4:[0,1,2,3,4,5,7,8,10,11,12,13,14,15,16,17,18,19,20,22,23] },
-        'Nomel': { 13:[6,9,21,24] },
-        'Spelon': { 25:all },
-        'Pamtre': { 26:all },
-        'Watmel': { 27:all },
-        'Durin': { 28:all },
-        'Belue': { 29:all },
-        'Pinkan': { 32:[12], 27:[11,13], 22:[10,14], 16:[5,9,15,19], 11:[0,4,20,24], 8:[7,17], 2:[2,22] },
-        'Occa': { 30:[5,9,22], 25:[0,4,17], 14:[2,15,19], 9:[7,20,24] },
-        'Passho': { 1:[5,9,22], 6:[0,4,17], 21:[2,15,19], 44:[7,20,24] },
-        'Wacan': { 22:[5,9,22], 18:[0,4,17], 13:[2,15,19], 24:[7,20,24] },
-        'Rindo': { 17:[6,9,21,24], 14:[0,3,15,18] },
-        'Yache': { 37:[0,2,4,10,12,14,20,22,24] },
-        'Chople': { 30:all },
-        'Kebia': { 31:all },
-        'Shuca': { 32:all },
-        'Coba': { 17:[6,9,21,24], 15:[0,3,15,18] },
-        'Payapa': { 10:[5,9,22], 15:[0,4,17], 26:[2,15,19], 31:[7,20,24] },
-        'Tanga': { 39:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,17,19,20,21,22,23,24] },
-        'Charti': { 26:all },
-        'Kasib': { 0:all },
-        'Haban': { 36:[12], 39:[1,9,15,23], 37:[3,5,19,21], 38:[2,10,14,22] },
-        'Colbur': { 45:[6,9,21,24], 28:[1,4,16,19], 48:[5,8,20,23] },
-        'Babiri': { 43:[0,1,2,3,4,7,17,20,21,22,23,24], 47:[5,9,10,11,12,13,14,15,19] },
-        'Chilan': { 41:all },
-        'Roseli': { 11:[5,9,22], 16:[0,4,17], 27:[2,15,19], 32:[7,20,24] },
-        'Micle': { 31:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
-        'Custap': { 32:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
-        'Jaboca': { 33:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
-        'Rowap': { 34:[0,1,2,3,4,5,7,9,10,11,13,14,15,17,19,20,21,22,23,24] },
-        'Kee': { 61:[6,9,21,24], 60:[0,3,15,18] },
-        'Maranga': { 63:[6,9,21,24], 62:[0,3,15,18] },
-        'Liechi': { 37:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Ganlon': { 43:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Salac': { 44:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Petaya': { 49:[24], 51:[16], 40:[14], 43:[15], 47:[10], 41:[21], 45:[12], 39:[22], 50:[4], 37:[13], 53:[17], 36:[0], 44:[11], 52:[23], 46:[18], 38:[19], 42:[2], 48:[20] },
-        'Apicot': { 52:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
-        'Lansat': { 53:[0,1,2,3,4,5,7,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] },
+        'Pomeg': { 18: [12], 16: [6] },
+        'Kelpsy': { 8: [12], 1: [6] },
+        'Qualot': { 16: [12], 13: [6] },
+        'Hondew': { 15: [12], 17: [13], 14: [8] },
+        'Grepa': { 17: [12], 14: [6] },
+        'Tamato': { 20: [6, 9, 21, 24], 9: [0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23] },
+        'Cornn': { 15: [6, 9, 21, 24], 10: [5, 8, 20, 23], 5: [1, 4, 16, 19] },
+        'Magost': { 16: [6, 9, 21, 24], 11: [5, 8, 20, 23], 2: [1, 4, 16, 19] },
+        'Rabuta': { 17: [6, 9, 21, 24], 4: [0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 23] },
+        'Nomel': { 13: [6, 9, 21, 24] },
+        'Spelon': { 25: all },
+        'Pamtre': { 26: all },
+        'Watmel': { 27: all },
+        'Durin': { 28: all },
+        'Belue': { 29: all },
+        'Pinkan': { 32: [12], 27: [11, 13], 22: [10, 14], 16: [5, 9, 15, 19], 11: [0, 4, 20, 24], 8: [7, 17], 2: [2, 22] },
+        'Occa': { 30: [5, 9, 22], 25: [0, 4, 17], 14: [2, 15, 19], 9: [7, 20, 24] },
+        'Passho': { 1: [5, 9, 22], 6: [0, 4, 17], 21: [2, 15, 19], 44: [7, 20, 24] },
+        'Wacan': { 22: [5, 9, 22], 18: [0, 4, 17], 13: [2, 15, 19], 24: [7, 20, 24] },
+        'Rindo': { 17: [6, 9, 21, 24], 14: [0, 3, 15, 18] },
+        'Yache': { 37: [0, 2, 4, 10, 12, 14, 20, 22, 24] },
+        'Chople': { 30: all },
+        'Kebia': { 31: all },
+        'Shuca': { 32: all },
+        'Coba': { 17: [6, 9, 21, 24], 15: [0, 3, 15, 18] },
+        'Payapa': { 10: [5, 9, 22], 15: [0, 4, 17], 26: [2, 15, 19], 31: [7, 20, 24] },
+        'Tanga': { 39: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24] },
+        'Charti': { 26: all },
+        'Kasib': { 0: all },
+        'Haban': { 36: [12], 39: [1, 9, 15, 23], 37: [3, 5, 19, 21], 38: [2, 10, 14, 22] },
+        'Colbur': { 45: [6, 9, 21, 24], 28: [1, 4, 16, 19], 48: [5, 8, 20, 23] },
+        'Babiri': { 43: [0, 1, 2, 3, 4, 7, 17, 20, 21, 22, 23, 24], 47: [5, 9, 10, 11, 12, 13, 14, 15, 19] },
+        'Chilan': { 41: all },
+        'Roseli': { 11: [5, 9, 22], 16: [0, 4, 17], 27: [2, 15, 19], 32: [7, 20, 24] },
+        'Micle': { 31: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24] },
+        'Custap': { 32: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24] },
+        'Jaboca': { 33: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24] },
+        'Rowap': { 34: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 13, 14, 15, 17, 19, 20, 21, 22, 23, 24] },
+        'Kee': { 61: [6, 9, 21, 24], 60: [0, 3, 15, 18] },
+        'Maranga': { 63: [6, 9, 21, 24], 62: [0, 3, 15, 18] },
+        'Liechi': { 37: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] },
+        'Ganlon': { 43: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] },
+        'Salac': { 44: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] },
+        'Petaya': { 49: [24], 51: [16], 40: [14], 43: [15], 47: [10], 41: [21], 45: [12], 39: [22], 50: [4], 37: [13], 53: [17], 36: [0], 44: [11], 52: [23], 46: [18], 38: [19], 42: [2], 48: [20] },
+        'Apicot': { 52: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] },
+        'Lansat': { 53: [0, 1, 2, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] },
     };
 
     const selectedBerry = Settings.getSetting('botstate.mutate').value;
     plantLayout(mutationLayouts[selectedBerry]);
 
     if (App.game.farming.plotList.some(p => p.berry != -1 &&
-        (p.age >  p.berryData.growthTime[4] - 5 || p.berry == BerryType[selectedBerry] &&  p.age > p.berryData.growthTime[3])
+        (p.age > p.berryData.growthTime[4] - 5 || p.berry == BerryType[selectedBerry] && p.age > p.berryData.growthTime[3])
     )) {
         App.game.farming.harvestAll();
     }
@@ -1240,7 +1097,7 @@ async function autoBreed() {
             if (player.itemList.Mystery_egg() >= 1) {
                 ItemList.Mystery_egg.use();
             } else {
-                Settings.setSettingByName('breedingOpts','none');
+                Settings.setSettingByName('breedingOpts', 'none');
                 Notifier.notify({
                     title: '[SCRIPT] ACSRQ',
                     message: 'You\'re out of eggs!',
@@ -1255,7 +1112,7 @@ async function autoBreed() {
             if (player._itemList[typeEggU]() >= 1) {
                 ItemList[typeEggU].use();
             } else {
-                Settings.setSettingByName('breedingOpts','none');
+                Settings.setSettingByName('breedingOpts', 'none');
                 Notifier.notify({
                     title: '[SCRIPT] ACSRQ',
                     message: 'You\'re out of eggs!',
@@ -1269,7 +1126,7 @@ async function autoBreed() {
             if (player.mineInventory().find(i => i.name == fossilU).amount() >= 1) {
                 Underground.sellMineItem(player.mineInventory().find(i => i.name == fossilU).id);
             } else {
-                Settings.setSettingByName('breedingOpts','none');
+                Settings.setSettingByName('breedingOpts', 'none');
                 Notifier.notify({
                     title: '[SCRIPT] ACSRQ',
                     message: `You're out of ${fossilU}s!`,
@@ -1322,9 +1179,9 @@ async function ballBot() {
     }
 
     if (shop.isUnlocked() && (!shop.parent || shop.parent?.isUnlocked())) {
-        let item = shop.items.find(({name}) => name == GameConstants.Pokeball[buyOpts]);
+        let item = shop.items.find(({ name }) => name == GameConstants.Pokeball[buyOpts]);
 
-        if (!(item && item.isAvailable()  && item.price() == item.basePrice)) {
+        if (!(item && item.isAvailable() && item.price() == item.basePrice)) {
             return;
         }
 
