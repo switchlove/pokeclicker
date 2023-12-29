@@ -104,7 +104,7 @@ srBot.evo = function () {
     const evoItems = Object.values(GameConstants.StoneType).filter((v) => option.test(v) && !Number.isInteger(v) && player.itemList[v]?.());
     const evoIds = evoItems.map(i => GameConstants.StoneType[i]);
     const needed = evoIds.flatMap(
-        i => PokemonHelper.getPokemonsWithEvolution(i).flatMap(
+        i => PartyController.getPokemonsWithEvolution(i).flatMap(
             p => p.evolutions.filter(
                 e => e.stone == i && EvolutionHandler.isSatisfied(e) && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
             )
