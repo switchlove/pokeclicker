@@ -3,15 +3,15 @@ var srCount;
 window.addEventListener('load', () => setTimeout(() => srBot.interval = setInterval(srBot, 3000), 3000));
 
 //#region LocalSettings
-const settingKey = 'a6csrq-settings';
-const localSettings = ko.observable(JSON.parse(localStorage.getItem(settingKey)) ?? {key: '', state: 0});
+const settingKey = 'acsrq-settings';
+const localSettings = ko.observable(JSON.parse(localStorage.getItem(settingKey)) ?? { key: '', state: 0 });
 localSettings.subscribe(() => localStorage.setItem(settingKey, ko.toJSON(localSettings)));
 window.addEventListener('storage', (e) => {
     if (e.key == settingKey) {
         if (JSON.parse(e.oldValue)?.state != JSON.parse(e.newValue)?.state) {
             location.reload();
         }
-        localSettings(JSON.parse(e.newValue) ?? {key: '', state: 0});
+        localSettings(JSON.parse(e.newValue) ?? { key: '', state: 0 });
     }
 });
 //#endregion
@@ -21,11 +21,11 @@ function srBot() {
         return;
     }
 
-    srCount = localLocal[6][2] ?? 0;
+    srCount = localLocal[5][2] ?? 0;
     sessionStorage.removeItem('reload');
     srBot[Settings.getSetting('srOpts').value]?.();
 
-    localSettings({...localSettings()});
+    localSettings({ ...localSettings() });
 }
 
 /** srBot option Pokemon shop */
@@ -60,15 +60,53 @@ srBot.poke = function () {
     return srBot.log(smnName, `Needed - ${smnNeed}`);
 };
 
+/** srBot option Trades */
+srBot.trade = function () {
+    const tradeKey = [];
+    const shops = player.town().content.filter(c => c instanceof BerryMasterShop);
+    if (player.route() || !shops.length) {
+        return;
+    }
+
+    let smnUsed = false;
+    for (let sdx = 0; sdx < shops.length; sdx++) {
+        for (let idx = 0; idx < BerryDeal.list[shops[sdx].location]().length; idx++) {
+            tradeKey.push(BerryDeal.list[shops[sdx].location]()[idx].item.itemType.name)
+        }
+    }
+
+    const items = shops.map(shop => BerryDeal.list[shop.location]().filter(i => i instanceof BerryDeal && !App.game.party.alreadyCaughtPokemonByName(i.item.itemType.name, true)));
+    for (let sdx = 0; sdx < shops.length; sdx++) {
+        ShopHandler.showShop(shops[sdx]);
+
+        for (let idx = 0; idx < items[sdx].length; idx++) {
+            if (BerryDeal.canUse(shops[sdx].location, idx)) {
+                var smnName = items[sdx][idx].item.itemType.name;
+                BerryDeal.use(shops[sdx].location, tradeKey.indexOf(items[sdx][idx].item.itemType.name), Number(Settings.getSetting('tradeItemCount').value));
+                smnUsed = true;
+                break;
+            }
+        }
+    }
+
+    localSettings().state = smnUsed;
+    if (!smnUsed) {
+        return;
+    }
+
+    const smnNeed = items.flat().length;
+    return srBot.log(smnName, `Needed - ${smnNeed}`);
+};
+
 /** srBot option evolution stones */
 srBot.evo = function () {
     const option = new RegExp(Settings.getSetting('evoOpts').value);
     const evoItems = Object.values(GameConstants.StoneType).filter((v) => option.test(v) && !Number.isInteger(v) && player.itemList[v]?.());
     const evoIds = evoItems.map(i => GameConstants.StoneType[i]);
     const needed = evoIds.flatMap(
-        i => PokemonHelper.getPokemonsWithEvolution(i).flatMap(
+        i => PartyController.getPokemonsWithEvolution(i).flatMap(
             p => p.evolutions.filter(
-                e => e.stone == i && e.isSatisfied() && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
+                e => e.stone == i && EvolutionHandler.isSatisfied(e) && !App.game.party.alreadyCaughtPokemonByName(e.evolvedPokemon, true)
             )
         )
     );
@@ -106,7 +144,7 @@ srBot.mys = function () {
 };
 
 /** srBot option fossils */
-srBot.fos = function() {
+srBot.fos = function () {
     if (App.game.breeding.eggList[0]().type < 0) {
         const option = new RegExp(Settings.getSetting('fossilOpts').value);
         const fosItems = Object.keys(GameConstants.FossilToPokemon)
@@ -130,17 +168,16 @@ srBot.fos = function() {
 };
 
 /** BreedingController overide shinyStatus for srBot option shiny breeding */
-srBot.visible = eval(`(${
-    BreedingController.visible.toString()
-        .replace('visible', 'function')
-        .replace(/BreedingFilters\.shinyStatus\.value\(\)/g, '0')
-})`);
+// srBot.visible = eval(`(${BreedingController.visible.toString()
+//         .replace('visible', 'function')
+//         .replace(/BreedingFilters\.shinyStatus\.value\(\)/g, '0')
+//     })`);
 /** srBot option shiny breeding */
 srBot.egg = function () {
     if (App.game.breeding.eggList[0]().type < 0) {
         const filteredEggList = [...App.game.party.caughtPokemon]
             .sort(PartyController.compareBy(Settings.getSetting('hatcherySort').value, Settings.getSetting('hatcherySortDirection').value))
-            .filter(p => srBot.visible(p)());
+            .filter(p => p.isHatchable());
 
         const max = Settings.getSetting('maxEggs').value - 1;
         while (filteredEggList.length && App.game.breeding.eggList[max]().type < 0) {
@@ -154,7 +191,7 @@ srBot.wasWaiting = false;
 srBot.hatch = function () {
     const egg = App.game.breeding.eggList[0]();
     if (egg.type < 0) {
-        return  localSettings().state = 0;
+        return localSettings().state = 0;
     }
 
     const shiny = App.game.party.alreadyCaughtPokemonByName(egg.pokemon, true);
@@ -174,7 +211,7 @@ srBot.hatch = function () {
         App.game.breeding.hatchPokemonEgg(0);
     }
 
-    localLocal[6][1] = egg.pokemon;
+    localLocal[5][1] = egg.pokemon;
     return srBot.log(egg.pokemon);
 };
 
@@ -194,11 +231,11 @@ srBot.log = function (pokeName, ...msgs) {
     });
 
     if (shiny) {
-        localLocal[6] = [,'', 0];
+        localLocal[5] = [, '', 0];
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         Save.store(player);
     } else {
-        localLocal[6][2] = ++srCount;
+        localLocal[5][2] = ++srCount;
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         clearInterval(srBot.interval); // safe guard in case off lag.
         location.reload();
