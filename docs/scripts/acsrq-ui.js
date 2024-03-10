@@ -47,6 +47,7 @@ Settings.add(
   new BooleanSetting("noWander", "Hide normal Wander log entries", false)
 );
 Settings.add(new BooleanSetting("showShiny", "Show needed shinies", false));
+Settings.add(new BooleanSetting('showPokerus', 'Show needed pokérus resisted', false));
 Settings.add(
   new BooleanSetting("showLoot", "Show possible dungeon loot", false)
 );
@@ -73,6 +74,7 @@ Settings.add(
       new SettingOption("None", "dungOptN"),
       new SettingOption("Clears", "dungOptC"),
       new SettingOption("Shiny Check", "dungOptSC"),
+      new SettingOption("Pokérus Check", "dungOptPC"),
       new SettingOption("Dungeon Tokens Left", "dungOptDT"),
     ],
     "dungOptN"
@@ -579,6 +581,7 @@ acsrqSettings = function () {
       acsrqSettings.Template("BooleanSettingTemplate", "hideNoti"),
       acsrqSettings.Template("BooleanSettingTemplate", "showLoot"),
       acsrqSettings.Template("BooleanSettingTemplate", "showShiny"),
+      acsrqSettings.Template('BooleanSettingTemplate', 'showPokerus'),
       acsrqSettings.Template("BooleanSettingTemplate", "noWander"),
     ]),
     acsrqSettings.Section("Phases", [
@@ -769,7 +772,7 @@ acsrqFooter = function () {
   $("#battleContainer")[0].insertAdjacentHTML(
     "beforeend",
     `
-        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot() || acsrqFooter.showShiny()">
+        <div class="card-footer p-0" data-bind="visible: acsrqFooter.showLoot() || acsrqFooter.showShiny() || acsrqFooter.showPokerus()">
             <table width="100%" class="table table-sm m-0">
                 <colgroup>
                     <col width="40%">
@@ -782,6 +785,10 @@ acsrqFooter = function () {
                     <tr data-bind="visible: acsrqFooter.showShiny">
                         <td>Needed Shiny</td>
                         <td data-bind="html: acsrqFooter.missingShinies"></td>
+                    </tr>
+                    <tr data-bind="visible: acsrqFooter.showPokerus">
+                        <td>Needed Pokérus</td>
+                        <td data-bind="html: acsrqFooter.missingPokerus"></td>
                     </tr>
                 </tbody>
             </table>
@@ -809,6 +816,19 @@ acsrqFooter.showShiny = ko.pureComputed(
             content.items.some((item) => item instanceof PokemonItem)
         )) //does town have shop
 );
+acsrqFooter.showPokerus = ko.pureComputed(
+    () =>
+      Settings.getSetting("showPokerus").observableValue() &&
+      (player?.route() || //is route
+        player?.town()?.dungeon || //is dungeon
+        player
+          .town()
+          .content.some(
+            (content) =>
+              content instanceof Shop &&
+              content.items.some((item) => item instanceof PokemonItem)
+          )) //does town have shop
+  );
 
 acsrqFooter.missingLoot = ko.pureComputed(() => {
   const dungeon = player.town().dungeon;
@@ -894,6 +914,78 @@ acsrqFooter.missingShinies = ko.pureComputed(() => {
 
   return missing.length ? [...new Set(missing)].join(", ") : "N/A";
 });
+
+acsrqFooter.missingPokerus = ko.pureComputed(() => {
+    let isResisted = (pokemon) => ((_a = App.game.party.getPokemonByName(pokemon)) === null || _a === void 0 ? void 0 : _a.pokerus) == 3;
+
+    const town = player.town();
+    const route = player.route();
+    const shops = town.content.filter(
+      (c) => c instanceof Shop && c.items.some((i) => i instanceof PokemonItem)
+    );
+    let missing = [];
+
+    if (route) {
+      //Route poke
+      const poke = RouteHelper.getAvailablePokemonList(route, player.region);
+      missing.push(
+        ...poke
+          .filter((p) => !isResisted(p))
+          .sort()
+      );
+    } else {
+      if (shops.length) {
+        //Shop poke
+        missing.push(
+          ...shops
+            .map(({ items }) =>
+              items
+                .filter(
+                  (i) =>
+                    i instanceof PokemonItem &&
+                    !isResisted(i.name)
+                )
+                .map(({ name }) => name)
+            )
+            .flat()
+        );
+      }
+      if (town.dungeon) {
+        //Dungeon poke
+        const poke = town.dungeon.allAvailablePokemon();
+        missing.push(
+          ...poke.filter(
+            (p) => !isResisted(p)
+          )
+        );
+
+        for (let key in town.dungeon.lootTable) {
+          for (let { loot } of town.dungeon.lootTable[key]) {
+            if (
+              PokemonHelper.getPokemonByName(loot).id &&
+              !isResisted(loot)
+            ) {
+              missing.push(
+                `<span style="line-height: normal; color:#D4AC0D;">${loot}</span>`
+              );
+            }
+          }
+        }
+
+        missing.sort((a, b) => {
+          if (a.startsWith("<")) {
+            a = a.replace(/<[^\>]*>/g, "");
+          }
+          if (b.startsWith("<")) {
+            b = b.replace(/<[^\>]*>/g, "");
+          }
+          return a.localeCompare(b);
+        });
+      }
+    }
+
+    return missing.length ? [...new Set(missing)].join(", ") : "N/A";
+  });
 
 //#endregion
 //#region Phase

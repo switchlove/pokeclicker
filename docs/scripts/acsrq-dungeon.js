@@ -106,6 +106,8 @@ dungeonBot.isRunning = ko.pureComputed(() => {
     switch (Settings.getSetting('dungeOpts').observableValue()) {
         case 'dungOptSC':
             return !DungeonRunner.dungeonCompleted(player.town().dungeon, true);
+        case 'dungOptPC':
+            return RouteHelper.minPokerus(player.town().dungeon.allAvailablePokemon()) < 3;
         case 'dungOptC':
             return App.game.statistics.dungeonsCleared[GameConstants.getDungeonIndex(player.town().dungeon.name)]() < Settings.getSetting('maxClears').observableValue();
         case 'dungOptDT':
