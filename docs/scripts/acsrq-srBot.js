@@ -129,16 +129,35 @@ srBot.mys = function () {
     if (ItemList.Mystery_egg.getCaughtStatus() == CaughtStatus.CaughtShiny) {
         return;
     }
-
-    if (App.game.breeding.eggList[0]().type < 0 && player.itemList.Mystery_egg() > 0) {
-        ItemList.Mystery_egg.use();
-        if (App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[0]().pokemon, true)) {
-            console.log(`Already have - ${App.game.breeding.eggList[0]().pokemon} - Shiny: ${true}`);
-            localSettings({ ...localSettings(), key: Save.key });
-            sessionStorage.setItem('reload', true);
-            return location.reload();
-        }
-    }
+	
+	for (let i = 0; i < App.game.breeding.eggSlots; i++) {
+		// don't try to add more eggs to the hatchery then there are available egg pokemon left for it
+		if (srBot.checkEggsRemaining() <= i + 1) {
+			break;
+		}
+		
+		if (App.game.breeding.eggList[i]().type < 0 && player.itemList.Mystery_egg() > 0) {
+			ItemList.Mystery_egg.use();
+			if (App.game.party.alreadyCaughtPokemonByName(App.game.breeding.eggList[i]().pokemon, true)) {
+				console.log(`Already have - ${App.game.breeding.eggList[i]().pokemon} - Shiny: ${true}`);
+				localSettings({ ...localSettings(), key: Save.key });
+				sessionStorage.setItem('reload', true);
+				return location.reload();
+			}
+			// check if the egg poke already is in the hatchery as egg
+			for (let j = 0; j < i; j++) {
+				if(App.game.breeding.eggList[j]().pokemon === App.game.breeding.eggList[i]().pokemon) {
+					console.log(`Already trying to hatch - ${App.game.breeding.eggList[i]().pokemon}`);
+					localSettings({ ...localSettings(), key: Save.key });
+					sessionStorage.setItem('reload', true);
+					return location.reload();
+				}
+			}
+			// store the added egg
+			Save.store(player);
+			return;
+		}
+	}
 
     return srBot.hatch();
 };
@@ -188,32 +207,65 @@ srBot.egg = function () {
     return srBot.hatch();
 };
 
+/** Helper function to get the number of remaining possible pokemon from an egg type (or all if mystery egg) */
+srBot.checkEggsRemaining = function () (type = GameConstants.EggItemType.Mystery_egg) {
+        let possiblePokes = [];
+        if(type !== GameConstants.EggItemType.Mystery_egg) {
+            possiblePokes = App.game.breeding.hatchList[type][player.region];
+        } else {
+            possiblePokes = App.game.breeding.hatchList[GameConstants.EggItemType.Fire_egg][player.region].concat(
+                App.game.breeding.hatchList[GameConstants.EggItemType.Water_egg][player.region],
+                App.game.breeding.hatchList[GameConstants.EggItemType.Grass_egg][player.region],
+                App.game.breeding.hatchList[GameConstants.EggItemType.Fighting_egg][player.region],
+                App.game.breeding.hatchList[GameConstants.EggItemType.Electric_egg][player.region],
+                App.game.breeding.hatchList[GameConstants.EggItemType.Dragon_egg][player.region],
+				// GameConstants.EggItemType.Pokemon_egg is not added here, since it is not in the lists
+                App.game.breeding.hatchList[GameConstants.EggItemType.Mystery_egg][player.region]
+            );
+        }
+        let result = 0;
+        for(let i = 0; i < possiblePokes.length; i++) {
+            if(!App.game.party.alreadyCaughtPokemonByName(possiblePokes[i], true)) {
+                result++;
+            }
+        }
+        return result;
+    }
+
 srBot.wasWaiting = false;
 srBot.hatch = function () {
-    const egg = App.game.breeding.eggList[0]();
-    if (egg.type < 0) {
-        return  localSettings().state = 0;
-    }
+	// hatch in reverse order since eggs move up on hatch
+	for (let i = App.game.breeding.eggSlots - 1; i >= 0; i--) {
+		const egg = App.game.breeding.eggList[i]();
+		if (egg.type < 0) {
+			
+			// unsure what to do with this, since it is looping at this point
+			localSettings().state = 0;
+			
+			continue;
+		};
 
-    const shiny = App.game.party.alreadyCaughtPokemonByName(egg.pokemon, true);
-    if (egg.steps() < egg.totalSteps) {
-        srBot.wasWaiting = true;
-        console.log(`Waiting for steps - ${egg.pokemon} - Shiny: ${shiny}`);
-        return;
-    }
-
-    if (srBot.wasWaiting) {
-        Save.store(player);
-    }
-
-    localSettings().state = 1;
-    console.log(`Hatching - ${egg.pokemon} - Shiny: ${shiny}`);
-    while (App.game.breeding.eggList[0]().pokemon == egg.pokemon) {
-        App.game.breeding.hatchPokemonEgg(0);
-    }
-
-    localLocal[5][1] = egg.pokemon;
-    return srBot.log(egg.pokemon);
+		const shiny = App.game.party.alreadyCaughtPokemonByName(egg.pokemon, true);
+		if (egg.steps() < egg.totalSteps) {
+			console.log(`Waiting for steps - ${egg.pokemon} - Shiny: ${shiny}`);
+			Save.store(player);
+			continue;
+		}
+		
+		// unsure what to do with this, since it is looping at this point
+		localSettings().state = 1;
+		
+		console.log(`Hatching - ${egg.pokemon} - Shiny: ${shiny}`);
+		App.game.breeding.hatchPokemonEgg(i);
+		
+		// unsure what to set this to if it loops multiple eggs
+		localLocal[5][1] = egg.pokemon;
+		
+		if (srBot.log(egg.pokemon)) {
+			// this case happens if a reload has to be done inside
+			return;
+		}
+	}
 };
 
 srBot.log = function (pokeName, ...msgs) {
@@ -240,5 +292,6 @@ srBot.log = function (pokeName, ...msgs) {
         localStorage.setItem(saveKey, JSON.stringify(localLocal));
         clearInterval(srBot.interval); // safe guard in case off lag.
         location.reload();
+		return true;
     }
 };
