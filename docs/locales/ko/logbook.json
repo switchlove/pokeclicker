@@ -1,17 +1,4 @@
 {
-  "type": {
-    "NEW": "",
-    "SHINY": "",
-    "CAUGHT": "",
-    "ESCAPED": "",
-    "ROAMER": "",
-    "ACHIEVE": "",
-    "QUEST": "",
-    "FOUND": "",
-    "FRONTIER": "",
-    "WANDER": "",
-    "OTHER": ""
-  },
   "earnedAchievement": "",
   "escapedShiny": "",
   "escapedShinyDupe": "",
@@ -38,7 +25,6 @@
   "capturedShiny": "",
   "capturedShinyDupe": "",
   "enemyDrop": "",
-  "capturedShadow": "",
   "roamer": "",
   "roamerShiny": "",
   "roamerShinyDupe": "",
