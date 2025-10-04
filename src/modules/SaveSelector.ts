@@ -120,7 +120,17 @@ export default class SaveSelector {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.log(`[${formatDate(new Date())}] %cFailed to load save:`, 'color:#e74c3c;font-weight:900;', key, e);
-            return document.createElement('div');
+            const card = document.createElement('div');
+            card.className = 'trainer-card col-md-4 col-sm-6 col-12';
+            card.dataset.key = key;
+            card.innerHTML = `<div class="card trainer-card-container">
+                <div class="card-body">
+                    <h5 class="card-title">Corrupted</h5>
+                    <p>This save file is corrupted and cannot be loaded.</p>
+                    <a class="btn btn-danger" href="#" onclick="Save.key = '${key}'; Save.delete();">Delete</a>
+                </div>
+            </div>`;
+            return card;
         }
     }
 
