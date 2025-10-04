@@ -1,0 +1,9 @@
+{
+    "version": "0.0.9",
+    "files": [
+        "scripts/randomizer.js",
+        "scripts/modules.min.js",
+        "scripts/script.min.js",
+        "index.html"
+    ]
+}
