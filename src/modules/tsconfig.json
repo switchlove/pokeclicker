@@ -4,7 +4,7 @@
       "vitest/globals",
       "jquery",
       "knockout",
-      "bootstrap",
+      "bootstrap"
     ],
     "lib": ["dom", "es2019"],
     "skipLibCheck": true,
