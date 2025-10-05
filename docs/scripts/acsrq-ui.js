@@ -611,7 +611,7 @@ window.addEventListener('load', () => {
         Settings.getSetting('botstate.sr').observableValue.subscribe((value) => {
             clickEngagedSR = +value;
             if (!value) {
-                localSettings({key:'', state: 0});
+                a6localSettings({key:'', state: 0});
             } else {
                 Settings.setSettingByName('disableSave', true);
             }

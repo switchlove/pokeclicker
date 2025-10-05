@@ -50,16 +50,17 @@ window.addEventListener('load', () => {
     }, 1000);
 
     //#region PreventAutoSave
-    Game.prototype.save = function () {
+    /*Game.prototype.save = function () {
         player._lastSeen = Date.now();
         if (!Settings.getSetting('disableSave').value) {
             Save.store(player);
         }
-    };
+    };*/
     //#endregion
 
     setInterval(() => {
-        if (Settings.getSetting('noWander').observableValue() == true) {
+        const noWanderSetting = Settings.getSetting('noWander');
+        if (noWanderSetting && noWanderSetting.observableValue() == true) {
             var wanLog = [];
             for (var x = 0; x < App.game.logbook.logs().length; x++) {
                 if (App.game.logbook.logs()[x].description().includes('wandered')) {
@@ -91,6 +92,10 @@ window.addEventListener('load', () => {
 });
 
 function main() {
+    if (App.game && App.game.gameState === GameConstants.GameState.fighting) {
+        return;
+    }
+
     var CharCard = document.querySelector('#saveSelector > div > div.mb-3.col-lg-4.col-md-6.col-sm-12.xol-xs-12 > div');
     if (CharCard == null && App.game != undefined) {
         a6save();
@@ -107,7 +112,7 @@ function main() {
     } else {
         if (localSettings().state || !!sessionStorage.getItem('reload')) {
             Game.prototype.computeOfflineEarnings = () => { };
-            $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
+            // $(`.clickable[data-key="${localSettings().key}"]`)[0]?.click();
         }
     }
 }

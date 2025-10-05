@@ -27,7 +27,9 @@ Profile.getTrainerCard = function (...args) {
     if (vanilla.every(([_,v]) => v)) {
         const badgeContainer = card.querySelector('.challenge-badges');
         for (let i = 0; i < vanilla.length; i++) {
-            badgeContainer.removeChild(badgeContainer.children[0]);
+            if (badgeContainer.children[0]) {
+                badgeContainer.removeChild(badgeContainer.children[0]);
+            }
         }
         const img = document.createElement('img');
         img.onerror = () => img.remove();
