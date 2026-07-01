@@ -1,10 +1,42 @@
 <!DOCTYPE html>
 <html lang="en" translate="no">
 <head>
-    <title>PokéClicker</title>
+    <title>PokéClicker - ACSRQ</title>
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta charset="utf-8"/>
+    <meta name="description" content="ACSRQ — a PokéClicker fork with custom automation bots, challenges, and quality-of-life features.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PokéClicker - ACSRQ">
+    <meta property="og:description" content="A PokéClicker fork with custom automation bots, challenges, and quality-of-life features.">
+    <meta property="og:url" content="https://acsrq.app/game/">
+    <meta property="og:image" content="https://acsrq.app/game/assets/images/favicon.ico">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="PokéClicker - ACSRQ">
+    <meta name="twitter:description" content="A PokéClicker fork with custom automation bots, challenges, and quality-of-life features.">
+
+    <meta name="application-name" content="PokéClicker - ACSRQ"/>
+    <meta name="msapplication-TileColor" content="#FFFFFF" />
+    <meta name="msapplication-TileImage" content="assets/images/mstile-144x144.png" />
+    <meta name="msapplication-square70x70logo" content="assets/images/mstile-70x70.png" />
+    <meta name="msapplication-square150x150logo" content="assets/images/mstile-150x150.png" />
+    <meta name="msapplication-wide310x150logo" content="assets/images/mstile-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="assets/images/mstile-310x310.png" />
+
     <link href="assets/images/favicon.ico" rel="icon" type="image/x-icon"/>
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="assets/images/apple-touch-icon-57x57.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/images/apple-touch-icon-114x114.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/images/apple-touch-icon-72x72.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/images/apple-touch-icon-144x144.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="60x60" href="assets/images/apple-touch-icon-60x60.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="assets/images/apple-touch-icon-120x120.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/images/apple-touch-icon-76x76.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="assets/images/apple-touch-icon-152x152.png" />
+    <link rel="icon" type="image/png" href="assets/images/favicon-196x196.png" sizes="196x196" />
+    <link rel="icon" type="image/png" href="assets/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="assets/images/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="assets/images/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="assets/images/favicon-128.png" sizes="128x128" />
+
     <script>window.featureFlags = {};</script>
 
     <!--jQuery-->
@@ -21,6 +53,20 @@
 
     <!--Minified scripts-->
     <script src="scripts/script.min.js?v=0.10.25"></script>
+
+    <!--ACSRQ-->
+    <script src="scripts/acsrq.js"></script>
+    <script src="scripts/acsrq-ui.js"></script>
+    <script src="scripts/acsrq-bots/srBot.js"></script>
+    <script src="scripts/acsrq-bots/dungeonBot.js"></script>
+    <script src="scripts/acsrq-bots/safariBot.js"></script>
+    <script src="scripts/acsrq-bots/gymBot.js"></script>
+    <script src="scripts/acsrq-bots/bfBot.js"></script>
+    <script src="scripts/acsrq-bots/farmBot.js"></script>
+    <script src="scripts/acsrq-bots/breedingBot.js"></script>
+    <script src="scripts/acsrq-bots/ballBot.js"></script>
+    <script src="scripts/acsrq-bots/boostedRouteBot.js"></script>
+    <script src="scripts/acsrq-challenges/index.js" type="module"></script>
 
     <!--Popper.js-->
     <script src="libs/popper.min.js"></script>
@@ -116,17 +162,17 @@
         </div>
         <div class="col-12 d-flex align-items-center justify-content-center my-3 flex-column flex-md-row">
             <a class="mb-1 mr-md-1" href="https://discord.gg/a6DFe4p" target="_blank">
-                <img alt="Join our Discord!" src="https://img.shields.io/discord/450412847017754644?color=7289DA&label=Discord&logo=discord&logoColor=7289DA&style=for-the-badge">
+                <img alt="Join our Discord!" src="https://img.shields.io/discord/867017886399725599?color=7289DA&label=Discord&logo=discord&logoColor=7289DA&style=for-the-badge">
             </a>
-            <a class="mb-1 mr-md-1" href="https://github.com/pokeclicker/pokeclicker" target="_blank">
-                <img alt="Visit our GitHub!" src="https://img.shields.io/github/package-json/v/pokeclicker/pokeclicker/master?label=GitHub&logo=github&style=for-the-badge">
+            <a class="mb-1 mr-md-1" href="https://github.com/switchlove/pokeclicker" target="_blank">
+                <img alt="Visit our GitHub!" src="https://img.shields.io/github/package-json/v/switchlove/pokeclicker/acsrq?label=GitHub&logo=github&style=for-the-badge">
             </a>
-            <a class="mb-1 mr-md-1" href="https://wiki.pokeclicker.com/" target="_blank">
-                <img alt="Check out the Wiki!" src="https://img.shields.io/badge/wiki-link-blue?logo=wikimedia-commons&style=for-the-badge">
+            <a class="mb-1 mr-md-1" href="https://leaderboard.acsrq.app/" target="_blank">
+                <img alt="Checkout the Leaderboard!" src="https://img.shields.io/badge/leaderboard-link-blue?logo=lunacy&style=for-the-badge">
             </a>
         </div>
         <div id="use-our-client-message" style="color: white; display: none; font-size: .875em;">
-            Play offline & improve performance by downloading our desktop client <b><a href="https://github.com/RedSparr0w/Pokeclicker-desktop/releases/latest" target="_blank">here</a></b>.
+            Play offline & improve performance by downloading our desktop client <b><a href="https://discord.com/channels/867017886399725599/871562954917687328" target="_blank">here</a></b>.
             You can even find a Pokémon exclusive to the client when you reach the Sevii Islands!<br/><br/>
         </div>
         <div class="save-container justify-content-center container row"></div>
@@ -1497,7 +1543,7 @@ selectAllClick - (Optional) Function called when the Select All button is clicke
 <div id="game" class="container loading" data-bind="css: {'container': Settings.getSetting('gameDisplayStyle').observableValue() === 'standard3', 'container-fluid': Settings.getSetting('gameDisplayStyle').observableValue() !== 'standard3'}">
     <div class="row justify-content-center">
         <!--The id title is needed for a default marker for money animation to display when not in a wild battle where the playerMoney span is not visible-->
-        <h1 id="gameTitle">PokéClicker</h1>
+        <h1 id="gameTitle">PokéClicker - ACSRQ</h1>
     </div>
     <div class="row justify-content-lg-center" style="text-align: center">
 
@@ -48071,6 +48117,7 @@ aria-labelledby="AchievementsModalLabel" aria-hidden="true">
                                 <tr data-bind="template: { name: 'KeyChoiceSettingTemplate', data: Settings.getSetting('hotkey.oakItems')}"></tr>
                                 <tr data-bind="template: { name: 'KeyChoiceSettingTemplate', data: Settings.getSetting('hotkey.pokeballSelection')}"></tr>
                                 <tr data-bind="template: { name: 'KeyChoiceSettingTemplate', data: Settings.getSetting('hotkey.dailyQuests')}"></tr>
+                                <tr data-bind="template: { name: 'KeyChoiceSettingTemplate', data: Settings.getSetting('hotkey.ship')}"></tr>
                                 <!-- ko if: Settings.getSetting('hotkey.castformApp').isUnlocked() -->
                                 <tr data-bind="template: { name: 'KeyChoiceSettingTemplate', data: Settings.getSetting('hotkey.castformApp')}"></tr>
                                 <!-- /ko -->
@@ -49071,13 +49118,13 @@ aria-labelledby="AchievementsModalLabel" aria-hidden="true">
 
             <div class="modal-body text-left">
                 <p><h5 class="text-primary"><strong>Discord:</strong></h5></p>
-                <span class="text-muted">Join the Discord server to join the conversation: <a href="https://discord.gg/a6DFe4p" target="_blank">https://discord.gg/a6DFe4p</a></span>
+                <span class="text-muted">Join the Discord server to join the conversation: <a href="https://discord.gg/gS2pp3jUKs" target="_blank">https://discord.gg/gS2pp3jUKs</a></span>
 
                 <p><h5 class="text-primary"><strong>Github:</strong></h5></p>
-                <span class="text-muted">Help make Pokeclicker even better! Contribute to the project by sharing your ideas on our Github: <a href="https://github.com/pokeclicker/pokeclicker" target="_blank">https://github.com/pokeclicker/pokeclicker</a></span>
+                <span class="text-muted">Help make Pokeclicker even better! Contribute to the project by sharing your ideas on our Github: <a href="https://github.com/switchlove/pokeclicker" target="_blank">https://github.com/pokeclicker/pokeclicker</a></span>
 
-                <p><h5 class="text-primary"><strong>Subreddit:</strong></h5></p>
-                <span class="text-muted">Check out some of the trending posts from the PokéClicker community: <a href="https://www.reddit.com/r/PokeClicker/" target="_blank">https://www.reddit.com/r/PokeClicker/</a></span>
+                <p><h5 class="text-primary"><strong>Leaderboard:</strong></h5></p>
+                <span class="text-muted">Check out our leaderboard: <a href="https://leaderboard.acsrq.app/" target="_blank">https://leaderboard.acsrq.app/</a></span>
 
                 <p><h5 class="text-primary"><strong>Wiki:</strong></h5></p>
                 <span class="text-muted">Check out the community wiki to learn more information about PokéClicker: <a href="https://wiki.pokeclicker.com/" target="_blank">https://wiki.pokeclicker.com/</a></span>
