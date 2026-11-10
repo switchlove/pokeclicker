@@ -63,7 +63,8 @@ echo "[deploy] Deployed $(wc -l < "$GAME/.deploy-manifest") files to $GAME"
 // The tar stream uses ssh's stdin, so the script travels base64-encoded in the
 // command line (safe through Windows argument quoting) and is decoded remotely.
 const shq = (s) => `'${String(s).replace(/'/g, '\'\\\'\'')}'`;
-const b64 = Buffer.from(remoteScript).toString('base64');
+// Strip \r so a CRLF checkout (core.autocrlf) can't break the remote bash script.
+const b64 = Buffer.from(remoteScript.replace(/\r/g, '')).toString('base64');
 const remoteCmd = `bash -c "$(echo ${b64} | base64 -d)" deploy ${shq(deploy.PATH)} ${shq(deploy.BACKUP)}`;
 
 console.log(`[deploy] Uploading v${version} build to ${deploy.HOST}:${deploy.PATH}`);
